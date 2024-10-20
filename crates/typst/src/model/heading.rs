@@ -3,14 +3,18 @@ use std::num::NonZeroUsize;
 use crate::diag::SourceResult;
 use crate::engine::Engine;
 use crate::foundations::{
-    elem, Content, NativeElement, Packed, Show, ShowSet, Smart, StyleChain, Styles,
-    Synthesize,
+    elem, Content, NativeElement, Packed, Resolve, Show, ShowSet, Smart, StyleChain,
+    Styles, Synthesize,
 };
-use crate::introspection::{Count, Counter, CounterUpdate, Locatable};
-use crate::layout::{BlockElem, Em, HElem, VElem};
-use crate::model::{Numbering, Outlinable, Refable, Supplement};
-use crate::text::{FontWeight, Lang, LocalName, Region, SpaceElem, TextElem, TextSize};
-use crate::util::{option_eq, NonZeroExt};
+use crate::introspection::{
+    Count, Counter, CounterUpdate, Locatable, Locator, LocatorLink,
+};
+use crate::layout::{
+    layout_frame, Abs, Axes, BlockBody, BlockElem, Em, HElem, Length, Region,
+};
+use crate::model::{Numbering, Outlinable, ParElem, Refable, Supplement};
+use crate::text::{FontWeight, LocalName, SpaceElem, TextElem, TextSize};
+use crate::utils::NonZeroExt;
 
 /// A section heading.
 ///
@@ -163,6 +167,18 @@ pub struct HeadingElem {
     #[default(Smart::Auto)]
     pub bookmarked: Smart<bool>,
 
+    /// The indent all but the first line of a heading should have.
+    ///
+    /// The default value of `{auto}` indicates that the subsequent heading
+    /// lines will be indented based on the width of the numbering.
+    ///
+    /// ```example
+    /// #set heading(numbering: "1.")
+    /// #heading[A very, very, very, very, very, very long heading]
+    /// ```
+    #[default(Smart::Auto)]
+    pub hanging_indent: Smart<Length>,
+
     /// The heading's title.
     #[required]
     pub body: Content,
@@ -201,16 +217,49 @@ impl Synthesize for Packed<HeadingElem> {
 impl Show for Packed<HeadingElem> {
     #[typst_macros::time(name = "heading", span = self.span())]
     fn show(&self, engine: &mut Engine, styles: StyleChain) -> SourceResult<Content> {
+        const SPACING_TO_NUMBERING: Em = Em::new(0.3);
+
         let span = self.span();
         let mut realized = self.body().clone();
+
+        let hanging_indent = self.hanging_indent(styles);
+        let mut indent = match hanging_indent {
+            Smart::Custom(length) => length.resolve(styles),
+            Smart::Auto => Abs::zero(),
+        };
+
         if let Some(numbering) = (**self).numbering(styles).as_ref() {
-            realized = Counter::of(HeadingElem::elem())
-                .display_at_loc(engine, self.location().unwrap(), styles, numbering)?
-                .spanned(span)
-                + HElem::new(Em::new(0.3).into()).with_weak(true).pack()
+            let location = self.location().unwrap();
+            let numbering = Counter::of(HeadingElem::elem())
+                .display_at_loc(engine, location, styles, numbering)?
+                .spanned(span);
+
+            if hanging_indent.is_auto() {
+                let pod = Region::new(Axes::splat(Abs::inf()), Axes::splat(false));
+
+                // We don't have a locator for the numbering here, so we just
+                // use the measurement infrastructure for now.
+                let link = LocatorLink::measure(location);
+                let size =
+                    layout_frame(engine, &numbering, Locator::link(&link), styles, pod)?
+                        .size();
+
+                indent = size.x + SPACING_TO_NUMBERING.resolve(styles);
+            }
+
+            realized = numbering
+                + HElem::new(SPACING_TO_NUMBERING.into()).with_weak(true).pack()
                 + realized;
         }
-        Ok(BlockElem::new().with_body(Some(realized)).pack().spanned(span))
+
+        if indent != Abs::zero() {
+            realized = realized.styled(ParElem::set_hanging_indent(indent.into()));
+        }
+
+        Ok(BlockElem::new()
+            .with_body(Some(BlockBody::Content(realized)))
+            .pack()
+            .spanned(span))
     }
 }
 
@@ -230,8 +279,8 @@ impl ShowSet for Packed<HeadingElem> {
         let mut out = Styles::new();
         out.set(TextElem::set_size(TextSize(size.into())));
         out.set(TextElem::set_weight(FontWeight::BOLD));
-        out.set(BlockElem::set_above(VElem::block_around(above.into())));
-        out.set(BlockElem::set_below(VElem::block_around(below.into())));
+        out.set(BlockElem::set_above(Smart::Custom(above.into())));
+        out.set(BlockElem::set_below(Smart::Custom(below.into())));
         out.set(BlockElem::set_sticky(true));
         out
     }
@@ -282,7 +331,7 @@ impl Outlinable for Packed<HeadingElem> {
                 styles,
                 numbering,
             )?;
-            content = numbers + SpaceElem::new().pack() + content;
+            content = numbers + SpaceElem::shared().clone() + content;
         };
 
         Ok(Some(content))
@@ -294,40 +343,5 @@ impl Outlinable for Packed<HeadingElem> {
 }
 
 impl LocalName for Packed<HeadingElem> {
-    fn local_name(lang: Lang, region: Option<Region>) -> &'static str {
-        match lang {
-            Lang::ALBANIAN => "Kapitull",
-            Lang::ARABIC => "الفصل",
-            Lang::BOKMÅL => "Kapittel",
-            Lang::CATALAN => "Secció",
-            Lang::CHINESE if option_eq(region, "TW") => "小節",
-            Lang::CHINESE => "小节",
-            Lang::CZECH => "Kapitola",
-            Lang::DANISH => "Afsnit",
-            Lang::DUTCH => "Hoofdstuk",
-            Lang::ESTONIAN => "Peatükk",
-            Lang::FILIPINO => "Seksyon",
-            Lang::FINNISH => "Osio",
-            Lang::FRENCH => "Chapitre",
-            Lang::GERMAN => "Abschnitt",
-            Lang::GREEK => "Κεφάλαιο",
-            Lang::HUNGARIAN => "Fejezet",
-            Lang::ITALIAN => "Sezione",
-            Lang::NYNORSK => "Kapittel",
-            Lang::POLISH => "Sekcja",
-            Lang::PORTUGUESE if option_eq(region, "PT") => "Secção",
-            Lang::PORTUGUESE => "Seção",
-            Lang::ROMANIAN => "Secțiunea",
-            Lang::RUSSIAN => "Раздел",
-            Lang::SERBIAN => "Поглавље",
-            Lang::SLOVENIAN => "Poglavje",
-            Lang::SPANISH => "Sección",
-            Lang::SWEDISH => "Kapitel",
-            Lang::TURKISH => "Bölüm",
-            Lang::UKRAINIAN => "Розділ",
-            Lang::VIETNAMESE => "Phần", // TODO: This may be wrong.
-            Lang::JAPANESE => "節",
-            Lang::ENGLISH | _ => "Section",
-        }
-    }
+    const KEY: &'static str = "heading";
 }

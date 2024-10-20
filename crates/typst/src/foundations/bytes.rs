@@ -8,7 +8,7 @@ use serde::{Serialize, Serializer};
 
 use crate::diag::{bail, StrResult};
 use crate::foundations::{cast, func, scope, ty, Array, Reflect, Repr, Str, Value};
-use crate::util::LazyHash;
+use crate::utils::LazyHash;
 
 /// A sequence of bytes.
 ///
@@ -127,7 +127,7 @@ impl Bytes {
             .ok_or_else(|| out_of_bounds_no_default(index, self.len()))
     }
 
-    /// Extracts a subslice of the bytes. Fails with an error if the start or
+    /// Extracts a subslice of the bytes. Fails with an error if the start or end
     /// index is out of bounds.
     #[func]
     pub fn slice(

@@ -6,13 +6,16 @@ use ttf_parser::{GlyphId, Rect};
 use unicode_math_class::MathClass;
 
 use crate::foundations::StyleChain;
-use crate::introspection::{Meta, MetaElem};
-use crate::layout::{Abs, Corner, Em, Frame, FrameItem, Point, Size};
+use crate::introspection::Tag;
+use crate::layout::{
+    Abs, Corner, Em, Frame, FrameItem, HideElem, Point, Size, VAlignment,
+};
 use crate::math::{
     scaled_font_size, EquationElem, Limits, MathContext, MathSize, Scaled,
 };
+use crate::model::{Destination, LinkElem};
 use crate::syntax::Span;
-use crate::text::{Font, Glyph, Lang, TextElem, TextItem};
+use crate::text::{Font, Glyph, Lang, Region, TextElem, TextItem};
 use crate::visualize::Paint;
 
 #[derive(Debug, Clone)]
@@ -20,10 +23,11 @@ pub enum MathFragment {
     Glyph(GlyphFragment),
     Variant(VariantFragment),
     Frame(FrameFragment),
-    Spacing(SpacingFragment),
+    Spacing(Abs, bool),
     Space(Abs),
     Linebreak,
     Align,
+    Tag(Tag),
 }
 
 impl MathFragment {
@@ -36,7 +40,7 @@ impl MathFragment {
             Self::Glyph(glyph) => glyph.width,
             Self::Variant(variant) => variant.frame.width(),
             Self::Frame(fragment) => fragment.frame.width(),
-            Self::Spacing(spacing) => spacing.width,
+            Self::Spacing(amount, _) => *amount,
             Self::Space(amount) => *amount,
             _ => Abs::zero(),
         }
@@ -69,15 +73,24 @@ impl MathFragment {
         }
     }
 
+    pub fn is_ignorant(&self) -> bool {
+        match self {
+            Self::Frame(fragment) => fragment.ignorant,
+            Self::Tag(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn class(&self) -> MathClass {
         match self {
             Self::Glyph(glyph) => glyph.class,
             Self::Variant(variant) => variant.class,
             Self::Frame(fragment) => fragment.class,
-            Self::Spacing(_) => MathClass::Space,
+            Self::Spacing(_, _) => MathClass::Space,
             Self::Space(_) => MathClass::Space,
             Self::Linebreak => MathClass::Space,
             Self::Align => MathClass::Special,
+            Self::Tag(_) => MathClass::Special,
         }
     }
 
@@ -118,17 +131,18 @@ impl MathFragment {
     }
 
     pub fn is_spaced(&self) -> bool {
-        self.class() == MathClass::Fence
-            || match self {
-                MathFragment::Frame(frame) => {
-                    frame.spaced
-                        && matches!(
-                            frame.class,
-                            MathClass::Normal | MathClass::Alphabetic
-                        )
-                }
-                _ => false,
-            }
+        if self.class() == MathClass::Fence {
+            return true;
+        }
+
+        matches!(
+            self,
+            MathFragment::Frame(FrameFragment {
+                spaced: true,
+                class: MathClass::Normal | MathClass::Alphabetic,
+                ..
+            })
+        )
     }
 
     pub fn is_text_like(&self) -> bool {
@@ -162,6 +176,11 @@ impl MathFragment {
             Self::Glyph(glyph) => glyph.into_frame(),
             Self::Variant(variant) => variant.frame,
             Self::Frame(fragment) => fragment.frame,
+            Self::Tag(tag) => {
+                let mut frame = Frame::soft(Size::zero());
+                frame.push(Point::zero(), FrameItem::Tag(tag));
+                frame
+            }
             _ => Frame::soft(self.size()),
         }
     }
@@ -172,6 +191,18 @@ impl MathFragment {
             MathFragment::Variant(variant) => variant.limits,
             MathFragment::Frame(fragment) => fragment.limits,
             _ => Limits::Never,
+        }
+    }
+
+    /// If no kern table is provided for a corner, a kerning amount of zero is
+    /// assumed.
+    pub fn kern_at_height(&self, ctx: &MathContext, corner: Corner, height: Abs) -> Abs {
+        match self {
+            Self::Glyph(glyph) => {
+                kern_at_height(ctx, glyph.font_size, glyph.id, corner, height)
+                    .unwrap_or_default()
+            }
+            _ => Abs::zero(),
         }
     }
 }
@@ -194,18 +225,13 @@ impl From<FrameFragment> for MathFragment {
     }
 }
 
-impl From<SpacingFragment> for MathFragment {
-    fn from(fragment: SpacingFragment) -> Self {
-        Self::Spacing(fragment)
-    }
-}
-
 #[derive(Clone)]
 pub struct GlyphFragment {
     pub id: GlyphId,
     pub c: char,
     pub font: Font,
     pub lang: Lang,
+    pub region: Option<Region>,
     pub fill: Paint,
     pub shift: Abs,
     pub width: Abs,
@@ -217,7 +243,8 @@ pub struct GlyphFragment {
     pub class: MathClass,
     pub math_size: MathSize,
     pub span: Span,
-    pub meta: SmallVec<[Meta; 1]>,
+    pub dests: SmallVec<[Destination; 1]>,
+    pub hidden: bool,
     pub limits: Limits,
 }
 
@@ -259,6 +286,7 @@ impl GlyphFragment {
             c,
             font: ctx.font.clone(),
             lang: TextElem::lang_in(styles),
+            region: TextElem::region_in(styles),
             fill: TextElem::fill_in(styles).as_decoration(),
             shift: TextElem::baseline_in(styles),
             font_size: scaled_font_size(ctx, styles),
@@ -271,7 +299,8 @@ impl GlyphFragment {
             accent_attach: Abs::zero(),
             class,
             span,
-            meta: MetaElem::data_in(styles),
+            dests: LinkElem::dests_in(styles),
+            hidden: HideElem::hidden_in(styles),
         };
         fragment.set_id(ctx, id);
         fragment
@@ -340,6 +369,7 @@ impl GlyphFragment {
             size: self.font_size,
             fill: self.fill,
             lang: self.lang,
+            region: self.region,
             text: self.c.into(),
             stroke: None,
             glyphs: vec![Glyph {
@@ -354,7 +384,7 @@ impl GlyphFragment {
         let mut frame = Frame::soft(size);
         frame.set_baseline(self.ascent);
         frame.push(Point::with_y(self.ascent + self.shift), FrameItem::Text(item));
-        frame.meta_iter(self.meta);
+        frame.post_process_raw(self.dests, self.hidden);
         frame
     }
 
@@ -403,9 +433,15 @@ impl VariantFragment {
     /// Vertically adjust the fragment's frame so that it is centered
     /// on the axis.
     pub fn center_on_axis(&mut self, ctx: &MathContext) {
+        self.align_on_axis(ctx, VAlignment::Horizon)
+    }
+
+    /// Vertically adjust the fragment's frame so that it is aligned
+    /// to the given alignment on the axis.
+    pub fn align_on_axis(&mut self, ctx: &MathContext, align: VAlignment) {
         let h = self.frame.height();
         let axis = ctx.constants.axis_height().scaled(ctx, self.font_size);
-        self.frame.set_baseline(h / 2.0 + axis);
+        self.frame.set_baseline(align.inv().position(h + axis * 2.0));
     }
 }
 
@@ -427,15 +463,15 @@ pub struct FrameFragment {
     pub italics_correction: Abs,
     pub accent_attach: Abs,
     pub text_like: bool,
+    pub ignorant: bool,
 }
 
 impl FrameFragment {
-    pub fn new(ctx: &MathContext, styles: StyleChain, mut frame: Frame) -> Self {
+    pub fn new(ctx: &MathContext, styles: StyleChain, frame: Frame) -> Self {
         let base_ascent = frame.ascent();
         let accent_attach = frame.width() / 2.0;
-        frame.meta(styles, false);
         Self {
-            frame,
+            frame: frame.post_processed(styles),
             font_size: scaled_font_size(ctx, styles),
             class: EquationElem::class_in(styles).unwrap_or(MathClass::Normal),
             math_size: EquationElem::size_in(styles),
@@ -445,6 +481,7 @@ impl FrameFragment {
             italics_correction: Abs::zero(),
             accent_attach,
             text_like: false,
+            ignorant: false,
         }
     }
 
@@ -475,12 +512,10 @@ impl FrameFragment {
     pub fn with_text_like(self, text_like: bool) -> Self {
         Self { text_like, ..self }
     }
-}
 
-#[derive(Debug, Clone)]
-pub struct SpacingFragment {
-    pub width: Abs,
-    pub weak: bool,
+    pub fn with_ignorant(self, ignorant: bool) -> Self {
+        Self { ignorant, ..self }
+    }
 }
 
 /// Look up the italics correction for a glyph.
@@ -525,10 +560,6 @@ fn is_extended_shape(ctx: &MathContext, id: GlyphId) -> bool {
 }
 
 /// Look up a kerning value at a specific corner and height.
-///
-/// This can be integrated once we've found a font that actually provides this
-/// data.
-#[allow(unused)]
 fn kern_at_height(
     ctx: &MathContext,
     font_size: Abs,

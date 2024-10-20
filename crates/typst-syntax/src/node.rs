@@ -35,8 +35,23 @@ impl SyntaxNode {
     }
 
     /// Create a new error node.
-    pub fn error(message: impl Into<EcoString>, text: impl Into<EcoString>) -> Self {
-        Self(Repr::Error(Arc::new(ErrorNode::new(message, text))))
+    pub fn error(error: SyntaxError, text: impl Into<EcoString>) -> Self {
+        Self(Repr::Error(Arc::new(ErrorNode::new(error, text))))
+    }
+
+    /// Create a dummy node of the given kind.
+    ///
+    /// Panics if `kind` is `SyntaxKind::Error`.
+    #[track_caller]
+    pub const fn placeholder(kind: SyntaxKind) -> Self {
+        if matches!(kind, SyntaxKind::Error) {
+            panic!("cannot create error placeholder");
+        }
+        Self(Repr::Leaf(LeafNode {
+            kind,
+            text: EcoString::new(),
+            span: Span::detached(),
+        }))
     }
 
     /// The type of the node.
@@ -194,7 +209,7 @@ impl SyntaxNode {
     pub(super) fn convert_to_error(&mut self, message: impl Into<EcoString>) {
         if !self.kind().is_error() {
             let text = std::mem::take(self).into_text();
-            *self = SyntaxNode::error(message, text);
+            *self = SyntaxNode::error(SyntaxError::new(message), text);
         }
     }
 
@@ -297,17 +312,6 @@ impl SyntaxNode {
             Repr::Error(node) => node.error.span.number() + 1,
         }
     }
-
-    /// An arbitrary node just for filling a slot in memory.
-    ///
-    /// In contrast to `default()`, this is a const fn.
-    pub(super) const fn arbitrary() -> Self {
-        Self(Repr::Leaf(LeafNode {
-            kind: SyntaxKind::Eof,
-            text: EcoString::new(),
-            span: Span::detached(),
-        }))
-    }
 }
 
 impl Debug for SyntaxNode {
@@ -322,7 +326,7 @@ impl Debug for SyntaxNode {
 
 impl Default for SyntaxNode {
     fn default() -> Self {
-        Self::arbitrary()
+        Self::leaf(SyntaxKind::End, EcoString::new())
     }
 }
 
@@ -624,15 +628,8 @@ struct ErrorNode {
 
 impl ErrorNode {
     /// Create new error node.
-    fn new(message: impl Into<EcoString>, text: impl Into<EcoString>) -> Self {
-        Self {
-            text: text.into(),
-            error: SyntaxError {
-                span: Span::detached(),
-                message: message.into(),
-                hints: eco_vec![],
-            },
-        }
+    fn new(error: SyntaxError, text: impl Into<EcoString>) -> Self {
+        Self { text: text.into(), error }
     }
 
     /// The byte length of the node in the source text.
@@ -670,6 +667,15 @@ pub struct SyntaxError {
 }
 
 impl SyntaxError {
+    /// Create a new detached syntax error.
+    pub fn new(message: impl Into<EcoString>) -> Self {
+        Self {
+            span: Span::detached(),
+            message: message.into(),
+            hints: eco_vec![],
+        }
+    }
+
     /// Whether the two errors are the same apart from spans.
     fn spanless_eq(&self, other: &Self) -> bool {
         self.message == other.message && self.hints == other.hints
@@ -811,7 +817,14 @@ impl<'a> LinkedNode<'a> {
     }
 }
 
-/// Access to leafs.
+/// Indicates whether the cursor is before the related byte index, or after.
+#[derive(Debug, Clone)]
+pub enum Side {
+    Before,
+    After,
+}
+
+/// Access to leaves.
 impl<'a> LinkedNode<'a> {
     /// Get the rightmost non-trivia leaf before this node.
     pub fn prev_leaf(&self) -> Option<Self> {
@@ -840,8 +853,8 @@ impl<'a> LinkedNode<'a> {
         None
     }
 
-    /// Get the leaf at the specified byte offset.
-    pub fn leaf_at(&self, cursor: usize) -> Option<Self> {
+    /// Get the leaf immediately before the specified byte offset.
+    fn leaf_before(&self, cursor: usize) -> Option<Self> {
         if self.node.children().len() == 0 && cursor <= self.offset + self.len() {
             return Some(self.clone());
         }
@@ -853,12 +866,38 @@ impl<'a> LinkedNode<'a> {
             if (offset < cursor && cursor <= offset + len)
                 || (offset == cursor && i + 1 == count)
             {
-                return child.leaf_at(cursor);
+                return child.leaf_before(cursor);
             }
             offset += len;
         }
 
         None
+    }
+
+    /// Get the leaf after the specified byte offset.
+    fn leaf_after(&self, cursor: usize) -> Option<Self> {
+        if self.node.children().len() == 0 && cursor < self.offset + self.len() {
+            return Some(self.clone());
+        }
+
+        let mut offset = self.offset;
+        for child in self.children() {
+            let len = child.len();
+            if offset <= cursor && cursor < offset + len {
+                return child.leaf_after(cursor);
+            }
+            offset += len;
+        }
+
+        None
+    }
+
+    /// Get the leaf at the specified byte offset.
+    pub fn leaf_at(&self, cursor: usize, side: Side) -> Option<Self> {
+        match side {
+            Side::Before => self.leaf_before(cursor),
+            Side::After => self.leaf_after(cursor),
+        }
     }
 
     /// Find the rightmost contained non-trivia leaf.
@@ -974,8 +1013,13 @@ mod tests {
     fn test_linked_node() {
         let source = Source::detached("#set text(12pt, red)");
 
-        // Find "text".
-        let node = LinkedNode::new(source.root()).leaf_at(7).unwrap();
+        // Find "text" with Before.
+        let node = LinkedNode::new(source.root()).leaf_at(7, Side::Before).unwrap();
+        assert_eq!(node.offset(), 5);
+        assert_eq!(node.text(), "text");
+
+        // Find "text" with After.
+        let node = LinkedNode::new(source.root()).leaf_at(7, Side::After).unwrap();
         assert_eq!(node.offset(), 5);
         assert_eq!(node.text(), "text");
 
@@ -988,17 +1032,26 @@ mod tests {
     #[test]
     fn test_linked_node_non_trivia_leaf() {
         let source = Source::detached("#set fun(12pt, red)");
-        let leaf = LinkedNode::new(source.root()).leaf_at(6).unwrap();
+        let leaf = LinkedNode::new(source.root()).leaf_at(6, Side::Before).unwrap();
         let prev = leaf.prev_leaf().unwrap();
         assert_eq!(leaf.text(), "fun");
         assert_eq!(prev.text(), "set");
 
+        // Check position 9 with Before.
         let source = Source::detached("#let x = 10");
-        let leaf = LinkedNode::new(source.root()).leaf_at(9).unwrap();
+        let leaf = LinkedNode::new(source.root()).leaf_at(9, Side::Before).unwrap();
         let prev = leaf.prev_leaf().unwrap();
         let next = leaf.next_leaf().unwrap();
         assert_eq!(prev.text(), "=");
         assert_eq!(leaf.text(), " ");
         assert_eq!(next.text(), "10");
+
+        // Check position 9 with After.
+        let source = Source::detached("#let x = 10");
+        let leaf = LinkedNode::new(source.root()).leaf_at(9, Side::After).unwrap();
+        let prev = leaf.prev_leaf().unwrap();
+        assert!(leaf.next_leaf().is_none());
+        assert_eq!(prev.text(), "=");
+        assert_eq!(leaf.text(), "10");
     }
 }

@@ -175,6 +175,7 @@ children:
         types:
         - auto
         - relative
+        - fraction
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -229,7 +230,8 @@ children:
         - relative
         - dictionary
         strings: []
-        default: <code><span class="typ-num">5pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">5pt</span></code>
         positional: false
         named: true
         required: false
@@ -1082,6 +1084,8 @@ children:
           </ul>
           <p>These components are also available using the
           <a href="/docs/reference/visualize/color/#definitions-components"><code>components</code></a> method.</p>
+          <p>Note that CMYK colors are not currently supported when PDF/A output is
+          enabled.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">square</span><span class="typ-punct">(</span>
             fill<span class="typ-punct">:</span> <span class="typ-func">cmyk</span><span class="typ-punct">(</span><span class="typ-num">27%</span><span class="typ-punct">,</span> <span class="typ-num">0%</span><span class="typ-punct">,</span> <span class="typ-num">3%</span><span class="typ-punct">,</span> <span class="typ-num">5%</span><span class="typ-punct">)</span>
@@ -1836,6 +1840,7 @@ children:
         types:
         - auto
         - relative
+        - fraction
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -1890,7 +1895,8 @@ children:
         - relative
         - dictionary
         strings: []
-        default: <code><span class="typ-num">5pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">5pt</span></code>
         positional: false
         named: true
         required: false
@@ -2091,7 +2097,7 @@ children:
         <li>As the fill of text:
         <code><span class="typ-key">set</span> <span class="typ-func">text</span><span class="typ-punct">(</span>fill<span class="typ-punct">:</span> gradient<span class="typ-punct">.</span><span class="typ-func">linear</span><span class="typ-punct">(</span><span class="typ-op">..</span><span class="typ-punct">)</span><span class="typ-punct">)</span></code></li>
         <li>As a color map you can <a href="/docs/reference/visualize/gradient/#definitions-sample">sample</a> from:
-        <code>gradient<span class="typ-punct">.</span><span class="typ-func">linear</span><span class="typ-punct">(</span><span class="typ-op">..</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">sample</span><span class="typ-punct">(</span><span class="typ-num">0.5</span><span class="typ-punct">)</span></code></li>
+        <code>gradient<span class="typ-punct">.</span><span class="typ-func">linear</span><span class="typ-punct">(</span><span class="typ-op">..</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">sample</span><span class="typ-punct">(</span><span class="typ-num">50%</span><span class="typ-punct">)</span></code></li>
         </ul>
         <h2 id="examples">Examples</h2>
         <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">stack</span><span class="typ-punct">(</span>
@@ -2186,11 +2192,12 @@ children:
         <ul>
         <li>SVG gradients are currently inefficiently encoded. This will be improved
         in the future.</li>
-        <li>PDF gradients in the <a href="/docs/reference/visualize/color/#definitions-hsv"><code>color.hsv</code></a>, <a href="/docs/reference/visualize/color/#definitions-hsl"><code>color.hsl</code></a>,
-        and <a href="/docs/reference/visualize/color/#definitions-oklch"><code>color.oklch</code></a> color spaces are stored as a list of
-        <a href="/docs/reference/visualize/color/#definitions-oklab"><code>color.oklab</code></a> colors with extra stops in between. This
-        avoids needing to encode these color spaces in your PDF file, but it does
-        add extra stops to your gradient, which can increase the file size.</li>
+        <li>PDF gradients in the <a href="/docs/reference/visualize/color/#definitions-oklab"><code>color.oklab</code></a>, <a href="/docs/reference/visualize/color/#definitions-hsv"><code>color.hsv</code></a>,
+        <a href="/docs/reference/visualize/color/#definitions-hsl"><code>color.hsl</code></a>, and <a href="/docs/reference/visualize/color/#definitions-oklch"><code>color.oklch</code></a> color spaces
+        are stored as a list of <a href="/docs/reference/visualize/color/#definitions-rgb"><code>color.rgb</code></a> colors with extra stops
+        in between. This avoids needing to encode these color spaces in your PDF
+        file, but it does add extra stops to your gradient, which can increase
+        the file size.</li>
         </ul>
       constructor: null
       scope:
@@ -2866,10 +2873,10 @@ children:
       contextual: false
       details: |-
         <p>A raster or vector graphic.</p>
-        <p>Supported formats are PNG, JPEG, GIF and SVG.</p>
-        <p><em>Note:</em> Work on SVG export is ongoing and there might be visual inaccuracies
-        in the resulting PDF. Make sure to double-check embedded SVG images. If you
-        have an issue, also feel free to report it on <a href="https://github.com/typst/typst/issues?q=is%3Aopen+is%3Aissue+label%3Asvg">GitHub</a>.</p>
+        <p>You can wrap the image in a <a href="/docs/reference/model/figure/" title="`figure`"><code>figure</code></a> to give it a number and caption.</p>
+        <p>Like most elements, images are <em>block-level</em> by default and thus do not
+        integrate themselves into adjacent paragraphs. To force an image to become
+        inline, put it into a <a href="/docs/reference/layout/box/" title="`box`"><code>box</code></a>.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">figure</span><span class="typ-punct">(</span>
           <span class="typ-func">image</span><span class="typ-punct">(</span><span class="typ-str">&quot;molecular.jpg&quot;</span><span class="typ-punct">,</span> width<span class="typ-punct">:</span> <span class="typ-num">80%</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
@@ -2883,7 +2890,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to an image file.</p>
+        details: |-
+          <p>Path to an image file</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -2895,7 +2904,10 @@ children:
         variadic: false
         settable: false
       - name: format
-        details: <p>The image's format. Detected automatically by default.</p>
+        details: |-
+          <p>The image's format. Detected automatically by default.</p>
+          <p>Supported formats are PNG, JPEG, GIF, and SVG. Using a PDF as an image
+          is <a href="https://github.com/typst/typst/issues/145">not currently supported</a>.</p>
         example: null
         types:
         - auto
@@ -2934,6 +2946,7 @@ children:
         types:
         - auto
         - relative
+        - fraction
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -3067,6 +3080,7 @@ children:
           types:
           - auto
           - relative
+          - fraction
           strings: []
           default: null
           positional: false
@@ -3180,8 +3194,10 @@ children:
         types:
         - array
         strings: []
-        default: <code><span class="typ-punct">(</span><span class="typ-num">0pt</span><span
-          class="typ-punct">,</span> <span class="typ-num">0pt</span><span class="typ-punct">)</span></code>
+        default: <code><span class="typ-punct">(</span><span class="typ-num">0%</span>
+          <span class="typ-op">+</span> <span class="typ-num">0pt</span><span class="typ-punct">,</span>
+          <span class="typ-num">0%</span> <span class="typ-op">+</span> <span class="typ-num">0pt</span><span
+          class="typ-punct">)</span></code>
         positional: false
         named: true
         required: false
@@ -3202,12 +3218,13 @@ children:
         settable: true
       - name: length
         details: <p>The line's length. This is only respected if <code>end</code>
-          is <code>none</code>.</p>
+          is <code><span class="typ-key">none</span></code>.</p>
         example: null
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">30pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">30pt</span></code>
         positional: false
         named: true
         required: false
@@ -3216,7 +3233,7 @@ children:
       - name: angle
         details: |-
           <p>The angle at which the line points away from the origin. This is only
-          respected if <code>end</code> is <code>none</code>.</p>
+          respected if <code>end</code> is <code><span class="typ-key">none</span></code>.</p>
         example: null
         types:
         - angle
@@ -3276,6 +3293,9 @@ children:
     - id: parameters-fill
       name: fill
       children: []
+    - id: parameters-fill-rule
+      name: fill-rule
+      children: []
     - id: parameters-stroke
       name: stroke
       children: []
@@ -3315,8 +3335,6 @@ children:
           <p>How to fill the path.</p>
           <p>When setting a fill, the default stroke disappears. To create a
           rectangle with both fill and stroke, you have to configure both.</p>
-          <p>Currently all paths are filled according to the <a href="https://en.wikipedia.org/wiki/Nonzero-rule">non-zero winding
-          rule</a>.</p>
         example: null
         types:
         - none
@@ -3325,6 +3343,40 @@ children:
         - pattern
         strings: []
         default: <code><span class="typ-key">none</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: fill-rule
+        details: <p>The drawing rule used to fill the path.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-comment">// We use `.with` to get a new</span>
+          <span class="typ-comment">// function that has the common</span>
+          <span class="typ-comment">// arguments pre-applied.</span>
+          <span class="typ-key">#</span><span class="typ-key">let</span> star <span class="typ-op">=</span> path<span class="typ-punct">.</span><span class="typ-func">with</span><span class="typ-punct">(</span>
+            fill<span class="typ-punct">:</span> red<span class="typ-punct">,</span>
+            closed<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-num">25pt</span><span class="typ-punct">,</span> <span class="typ-num">0pt</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-num">10pt</span><span class="typ-punct">,</span> <span class="typ-num">50pt</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-num">50pt</span><span class="typ-punct">,</span> <span class="typ-num">20pt</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-num">0pt</span><span class="typ-punct">,</span> <span class="typ-num">20pt</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-num">40pt</span><span class="typ-punct">,</span> <span class="typ-num">50pt</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+          <span class="typ-punct">)</span>
+
+          <span class="typ-func">#</span><span class="typ-func">star</span><span class="typ-punct">(</span>fill-rule<span class="typ-punct">:</span> <span class="typ-str">&quot;non-zero&quot;</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">star</span><span class="typ-punct">(</span>fill-rule<span class="typ-punct">:</span> <span class="typ-str">&quot;even-odd&quot;</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/b35f212b97cac5bc0415862bd35fa59e.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - str
+        strings:
+        - string: non-zero
+          details: <p>Specifies that &quot;inside&quot; is computed by a non-zero
+            sum of signed edge crossings.</p>
+        - string: even-odd
+          details: <p>Specifies that &quot;inside&quot; is computed by an odd number
+            of edge crossings.</p>
+        default: <code><span class="typ-str">&quot;non-zero&quot;</span></code>
         positional: false
         named: true
         required: false
@@ -3440,7 +3492,7 @@ children:
         pattern is repeated in a grid-like fashion, covering the entire area of an
         element that is filled or stroked. The pattern is defined by a tile size and
         a body defining the content of each cell. You can also add horizontal or
-        vertical spacing between the cells of the patterng.</p>
+        vertical spacing between the cells of the pattern.</p>
         <h2 id="examples">Examples</h2>
         <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> pat <span class="typ-op">=</span> <span class="typ-func">pattern</span><span class="typ-punct">(</span>size<span class="typ-punct">:</span> <span class="typ-punct">(</span><span class="typ-num">30pt</span><span class="typ-punct">,</span> <span class="typ-num">30pt</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">[</span>
           <span class="typ-func">#</span><span class="typ-func">place</span><span class="typ-punct">(</span><span class="typ-func">line</span><span class="typ-punct">(</span>start<span class="typ-punct">:</span> <span class="typ-punct">(</span><span class="typ-num">0%</span><span class="typ-punct">,</span> <span class="typ-num">0%</span><span class="typ-punct">)</span><span class="typ-punct">,</span> end<span class="typ-punct">:</span> <span class="typ-punct">(</span><span class="typ-num">100%</span><span class="typ-punct">,</span> <span class="typ-num">100%</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
@@ -3616,6 +3668,9 @@ children:
     - id: parameters-fill
       name: fill
       children: []
+    - id: parameters-fill-rule
+      name: fill-rule
+      children: []
     - id: parameters-stroke
       name: stroke
       children: []
@@ -3671,8 +3726,6 @@ children:
           <p>How to fill the polygon.</p>
           <p>When setting a fill, the default stroke disappears. To create a
           rectangle with both fill and stroke, you have to configure both.</p>
-          <p>Currently all polygons are filled according to the
-          <a href="https://en.wikipedia.org/wiki/Nonzero-rule">non-zero winding rule</a>.</p>
         example: null
         types:
         - none
@@ -3681,6 +3734,26 @@ children:
         - pattern
         strings: []
         default: <code><span class="typ-key">none</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: fill-rule
+        details: |-
+          <p>The drawing rule used to fill the polygon.</p>
+          <p>See the <a href="/docs/reference/visualize/path/#parameters-fill-rule">path documentation</a> for an example.</p>
+        example: null
+        types:
+        - str
+        strings:
+        - string: non-zero
+          details: <p>Specifies that &quot;inside&quot; is computed by a non-zero
+            sum of signed edge crossings.</p>
+        - string: even-odd
+          details: <p>Specifies that &quot;inside&quot; is computed by an odd number
+            of edge crossings.</p>
+        default: <code><span class="typ-str">&quot;non-zero&quot;</span></code>
         positional: false
         named: true
         required: false
@@ -3894,6 +3967,7 @@ children:
         types:
         - auto
         - relative
+        - fraction
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -3929,7 +4003,7 @@ children:
           <li><code><span class="typ-key">auto</span></code> for a stroke of <code><span class="typ-num">1pt</span> <span class="typ-op">+</span> black</code> if and if only if no fill is
           given.</li>
           <li>Any kind of <a href="/docs/reference/visualize/stroke/" title="stroke">stroke</a></li>
-          <li>A dictionary describing the stroke for each side inidvidually. The
+          <li>A dictionary describing the stroke for each side individually. The
           dictionary can contain the following keys in order of precedence:
           <ul>
           <li><code>top</code>: The top stroke.</li>
@@ -4027,7 +4101,8 @@ children:
         - relative
         - dictionary
         strings: []
-        default: <code><span class="typ-num">5pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">5pt</span></code>
         positional: false
         named: true
         required: false
@@ -4175,6 +4250,7 @@ children:
         types:
         - auto
         - relative
+        - fraction
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -4245,7 +4321,8 @@ children:
         - relative
         - dictionary
         strings: []
-        default: <code><span class="typ-num">5pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">5pt</span></code>
         positional: false
         named: true
         required: false

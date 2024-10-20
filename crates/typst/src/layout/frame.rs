@@ -4,14 +4,18 @@ use std::fmt::{self, Debug, Formatter};
 use std::num::NonZeroUsize;
 use std::sync::Arc;
 
-use crate::foundations::{cast, dict, Dict, StyleChain, Value};
-use crate::introspection::{Meta, MetaElem};
+use smallvec::SmallVec;
+
+use crate::foundations::{cast, dict, Dict, Label, StyleChain, Value};
+use crate::introspection::{Location, Tag};
 use crate::layout::{
-    Abs, Axes, Corners, FixedAlignment, Length, Point, Rel, Sides, Size, Transform,
+    Abs, Axes, Corners, FixedAlignment, HideElem, Length, Point, Rel, Sides, Size,
+    Transform,
 };
+use crate::model::{Destination, LinkElem};
 use crate::syntax::Span;
 use crate::text::TextItem;
-use crate::util::Numeric;
+use crate::utils::{LazyHash, Numeric};
 use crate::visualize::{
     ellipse, styled_rect, Color, FixedStroke, Geometry, Image, Paint, Path, Shape,
 };
@@ -25,8 +29,10 @@ pub struct Frame {
     /// frame's implicit baseline is at the bottom.
     baseline: Option<Abs>,
     /// The items composing this layout.
-    items: Arc<Vec<(Point, FrameItem)>>,
+    items: Arc<LazyHash<Vec<(Point, FrameItem)>>>,
     /// The hardness of this frame.
+    ///
+    /// Determines whether it is a boundary for gradient drawing.
     kind: FrameKind,
 }
 
@@ -41,7 +47,7 @@ impl Frame {
         Self {
             size,
             baseline: None,
-            items: Arc::new(vec![]),
+            items: Arc::new(LazyHash::new(vec![])),
             kind,
         }
     }
@@ -65,6 +71,12 @@ impl Frame {
     /// Sets the frame's hardness.
     pub fn set_kind(&mut self, kind: FrameKind) {
         self.kind = kind;
+    }
+
+    /// Sets the frame's hardness builder-style.
+    pub fn with_kind(mut self, kind: FrameKind) -> Self {
+        self.kind = kind;
+        self
     }
 
     /// Whether the frame is hard or soft.
@@ -150,6 +162,17 @@ impl Frame {
         Arc::make_mut(&mut self.items).push((pos, item));
     }
 
+    /// Add multiple items at a position in the foreground.
+    ///
+    /// The first item in the iterator will be the one that is most in the
+    /// background.
+    pub fn push_multiple<I>(&mut self, items: I)
+    where
+        I: IntoIterator<Item = (Point, FrameItem)>,
+    {
+        Arc::make_mut(&mut self.items).extend(items);
+    }
+
     /// Add a frame at a position in the foreground.
     ///
     /// Automatically decides whether to inline the frame or to include it as a
@@ -160,11 +183,6 @@ impl Frame {
         } else {
             self.push(pos, FrameItem::Group(GroupItem::new(frame)));
         }
-    }
-
-    /// Add zero-sized metadata at the origin.
-    pub fn push_positionless_meta(&mut self, meta: Meta) {
-        self.push(Point::zero(), FrameItem::Meta(meta, Size::zero()));
     }
 
     /// Insert an item at the given layer in the frame.
@@ -208,6 +226,11 @@ impl Frame {
 
     /// Inline a frame at the given layer.
     fn inline(&mut self, layer: usize, pos: Point, frame: Frame) {
+        // Skip work if there's nothing to do.
+        if frame.items.is_empty() {
+            return;
+        }
+
         // Try to just reuse the items.
         if pos.is_zero() && self.items.is_empty() {
             self.items = frame.items;
@@ -221,7 +244,7 @@ impl Frame {
             let sink = Arc::make_mut(&mut self.items);
             match Arc::try_unwrap(frame.items) {
                 Ok(items) => {
-                    sink.splice(range, items);
+                    sink.splice(range, items.into_inner());
                 }
                 Err(arc) => {
                     sink.splice(range, arc.iter().cloned());
@@ -235,7 +258,10 @@ impl Frame {
         let sink = Arc::make_mut(&mut self.items);
         match Arc::try_unwrap(frame.items) {
             Ok(items) => {
-                sink.splice(range, items.into_iter().map(|(p, e)| (p + pos, e)));
+                sink.splice(
+                    range,
+                    items.into_inner().into_iter().map(|(p, e)| (p + pos, e)),
+                );
             }
             Err(arc) => {
                 sink.splice(range, arc.iter().cloned().map(|(p, e)| (p + pos, e)));
@@ -251,7 +277,7 @@ impl Frame {
         if Arc::strong_count(&self.items) == 1 {
             Arc::make_mut(&mut self.items).clear();
         } else {
-            self.items = Arc::new(vec![]);
+            self.items = Arc::new(LazyHash::new(vec![]));
         }
     }
 
@@ -275,33 +301,52 @@ impl Frame {
             if let Some(baseline) = &mut self.baseline {
                 *baseline += offset.y;
             }
-            for (point, _) in Arc::make_mut(&mut self.items) {
+            for (point, _) in Arc::make_mut(&mut self.items).iter_mut() {
                 *point += offset;
             }
         }
     }
 
-    /// Attach the metadata from this style chain to the frame.
-    pub fn meta(&mut self, styles: StyleChain, force: bool) {
-        if force || !self.is_empty() {
-            self.meta_iter(MetaElem::data_in(styles));
+    /// Apply late-stage properties from the style chain to this frame. This
+    /// includes:
+    /// - `HideElem::hidden`
+    /// - `LinkElem::dests`
+    ///
+    /// This must be called on all frames produced by elements
+    /// that manually handle styles (because their children can have varying
+    /// styles). This currently includes flow, par, and equation.
+    ///
+    /// Other elements don't manually need to handle it because their parents
+    /// that result from realization will take care of it and the styles can
+    /// only apply to them as a whole, not part of it (because they don't manage
+    /// styles).
+    pub fn post_processed(mut self, styles: StyleChain) -> Self {
+        self.post_process(styles);
+        self
+    }
+
+    /// Post process in place.
+    pub fn post_process(&mut self, styles: StyleChain) {
+        if !self.is_empty() {
+            self.post_process_raw(
+                LinkElem::dests_in(styles),
+                HideElem::hidden_in(styles),
+            );
         }
     }
 
-    /// Attach metadata from an iterator.
-    pub fn meta_iter(&mut self, iter: impl IntoIterator<Item = Meta>) {
-        let mut hide = false;
-        let size = self.size;
-        self.prepend_multiple(iter.into_iter().filter_map(|meta| {
-            if matches!(meta, Meta::Hide) {
-                hide = true;
-                None
-            } else {
-                Some((Point::zero(), FrameItem::Meta(meta, size)))
+    /// Apply raw late-stage properties from the raw data.
+    pub fn post_process_raw(&mut self, dests: SmallVec<[Destination; 1]>, hide: bool) {
+        if !self.is_empty() {
+            let size = self.size;
+            self.push_multiple(
+                dests
+                    .into_iter()
+                    .map(|dest| (Point::zero(), FrameItem::Link(dest, size))),
+            );
+            if hide {
+                self.hide();
             }
-        }));
-        if hide {
-            self.hide();
         }
     }
 
@@ -312,7 +357,7 @@ impl Frame {
                 group.frame.hide();
                 !group.frame.is_empty()
             }
-            FrameItem::Meta(Meta::Elem(_), _) => true,
+            FrameItem::Tag(_) => true,
             _ => false,
         });
     }
@@ -329,9 +374,9 @@ impl Frame {
     pub fn fill_and_stroke(
         &mut self,
         fill: Option<Paint>,
-        stroke: Sides<Option<FixedStroke>>,
-        outset: Sides<Rel<Abs>>,
-        radius: Corners<Rel<Abs>>,
+        stroke: &Sides<Option<FixedStroke>>,
+        outset: &Sides<Rel<Abs>>,
+        radius: &Corners<Rel<Abs>>,
         span: Span,
     ) {
         let outset = outset.relative_to(self.size());
@@ -341,7 +386,7 @@ impl Frame {
             styled_rect(size, radius, fill, stroke)
                 .into_iter()
                 .map(|x| (pos, FrameItem::Shape(x, span))),
-        )
+        );
     }
 
     /// Arbitrarily transform the contents of the frame.
@@ -359,6 +404,19 @@ impl Frame {
     pub fn clip(&mut self, clip_path: Path) {
         if !self.is_empty() {
             self.group(|g| g.clip_path = Some(clip_path));
+        }
+    }
+
+    /// Add a label to the frame.
+    pub fn label(&mut self, label: Label) {
+        self.group(|g| g.label = Some(label));
+    }
+
+    /// Set a parent for the frame. As a result, all elements in the frame
+    /// become logically ordered immediately after the given location.
+    pub fn set_parent(&mut self, parent: Location) {
+        if !self.is_empty() {
+            self.group(|g| g.parent = Some(parent));
         }
     }
 
@@ -453,6 +511,8 @@ pub enum FrameKind {
     #[default]
     Soft,
     /// A container which uses its own size.
+    ///
+    /// This is used for pages, blocks, and boxes.
     Hard,
 }
 
@@ -479,8 +539,11 @@ pub enum FrameItem {
     Shape(Shape, Span),
     /// An image and its size.
     Image(Image, Size, Span),
-    /// Meta information and the region it applies to.
-    Meta(Meta, Size),
+    /// An internal or external link to a destination.
+    Link(Destination, Size),
+    /// An introspectable element that produced something within this frame
+    /// alongside its key.
+    Tag(Tag),
 }
 
 impl Debug for FrameItem {
@@ -490,7 +553,8 @@ impl Debug for FrameItem {
             Self::Text(text) => write!(f, "{text:?}"),
             Self::Shape(shape, _) => write!(f, "{shape:?}"),
             Self::Image(image, _, _) => write!(f, "{image:?}"),
-            Self::Meta(meta, _) => write!(f, "{meta:?}"),
+            Self::Link(dest, _) => write!(f, "Link({dest:?})"),
+            Self::Tag(tag) => write!(f, "{tag:?}"),
         }
     }
 }
@@ -504,6 +568,11 @@ pub struct GroupItem {
     pub transform: Transform,
     /// Whether the frame should be a clipping boundary.
     pub clip_path: Option<Path>,
+    /// The group's label.
+    pub label: Option<Label>,
+    /// The group's logical parent. All elements in this group are logically
+    /// ordered immediately after the parent's start location.
+    pub parent: Option<Location>,
 }
 
 impl GroupItem {
@@ -513,6 +582,8 @@ impl GroupItem {
             frame,
             transform: Transform::identity(),
             clip_path: None,
+            label: None,
+            parent: None,
         }
     }
 }

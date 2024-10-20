@@ -10,7 +10,8 @@ use crate::layout::{
 };
 use crate::syntax::Span;
 use crate::text::{
-    BottomEdge, BottomEdgeMetric, TextElem, TextItem, TopEdge, TopEdgeMetric,
+    BottomEdge, BottomEdgeMetric, TextEdgeBounds, TextElem, TextItem, TopEdge,
+    TopEdgeMetric,
 };
 use crate::visualize::{styled_rect, Color, FixedStroke, Geometry, Paint, Stroke};
 
@@ -280,13 +281,21 @@ pub struct HighlightElem {
     /// The color to highlight the text with.
     ///
     /// ```example
-    /// This is #highlight(fill: blue)[with blue].
+    /// This is #highlight(
+    ///   fill: blue
+    /// )[highlighted with blue].
     /// ```
-    #[default(Color::from_u8(0xFF, 0xFD, 0x11, 0xA1).into())]
-    pub fill: Paint,
+    #[default(Some(Color::from_u8(0xFF, 0xFD, 0x11, 0xA1).into()))]
+    pub fill: Option<Paint>,
 
     /// The highlight's border color. See the
     /// [rectangle's documentation]($rect.stroke) for more details.
+    ///
+    /// ```example
+    /// This is a #highlight(
+    ///   stroke: fuchsia
+    /// )[stroked highlighting].
+    /// ```
     #[resolve]
     #[fold]
     pub stroke: Sides<Option<Option<Stroke>>>,
@@ -326,6 +335,12 @@ pub struct HighlightElem {
 
     /// How much to round the highlight's corners. See the
     /// [rectangle's documentation]($rect.radius) for more details.
+    ///
+    /// ```example
+    /// Listen #highlight(
+    ///   radius: 5pt, extent: 2pt
+    /// )[carefully], it will be on the test.
+    /// ```
     #[resolve]
     #[fold]
     pub radius: Corners<Option<Rel<Length>>>,
@@ -385,7 +400,7 @@ enum DecoLine {
         background: bool,
     },
     Highlight {
-        fill: Paint,
+        fill: Option<Paint>,
         stroke: Sides<Option<FixedStroke>>,
         top_edge: TopEdge,
         bottom_edge: BottomEdge,
@@ -408,8 +423,8 @@ pub(crate) fn decorate(
         &deco.line
     {
         let (top, bottom) = determine_edges(text, *top_edge, *bottom_edge);
-        let size = Size::new(width + 2.0 * deco.extent, top - bottom);
-        let rects = styled_rect(size, *radius, Some(fill.clone()), stroke.clone());
+        let size = Size::new(width + 2.0 * deco.extent, top + bottom);
+        let rects = styled_rect(size, radius, fill.clone(), stroke);
         let origin = Point::new(pos.x - deco.extent, pos.y - top - shift);
         frame.prepend_multiple(
             rects
@@ -526,22 +541,20 @@ fn determine_edges(
     top_edge: TopEdge,
     bottom_edge: BottomEdge,
 ) -> (Abs, Abs) {
-    let mut bbox = None;
-    if top_edge.is_bounds() || bottom_edge.is_bounds() {
-        let ttf = text.font.ttf();
-        bbox = text
-            .glyphs
-            .iter()
-            .filter_map(|g| ttf.glyph_bounding_box(ttf_parser::GlyphId(g.id)))
-            .reduce(|a, b| ttf_parser::Rect {
-                y_max: a.y_max.max(b.y_max),
-                y_min: a.y_min.min(b.y_min),
-                ..a
-            });
+    let mut top = Abs::zero();
+    let mut bottom = Abs::zero();
+
+    for g in text.glyphs.iter() {
+        let (t, b) = text.font.edges(
+            top_edge,
+            bottom_edge,
+            text.size,
+            TextEdgeBounds::Glyph(g.id),
+        );
+        top.set_max(t);
+        bottom.set_max(b);
     }
 
-    let top = top_edge.resolve(text.size, &text.font, bbox);
-    let bottom = bottom_edge.resolve(text.size, &text.font, bbox);
     (top, bottom)
 }
 

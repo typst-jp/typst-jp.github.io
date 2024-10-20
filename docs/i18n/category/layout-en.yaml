@@ -69,7 +69,6 @@ body:
     - name: layout
       route: /docs/reference/layout/layout/
       oneliner: Provides access to the current outer container's (or page's, if none)
-        size
       code: true
     - name: length
       route: /docs/reference/layout/length/
@@ -97,7 +96,7 @@ body:
       code: true
     - name: place
       route: /docs/reference/layout/place/
-      oneliner: Places content at an absolute position.
+      oneliner: Places content relatively to its parent container.
       code: true
     - name: ratio
       route: /docs/reference/layout/ratio/
@@ -119,6 +118,10 @@ body:
       route: /docs/reference/layout/scale/
       oneliner: Scales content without affecting layout.
       code: true
+    - name: skew
+      route: /docs/reference/layout/skew/
+      oneliner: Skews content.
+      code: true
     - name: stack
       route: /docs/reference/layout/stack/
       oneliner: Arranges content and spacing horizontally or vertically.
@@ -139,6 +142,15 @@ children:
     children: []
   - id: example
     name: Example
+    children: []
+  - id: combining-alignments
+    name: Combining Alignments
+    children: []
+  - id: nested-alignment
+    name: Nested Alignment
+    children: []
+  - id: alignment-within-the-same-line
+    name: Alignment Within The Same Line
     children: []
   - id: parameters
     name: Parameters
@@ -162,13 +174,54 @@ children:
       details: |-
         <p>Aligns content horizontally and vertically.</p>
         <h2 id="example">Example</h2>
-        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">align</span><span class="typ-punct">(</span>center<span class="typ-punct">)</span>
+        <p>Let's start with centering our content horizontally:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">120pt</span><span class="typ-punct">)</span>
+        <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">align</span><span class="typ-punct">(</span>center<span class="typ-punct">)</span>
 
         Centered text, a sight to see <span class="typ-escape">\</span>
         In perfect balance, visually <span class="typ-escape">\</span>
         Not left nor right, it stands alone <span class="typ-escape">\</span>
         A work of art, a visual throne
-        </code></pre><div class="preview"><img src="/assets/docs/99b62ab7d2744a6c2a0f96112724a0be.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/b6b7a8716be1064542879e668575dcef.png" alt="Preview" width="480" height="190"/></div></div>
+        <p>To center something vertically, use <em>horizon</em> alignment:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">120pt</span><span class="typ-punct">)</span>
+        <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">align</span><span class="typ-punct">(</span>horizon<span class="typ-punct">)</span>
+
+        Vertically centered, <span class="typ-escape">\</span>
+        the stage had entered, <span class="typ-escape">\</span>
+        a new paragraph.
+        </code></pre><div class="preview"><img src="/assets/docs/6c38fc2d11e8adce1a8e61335f57c78e.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="combining-alignments">Combining alignments</h2>
+        <p>You can combine two alignments with the <code>+</code> operator. Let's also only apply
+        this to one piece of content by using the function form instead of a set
+        rule:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">120pt</span><span class="typ-punct">)</span>
+        Though left in the beginning <span class="typ-escape">...</span>
+
+        <span class="typ-func">#</span><span class="typ-func">align</span><span class="typ-punct">(</span>right <span class="typ-op">+</span> bottom<span class="typ-punct">)</span><span class="typ-punct">[</span>
+          <span class="typ-escape">...</span> they were right in the end, <span class="typ-escape">\</span>
+          and with addition had gotten, <span class="typ-escape">\</span>
+          the paragraph to the bottom!
+        <span class="typ-punct">]</span>
+        </code></pre><div class="preview"><img src="/assets/docs/43a09074bb333ab200ff18f40d531723.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="nested-alignment">Nested alignment</h2>
+        <p>You can use varying alignments for layout containers and the elements within
+        them. This way, you can create intricate layouts:</p>
+        <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">align</span><span class="typ-punct">(</span>center<span class="typ-punct">,</span> <span class="typ-func">block</span><span class="typ-punct">[</span>
+          <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">align</span><span class="typ-punct">(</span>left<span class="typ-punct">)</span>
+          Though centered together <span class="typ-escape">\</span>
+          alone <span class="typ-escape">\</span>
+          we <span class="typ-escape">\</span>
+          are <span class="typ-escape">\</span>
+          left.
+        <span class="typ-punct">]</span><span class="typ-punct">)</span>
+        </code></pre><div class="preview"><img src="/assets/docs/8b96cb721e0e4db9de9a79e8da4361a4.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="alignment-within-the-same-line">Alignment within the same line</h2>
+        <p>The <code>align</code> function performs block-level alignment and thus always
+        interrupts the current paragraph. To have different alignment for parts
+        of the same line, you should use <a href="/docs/reference/layout/h/">fractional spacing</a> instead:</p>
+        <div class="previewed-code"><pre><code>Start <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">1fr</span><span class="typ-punct">)</span> End
+        </code></pre><div class="preview"><img src="/assets/docs/3da5fdcbb7d71b7b1af58b13acaae5f8.png" alt="Preview" width="480" height="190"/></div></div>
       example: null
       self: false
       params:
@@ -440,6 +493,9 @@ children:
     - id: parameters-clip
       name: clip
       children: []
+    - id: parameters-sticky
+      name: sticky
+      children: []
     - id: parameters-body
       name: body
       children: []
@@ -519,6 +575,7 @@ children:
         types:
         - auto
         - relative
+        - fraction
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -634,8 +691,17 @@ children:
         settable: true
       - name: spacing
         details: |-
-          <p>The spacing around this block. This is shorthand to set <code>above</code> and
-          <code>below</code> to the same value.</p>
+          <p>The spacing around the block. When <code><span class="typ-key">auto</span></code>, inherits the paragraph
+          <a href="/docs/reference/model/par/#parameters-spacing"><code>spacing</code></a>.</p>
+          <p>For two adjacent blocks, the larger of the first block's <code>above</code> and the
+          second block's <code>below</code> spacing wins. Moreover, block spacing takes
+          precedence over paragraph <a href="/docs/reference/model/par/#parameters-spacing"><code>spacing</code></a>.</p>
+          <p>Note that this is only a shorthand to set <code>above</code> and <code>below</code> to the
+          same value. Since the values for <code>above</code> and <code>below</code> might differ, a
+          <a href="/docs/reference/context/" title="context">context</a> block only provides access to <code>block<span class="typ-punct">.</span>above</code> and
+          <code>block<span class="typ-punct">.</span>below</code>, not to <code>block<span class="typ-punct">.</span>spacing</code> directly.</p>
+          <p>This property can be used in combination with a show rule to adjust the
+          spacing around arbitrary block-level elements.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">align</span><span class="typ-punct">(</span>center<span class="typ-punct">)</span>
           <span class="typ-key">#</span><span class="typ-key">show</span> math<span class="typ-punct">.</span><span class="typ-func">equation</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">block</span><span class="typ-punct">(</span>above<span class="typ-punct">:</span> <span class="typ-num">8pt</span><span class="typ-punct">,</span> below<span class="typ-punct">:</span> <span class="typ-num">16pt</span><span class="typ-punct">)</span>
@@ -655,39 +721,69 @@ children:
         variadic: false
         settable: true
       - name: above
-        details: |-
-          <p>The spacing between this block and its predecessor. Takes precedence
-          over <code>spacing</code>. Can be used in combination with a show rule to adjust
-          the spacing around arbitrary block-level elements.</p>
+        details: <p>The spacing between this block and its predecessor.</p>
         example: null
         types:
+        - auto
         - relative
         - fraction
         strings: []
-        default: <code><span class="typ-num">1.2em</span></code>
+        default: <code><span class="typ-key">auto</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: below
-        details: |-
-          <p>The spacing between this block and its successor. Takes precedence
-          over <code>spacing</code>.</p>
+        details: <p>The spacing between this block and its successor.</p>
         example: null
         types:
+        - auto
         - relative
         - fraction
         strings: []
-        default: <code><span class="typ-num">1.2em</span></code>
+        default: <code><span class="typ-key">auto</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: clip
-        details: <p>Whether to clip the content inside the block.</p>
-        example: null
+        details: |-
+          <p>Whether to clip the content inside the block.</p>
+          <p>Clipping is useful when the block's content is larger than the block itself,
+          as any content that exceeds the block's bounds will be hidden.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">block</span><span class="typ-punct">(</span>
+            width<span class="typ-punct">:</span> <span class="typ-num">50pt</span><span class="typ-punct">,</span>
+            height<span class="typ-punct">:</span> <span class="typ-num">50pt</span><span class="typ-punct">,</span>
+            clip<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span>
+            <span class="typ-func">image</span><span class="typ-punct">(</span><span class="typ-str">&quot;tiger.jpg&quot;</span><span class="typ-punct">,</span> width<span class="typ-punct">:</span> <span class="typ-num">100pt</span><span class="typ-punct">,</span> height<span class="typ-punct">:</span> <span class="typ-num">100pt</span><span class="typ-punct">)</span>
+          <span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/b9ef1411cdecea5f9cbf7765411c1445.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - bool
+        strings: []
+        default: <code><span class="typ-key">false</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: sticky
+        details: |-
+          <p>Whether this block must stick to the following one, with no break in
+          between.</p>
+          <p>This is, by default, set on heading blocks to prevent orphaned headings
+          at the bottom of the page.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-comment">// Disable stickiness of headings.</span>
+          <span class="typ-key">#</span><span class="typ-key">show</span> <span class="typ-func">heading</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">block</span><span class="typ-punct">(</span>sticky<span class="typ-punct">:</span> <span class="typ-key">false</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">20</span><span class="typ-punct">)</span>
+
+          <span class="typ-heading">= Chapter</span>
+          <span class="typ-func">#</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">10</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/f18b1e4d3bf0b0f22a49122c076a52ea.png" alt="Preview" width="480" height="190"/></div></div>
         types:
         - bool
         strings: []
@@ -828,7 +924,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -934,8 +1031,18 @@ children:
         variadic: false
         settable: true
       - name: clip
-        details: <p>Whether to clip the content inside the box.</p>
-        example: null
+        details: |-
+          <p>Whether to clip the content inside the box.</p>
+          <p>Clipping is useful when the box's content is larger than the box itself,
+          as any content that exceeds the box's bounds will be hidden.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">box</span><span class="typ-punct">(</span>
+            width<span class="typ-punct">:</span> <span class="typ-num">50pt</span><span class="typ-punct">,</span>
+            height<span class="typ-punct">:</span> <span class="typ-num">50pt</span><span class="typ-punct">,</span>
+            clip<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span>
+            <span class="typ-func">image</span><span class="typ-punct">(</span><span class="typ-str">&quot;tiger.jpg&quot;</span><span class="typ-punct">,</span> width<span class="typ-punct">:</span> <span class="typ-num">100pt</span><span class="typ-punct">,</span> height<span class="typ-punct">:</span> <span class="typ-num">100pt</span><span class="typ-punct">)</span>
+          <span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/932ce9b9ea92fde18652de3603721ce9.png" alt="Preview" width="480" height="190"/></div></div>
         types:
         - bool
         strings: []
@@ -1039,8 +1146,11 @@ children:
   - id: summary
     name: Summary
     children: []
-  - id: example
-    name: Example
+  - id: page-level
+    name: Page Level
+    children: []
+  - id: breaking-out
+    name: Breaking Out
     children: []
   - id: parameters
     name: Parameters
@@ -1066,32 +1176,36 @@ children:
       contextual: false
       details: |-
         <p>Separates a region into multiple equally sized columns.</p>
-        <p>The <code>column</code> function allows to separate the interior of any container into
-        multiple columns. It will not equalize the height of the columns, instead,
-        the columns will take up the height of their container or the remaining
-        height on the page. The columns function can break across pages if
-        necessary.</p>
-        <p>If you need to insert columns across your whole document, you can use the
-        <a href="/docs/reference/layout/page/#parameters-columns"><code>page</code> function's <code>columns</code> parameter</a> instead.</p>
-        <h2 id="example">Example</h2>
-        <div class="previewed-code"><pre><code><span class="typ-heading">= Towards Advanced Deep Learning</span>
+        <p>The <code>column</code> function lets you separate the interior of any container into
+        multiple columns. It will currently not balance the height of the columns.
+        Instead, the columns will take up the height of their container or the
+        remaining height on the page. Support for balanced columns is planned for
+        the future.</p>
+        <h2 id="page-level">Page-level columns</h2>
+        <p>If you need to insert columns across your whole document, use the <code>page</code>
+        function's <a href="/docs/reference/layout/page/#parameters-columns"><code>columns</code> parameter</a> instead. This will create
+        the columns directly at the page-level rather than wrapping all of your
+        content in a layout container. As a result, things like
+        <a href="/docs/reference/layout/pagebreak/">pagebreaks</a>, <a href="/docs/reference/model/footnote/">footnotes</a>, and <a href="/docs/reference/model/par/#definitions-line">line
+        numbers</a> will continue to work as expected. For more information,
+        also read the <a href="/docs/guides/page-setup-guide/#columns">relevant part of the page setup
+        guide</a>.</p>
+        <h2 id="breaking-out">Breaking out of columns</h2>
+        <p>To temporarily break out of columns (e.g. for a paper's title), use
+        parent-scoped floating placement:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>columns<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">,</span> height<span class="typ-punct">:</span> <span class="typ-num">150pt</span><span class="typ-punct">)</span>
 
-        <span class="typ-func">#</span><span class="typ-func">box</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">68pt</span><span class="typ-punct">,</span>
-         <span class="typ-func">columns</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">,</span> gutter<span class="typ-punct">:</span> <span class="typ-num">11pt</span><span class="typ-punct">)</span><span class="typ-punct">[</span>
-           <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">par</span><span class="typ-punct">(</span>justify<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span>
-           This research was funded by the
-           National Academy of Sciences.
-           NAoS provided support for field
-           tests and interviews with a
-           grant of up to USD 40.000 for a
-           period of 6 months.
-         <span class="typ-punct">]</span>
+        <span class="typ-func">#</span><span class="typ-func">place</span><span class="typ-punct">(</span>
+          top <span class="typ-op">+</span> center<span class="typ-punct">,</span>
+          scope<span class="typ-punct">:</span> <span class="typ-str">&quot;parent&quot;</span><span class="typ-punct">,</span>
+          float<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span>
+          <span class="typ-func">text</span><span class="typ-punct">(</span><span class="typ-num">1.4em</span><span class="typ-punct">,</span> weight<span class="typ-punct">:</span> <span class="typ-str">&quot;bold&quot;</span><span class="typ-punct">)</span><span class="typ-punct">[</span>
+            My document
+          <span class="typ-punct">]</span><span class="typ-punct">,</span>
         <span class="typ-punct">)</span>
 
-        In recent years, deep learning has
-        increasingly been used to solve a
-        variety of problems.
-        </code></pre><div class="preview"><img src="/assets/docs/c5eb795a3e563522297d1f157b2eb6d5.png" alt="Preview" width="480" height="190"/></div></div>
+        <span class="typ-func">#</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">40</span><span class="typ-punct">)</span>
+        </code></pre><div class="preview"><img src="/assets/docs/38a6fa2245d9d4ae65a4c1a481be6e80.png" alt="Preview" width="480" height="190"/></div></div>
       example: null
       self: false
       params:
@@ -1113,7 +1227,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">4%</span></code>
+        default: <code><span class="typ-num">4%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -1453,7 +1568,7 @@ children:
         intended for presentational and layout purposes, while the
         <a href="/docs/reference/model/table/"><code>table</code></a> element is intended for, in broad terms, presenting
         multiple related data points. In the future, Typst will annotate its output
-        such that screenreaders will annouce content in <code>table</code> as tabular while a
+        such that screenreaders will announce content in <code>table</code> as tabular while a
         grid's content will be announced no different than multiple content blocks
         in the document flow. Set and show rules on one of these elements do not
         affect the other.</p>
@@ -1596,7 +1711,10 @@ children:
       - name: gutter
         details: |-
           <p>The gaps between rows and columns.</p>
-          <p>If there are more gutters than defined sizes, the last gutter is repeated.</p>
+          <p>If there are more gutters than defined sizes, the last gutter is
+          repeated.</p>
+          <p>This is a shorthand to set <code>column-gutter</code> and <code>row-gutter</code> to the same
+          value.</p>
         example: null
         types:
         - auto
@@ -1612,7 +1730,7 @@ children:
         variadic: false
         settable: true
       - name: column-gutter
-        details: <p>The gaps between columns. Takes precedence over <code>gutter</code>.</p>
+        details: <p>The gaps between columns.</p>
         example: null
         types:
         - auto
@@ -1628,7 +1746,7 @@ children:
         variadic: false
         settable: true
       - name: row-gutter
-        details: <p>The gaps between rows. Takes precedence over <code>gutter</code>.</p>
+        details: <p>The gaps between rows.</p>
         example: null
         types:
         - auto
@@ -1853,25 +1971,25 @@ children:
 
           <span class="typ-func">#</span><span class="typ-func">grid</span><span class="typ-punct">(</span>
             fill<span class="typ-punct">:</span> <span class="typ-punct">(</span>x<span class="typ-punct">,</span> y<span class="typ-punct">)</span> <span class="typ-op">=&gt;</span> <span class="typ-func">rgb</span><span class="typ-punct">(</span>
-              <span class="typ-key">if</span> calc<span class="typ-punct">.</span><span class="typ-func">odd</span><span class="typ-punct">(</span>x <span class="typ-op">+</span> y<span class="typ-punct">)</span> <span class="typ-punct">{</span> <span class="typ-str">&quot;EFF0F3&quot;</span> <span class="typ-punct">}</span>
-              <span class="typ-key">else</span> <span class="typ-punct">{</span> <span class="typ-str">&quot;7F8396&quot;</span> <span class="typ-punct">}</span>
+              <span class="typ-key">if</span> calc<span class="typ-punct">.</span><span class="typ-func">odd</span><span class="typ-punct">(</span>x <span class="typ-op">+</span> y<span class="typ-punct">)</span> <span class="typ-punct">{</span> <span class="typ-str">&quot;7F8396&quot;</span> <span class="typ-punct">}</span>
+              <span class="typ-key">else</span> <span class="typ-punct">{</span> <span class="typ-str">&quot;EFF0F3&quot;</span> <span class="typ-punct">}</span>
             <span class="typ-punct">)</span><span class="typ-punct">,</span>
             columns<span class="typ-punct">:</span> <span class="typ-punct">(</span><span class="typ-num">1em</span><span class="typ-punct">,</span><span class="typ-punct">)</span> <span class="typ-op">*</span> <span class="typ-num">8</span><span class="typ-punct">,</span>
             rows<span class="typ-punct">:</span> <span class="typ-num">1em</span><span class="typ-punct">,</span>
             align<span class="typ-punct">:</span> center <span class="typ-op">+</span> horizon<span class="typ-punct">,</span>
 
-            <span class="typ-punct">[</span>♜<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♞<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♝<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♛<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♚<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♝<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♞<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♜<span class="typ-punct">]</span><span class="typ-punct">,</span>
-            <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span><span class="typ-punct">]</span><span class="typ-punct">,</span>  <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span>
+            <span class="typ-punct">[</span>♖<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♘<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♗<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♕<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♔<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♗<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♘<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♖<span class="typ-punct">]</span><span class="typ-punct">,</span>
+            <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span><span class="typ-punct">]</span><span class="typ-punct">,</span>  <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span>
             grid<span class="typ-punct">.</span><span class="typ-func">cell</span><span class="typ-punct">(</span>
               x<span class="typ-punct">:</span> <span class="typ-num">4</span><span class="typ-punct">,</span> y<span class="typ-punct">:</span> <span class="typ-num">3</span><span class="typ-punct">,</span>
               stroke<span class="typ-punct">:</span> blue<span class="typ-punct">.</span><span class="typ-func">transparentize</span><span class="typ-punct">(</span><span class="typ-num">60%</span><span class="typ-punct">)</span>
-            <span class="typ-punct">)</span><span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span>
+            <span class="typ-punct">)</span><span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span>
 
-            <span class="typ-op">..</span><span class="typ-punct">(</span>grid<span class="typ-punct">.</span><span class="typ-func">cell</span><span class="typ-punct">(</span>y<span class="typ-punct">:</span> <span class="typ-num">6</span><span class="typ-punct">)</span><span class="typ-punct">[</span>♙<span class="typ-punct">]</span><span class="typ-punct">,</span><span class="typ-punct">)</span> <span class="typ-op">*</span> <span class="typ-num">8</span><span class="typ-punct">,</span>
-            <span class="typ-op">..</span><span class="typ-punct">(</span><span class="typ-punct">[</span>♖<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♘<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♗<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♕<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♔<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♗<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♘<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♖<span class="typ-punct">]</span><span class="typ-punct">)</span>
+            <span class="typ-op">..</span><span class="typ-punct">(</span>grid<span class="typ-punct">.</span><span class="typ-func">cell</span><span class="typ-punct">(</span>y<span class="typ-punct">:</span> <span class="typ-num">6</span><span class="typ-punct">)</span><span class="typ-punct">[</span>♟<span class="typ-punct">]</span><span class="typ-punct">,</span><span class="typ-punct">)</span> <span class="typ-op">*</span> <span class="typ-num">8</span><span class="typ-punct">,</span>
+            <span class="typ-op">..</span><span class="typ-punct">(</span><span class="typ-punct">[</span>♜<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♞<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♝<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♛<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♚<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♝<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♞<span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span>♜<span class="typ-punct">]</span><span class="typ-punct">)</span>
               <span class="typ-punct">.</span><span class="typ-func">map</span><span class="typ-punct">(</span>grid<span class="typ-punct">.</span>cell<span class="typ-punct">.</span><span class="typ-func">with</span><span class="typ-punct">(</span>y<span class="typ-punct">:</span> <span class="typ-num">7</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
           <span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/9b7cb9300b3b4743d51c03b7666786a1.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/aac963439b453da5433a9ba3a9bcbd90.png" alt="Preview" width="480" height="190"/></div></div>
           <p>You may also apply a show rule on <code>grid.cell</code> to style all cells at once,
           which allows you, for example, to apply styles based on a cell's position.
           Refer to the examples of the <a href="/docs/reference/model/table/#definitions-cell"><code>table.cell</code></a> element to learn
@@ -2479,14 +2597,16 @@ children:
       title: Layout
       keywords: []
       oneliner: Provides access to the current outer container's (or page's, if none)
-        size
       element: false
       contextual: false
       details: |-
-        <p>Provides access to the current outer container's (or page's, if none) size
-        (width and height).</p>
-        <p>The given function must accept a single parameter, <code>size</code>, which is a
-        dictionary with keys <code>width</code> and <code>height</code>, both of type <a href="/docs/reference/layout/length/" title="`length`"><code>length</code></a>.</p>
+        <p>Provides access to the current outer container's (or page's, if none)
+        dimensions (width and height).</p>
+        <p>Accepts a function that receives a single parameter, which is a dictionary
+        with keys <code>width</code> and <code>height</code>, both of type <a href="/docs/reference/layout/length/" title="`length`"><code>length</code></a>. The function is
+        provided <a href="/docs/reference/context/" title="context">context</a>, meaning you don't need to use it in combination with the
+        <code>context</code> keyword. This is why <a href="/docs/reference/layout/measure/" title="`measure`"><code>measure</code></a> can be called in the example
+        below.</p>
         <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> text <span class="typ-op">=</span> <span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">30</span><span class="typ-punct">)</span>
         <span class="typ-func">#</span><span class="typ-func">layout</span><span class="typ-punct">(</span>size <span class="typ-op">=&gt;</span> <span class="typ-punct">[</span>
           <span class="typ-key">#</span><span class="typ-key">let</span> <span class="typ-punct">(</span>height<span class="typ-punct">,</span><span class="typ-punct">)</span> <span class="typ-op">=</span> <span class="typ-func">measure</span><span class="typ-punct">(</span>
@@ -2497,11 +2617,14 @@ children:
           <span class="typ-pol">#</span><span class="typ-pol">text</span>
         <span class="typ-punct">]</span><span class="typ-punct">)</span>
         </code></pre><div class="preview"><img src="/assets/docs/c40525c5c0cb1da6679a02a808d0433b.png" alt="Preview" width="480" height="190"/></div></div>
-        <p>If the <code>layout</code> call is placed inside of a box width a width of <code><span class="typ-num">800pt</span></code>
-        and a height of <code><span class="typ-num">400pt</span></code>, then the specified function will be given the
-        parameter <code><span class="typ-punct">(</span>width<span class="typ-punct">:</span> <span class="typ-num">800pt</span><span class="typ-punct">,</span> height<span class="typ-punct">:</span> <span class="typ-num">400pt</span><span class="typ-punct">)</span></code>. If it placed directly into the
-        page it receives the page's dimensions minus its margins. This is mostly
-        useful in combination with <a href="/docs/reference/layout/measure/">measurement</a>.</p>
+        <p>Note that the <code>layout</code> function forces its contents into a <a href="/docs/reference/layout/block/" title="block">block</a>-level
+        container, so placement relative to the page or pagebreaks are not possible
+        within it.</p>
+        <p>If the <code>layout</code> call is placed inside a box with a width of <code><span class="typ-num">800pt</span></code> and a
+        height of <code><span class="typ-num">400pt</span></code>, then the specified function will be given the argument
+        <code><span class="typ-punct">(</span>width<span class="typ-punct">:</span> <span class="typ-num">800pt</span><span class="typ-punct">,</span> height<span class="typ-punct">:</span> <span class="typ-num">400pt</span><span class="typ-punct">)</span></code>. If it is placed directly into the page, it
+        receives the page's dimensions minus its margins. This is mostly useful in
+        combination with <a href="/docs/reference/layout/measure/">measurement</a>.</p>
         <p>You can also use this function to resolve <a href="/docs/reference/layout/ratio/" title="`ratio`"><code>ratio</code></a> to fixed lengths. This
         might come in handy if you're building your own layout abstractions.</p>
         <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">layout</span><span class="typ-punct">(</span>size <span class="typ-op">=&gt;</span> <span class="typ-punct">{</span>
@@ -2509,8 +2632,8 @@ children:
           <span class="typ-punct">[</span>Half a page is <span class="typ-pol">#</span><span class="typ-pol">half</span> wide.<span class="typ-punct">]</span>
         <span class="typ-punct">}</span><span class="typ-punct">)</span>
         </code></pre><div class="preview"><img src="/assets/docs/19a1c5918ef068a85d6938ba5c41544b.png" alt="Preview" width="480" height="190"/></div></div>
-        <p>Note that this function will provide an infinite width or height if one of
-        the page width or height is <code>auto</code>, respectively.</p>
+        <p>Note that the width or height provided by <code>layout</code> will be infinite if the
+        corresponding page dimension is set to <code><span class="typ-key">auto</span></code>.</p>
       example: null
       self: false
       params:
@@ -2521,8 +2644,8 @@ children:
           <p>The container's size is given as a <a href="/docs/reference/foundations/dictionary/" title="dictionary">dictionary</a> with the keys <code>width</code>
           and <code>height</code>.</p>
           <p>This function is called once for each time the content returned by
-          <code>layout</code> appears in the document. That makes it possible to generate
-          content that depends on the size of the container it is inside of.</p>
+          <code>layout</code> appears in the document. This makes it possible to generate
+          content that depends on the dimensions of its container.</p>
         example: null
         types:
         - function
@@ -2723,6 +2846,12 @@ children:
   - id: parameters
     name: Parameters
     children:
+    - id: parameters-width
+      name: width
+      children: []
+    - id: parameters-height
+      name: height
+      children: []
     - id: parameters-content
       name: content
       children: []
@@ -2741,15 +2870,15 @@ children:
       contextual: true
       details: |-
         <p>Measures the layouted size of content.</p>
-        <p>The <code>measure</code> function lets you determine the layouted size of content. Note
-        that an infinite space is assumed, therefore the measured height/width may
-        not necessarily match the final height/width of the measured content. If you
-        want to measure in the current layout dimensions, you can combine <code>measure</code>
-        and <a href="/docs/reference/layout/layout/" title="`layout`"><code>layout</code></a>.</p>
+        <p>The <code>measure</code> function lets you determine the layouted size of content.
+        By default an infinite space is assumed, so the measured dimensions may
+        not necessarily match the final dimensions of the content.
+        If you want to measure in the current layout dimensions, you can combine
+        <code>measure</code> and <a href="/docs/reference/layout/layout/" title="`layout`"><code>layout</code></a>.</p>
         <h2 id="example">Example</h2>
         <p>The same content can have a different size depending on the <a href="/docs/reference/context/" title="context">context</a> that
-        it is placed into. For example, in the example below <code><span class="typ-pol">#</span><span class="typ-pol">content</span></code> is of
-        course bigger when we increase the font size.</p>
+        it is placed into. In the example below, the <code><span class="typ-pol">#</span><span class="typ-pol">content</span></code> is of course
+        bigger when we increase the font size.</p>
         <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> content <span class="typ-op">=</span> <span class="typ-punct">[</span>Hello!<span class="typ-punct">]</span>
         <span class="typ-pol">#</span><span class="typ-pol">content</span>
         <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">text</span><span class="typ-punct">(</span><span class="typ-num">14pt</span><span class="typ-punct">)</span>
@@ -2769,6 +2898,44 @@ children:
       example: null
       self: false
       params:
+      - name: width
+        details: |-
+          <p>The width available to layout the content.</p>
+          <p>Setting this to <code><span class="typ-key">auto</span></code> indicates infinite available width.</p>
+          <p>Note that using the <code>width</code> and <code>height</code> parameters of this function is
+          different from measuring a sized <a href="/docs/reference/layout/block/" title="`block`"><code>block</code></a> containing the content. In
+          the following example, the former will get the dimensions of the inner
+          content instead of the dimensions of the block.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">context</span> <span class="typ-func">measure</span><span class="typ-punct">(</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">100</span><span class="typ-punct">)</span><span class="typ-punct">,</span> width<span class="typ-punct">:</span> <span class="typ-num">400pt</span><span class="typ-punct">)</span>
+
+          <span class="typ-key">#</span><span class="typ-key">context</span> <span class="typ-func">measure</span><span class="typ-punct">(</span><span class="typ-func">block</span><span class="typ-punct">(</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">100</span><span class="typ-punct">)</span><span class="typ-punct">,</span> width<span class="typ-punct">:</span> <span class="typ-num">400pt</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/ab3d09b5f6527bb333d6c8a7f9ac813c.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - auto
+        - length
+        strings: []
+        default: <code><span class="typ-key">auto</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: false
+      - name: height
+        details: |-
+          <p>The height available to layout the content.</p>
+          <p>Setting this to <code><span class="typ-key">auto</span></code> indicates infinite available height.</p>
+        example: null
+        types:
+        - auto
+        - length
+        strings: []
+        default: <code><span class="typ-key">auto</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: false
       - name: content
         details: <p>The content whose size to measure.</p>
         example: null
@@ -2783,8 +2950,8 @@ children:
         settable: false
       - name: styles
         details: |-
-          <p><em>Compatibility:</em> This argument only exists for compatibility with
-          Typst 0.10 and lower and shouldn't be used anymore.</p>
+          <p><em>Compatibility:</em> This argument is deprecated. It only exists for
+          compatibility with Typst 0.10 and lower and shouldn't be used anymore.</p>
         example: null
         types:
         - none
@@ -2835,7 +3002,7 @@ children:
       contextual: false
       details: |-
         <p>Moves content without affecting layout.</p>
-        <p>The <code>move</code> function allows you to move content while th layout still 'sees'
+        <p>The <code>move</code> function allows you to move content while the layout still 'sees'
         it at the original positions. Containers will still be sized as if the
         content was not moved.</p>
         <h2 id="example">Example</h2>
@@ -2858,7 +3025,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -2870,7 +3038,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -2960,7 +3129,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -2972,7 +3142,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -2984,7 +3155,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -2996,48 +3168,49 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: x
-        details: |-
-          <p>The horizontal padding. Both <code>left</code> and <code>right</code> take precedence over
-          this.</p>
+        details: <p>A shorthand to set <code>left</code> and <code>right</code> to
+          the same value.</p>
         example: null
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: y
-        details: <p>The vertical padding. Both <code>top</code> and <code>bottom</code>
-          take precedence over this.</p>
+        details: <p>A shorthand to set <code>top</code> and <code>bottom</code> to
+          the same value.</p>
         example: null
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: rest
-        details: |-
-          <p>The padding for all sides. All other parameters take precedence over
-          this.</p>
+        details: <p>A shorthand to set all four sides to the same value.</p>
         example: null
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -3152,7 +3325,10 @@ children:
       self: false
       params:
       - name: paper
-        details: <p>A standard paper size to set width and height.</p>
+        details: |-
+          <p>A standard paper size to set width and height.</p>
+          <p>This is just a shorthand for setting <code>width</code> and <code>height</code> and, as such,
+          cannot be retrieved in a context expression.</p>
         example: null
         types:
         - str
@@ -3545,11 +3721,17 @@ children:
         settable: true
       - name: fill
         details: |-
-          <p>The page's background color.</p>
-          <p>This instructs the printer to color the complete page with the given
-          color. If you are considering larger production runs, it may be more
-          environmentally friendly and cost-effective to source pre-dyed pages and
-          not set this property.</p>
+          <p>The page's background fill.</p>
+          <p>Setting this to something non-transparent instructs the printer to color
+          the complete page. If you are considering larger production runs, it may
+          be more environmentally friendly and cost-effective to source pre-dyed
+          pages and not set this property.</p>
+          <p>When set to <code><span class="typ-key">none</span></code>, the background becomes transparent. Note that PDF
+          pages will still appear with a (usually white) background in viewers,
+          but they are actually transparent. (If you print them, no color is used
+          for the background.)</p>
+          <p>The default of <code><span class="typ-key">auto</span></code> results in <code><span class="typ-key">none</span></code> for PDF output, and
+          <code>white</code> for PNG and SVG.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>fill<span class="typ-punct">:</span> <span class="typ-func">rgb</span><span class="typ-punct">(</span><span class="typ-str">&quot;444352&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
           <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">text</span><span class="typ-punct">(</span>fill<span class="typ-punct">:</span> <span class="typ-func">rgb</span><span class="typ-punct">(</span><span class="typ-str">&quot;fdfdfd&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
@@ -3557,11 +3739,12 @@ children:
           </code></pre><div class="preview"><img src="/assets/docs/cdc0af4680a52793d4d06ab2f01d6c91.png" alt="Preview" width="480" height="190"/></div></div>
         types:
         - none
+        - auto
         - color
         - gradient
         - pattern
         strings: []
-        default: <code><span class="typ-key">none</span></code>
+        default: <code><span class="typ-key">auto</span></code>
         positional: false
         named: true
         required: false
@@ -3618,7 +3801,14 @@ children:
         variadic: false
         settable: true
       - name: header
-        details: <p>The page's header. Fills the top margin of each page.</p>
+        details: |-
+          <p>The page's header. Fills the top margin of each page.</p>
+          <ul>
+          <li>Content: Shows the content as the header.</li>
+          <li><code><span class="typ-key">auto</span></code>: Shows the page number if a <code>numbering</code> is set and
+          <code>number-align</code> is <code>top</code>.</li>
+          <li><code><span class="typ-key">none</span></code>: Suppresses the header.</li>
+          </ul>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">par</span><span class="typ-punct">(</span>justify<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span>
           <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>
@@ -3634,9 +3824,10 @@ children:
           </code></pre><div class="preview"><img src="/assets/docs/97f68c9badee84276bb627e66716d146.png" alt="Preview" width="480" height="190"/></div></div>
         types:
         - none
+        - auto
         - content
         strings: []
-        default: <code><span class="typ-key">none</span></code>
+        default: <code><span class="typ-key">auto</span></code>
         positional: false
         named: true
         required: false
@@ -3648,7 +3839,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">30%</span></code>
+        default: <code><span class="typ-num">30%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -3657,8 +3849,14 @@ children:
       - name: footer
         details: |-
           <p>The page's footer. Fills the bottom margin of each page.</p>
-          <p>For just a page number, the <code>numbering</code> property, typically suffices. If
-          you want to create a custom footer, but still display the page number,
+          <ul>
+          <li>Content: Shows the content as the footer.</li>
+          <li><code><span class="typ-key">auto</span></code>: Shows the page number if a <code>numbering</code> is set and
+          <code>number-align</code> is <code>bottom</code>.</li>
+          <li><code><span class="typ-key">none</span></code>: Suppresses the footer.</li>
+          </ul>
+          <p>For just a page number, the <code>numbering</code> property typically suffices. If
+          you want to create a custom footer but still display the page number,
           you can directly access the <a href="/docs/reference/introspection/counter/">page counter</a>.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">par</span><span class="typ-punct">(</span>justify<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span>
@@ -3679,9 +3877,10 @@ children:
           </code></pre><div class="preview"><img src="/assets/docs/63d67767a7728f2d2834c9dc9f61d529.png" alt="Preview" width="480" height="190"/></div></div>
         types:
         - none
+        - auto
         - content
         strings: []
-        default: <code><span class="typ-key">none</span></code>
+        default: <code><span class="typ-key">auto</span></code>
         positional: false
         named: true
         required: false
@@ -3693,7 +3892,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">30%</span></code>
+        default: <code><span class="typ-num">30%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -3861,14 +4061,20 @@ children:
   - id: summary
     name: Summary
     children: []
-  - id: example
-    name: Example
+  - id: examples
+    name: Examples
+    children: []
+  - id: effect-on-other-elements
+    name: Effect On Other Elements
     children: []
   - id: parameters
     name: Parameters
     children:
     - id: parameters-alignment
       name: alignment
+      children: []
+    - id: parameters-scope
+      name: scope
       children: []
     - id: parameters-float
       name: float
@@ -3885,6 +4091,12 @@ children:
     - id: parameters-body
       name: body
       children: []
+  - id: definitions
+    name: Definitions
+    children:
+    - id: definitions-flush
+      name: Flush
+      children: []
   body:
     kind: func
     content:
@@ -3892,26 +4104,64 @@ children:
       name: place
       title: Place
       keywords: []
-      oneliner: Places content at an absolute position.
+      oneliner: Places content relatively to its parent container.
       element: true
       contextual: false
       details: |-
-        <p>Places content at an absolute position.</p>
-        <p>Placed content will not affect the position of other content. Place is
-        always relative to its parent container and will be in the foreground of all
-        other content in the container. Page margins will be respected.</p>
-        <h2 id="example">Example</h2>
-        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">60pt</span><span class="typ-punct">)</span>
+        <p>Places content relatively to its parent container.</p>
+        <p>Placed content can be either overlaid (the default) or floating. Overlaid
+        content is aligned with the parent container according to the given
+        <a href="/docs/reference/layout/place/#parameters-alignment"><code>alignment</code></a>, and shown over any other content added so
+        far in the container. Floating content is placed at the top or bottom of
+        the container, displacing other content down or up respectively. In both
+        cases, the content position can be adjusted with <a href="/docs/reference/layout/place/#parameters-dx"><code>dx</code></a> and
+        <a href="/docs/reference/layout/place/#parameters-dy"><code>dy</code></a> offsets without affecting the layout.</p>
+        <p>The parent can be any container such as a <a href="/docs/reference/layout/block/" title="`block`"><code>block</code></a>, <a href="/docs/reference/layout/box/" title="`box`"><code>box</code></a>,
+        <a href="/docs/reference/visualize/rect/" title="`rect`"><code>rect</code></a>, etc. A top level <code>place</code> call will place content directly
+        in the text area of the current page. This can be used for absolute
+        positioning on the page: with a <code>top + left</code>
+        <a href="/docs/reference/layout/place/#parameters-alignment"><code>alignment</code></a>, the offsets <code>dx</code> and <code>dy</code> will set the
+        position of the element's top left corner relatively to the top left corner
+        of the text area. For absolute positioning on the full page including
+        margins, you can use <code>place</code> in <a href="/docs/reference/layout/page/#parameters-foreground"><code>page.foreground</code></a> or
+        <a href="/docs/reference/layout/page/#parameters-background"><code>page.background</code></a>.</p>
+        <h2 id="examples">Examples</h2>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">120pt</span><span class="typ-punct">)</span>
         Hello, world!
 
-        <span class="typ-func">#</span><span class="typ-func">place</span><span class="typ-punct">(</span>
-          top <span class="typ-op">+</span> right<span class="typ-punct">,</span>
-          <span class="typ-func">square</span><span class="typ-punct">(</span>
-            width<span class="typ-punct">:</span> <span class="typ-num">20pt</span><span class="typ-punct">,</span>
-            stroke<span class="typ-punct">:</span> <span class="typ-num">2pt</span> <span class="typ-op">+</span> blue
-          <span class="typ-punct">)</span><span class="typ-punct">,</span>
+        <span class="typ-func">#</span><span class="typ-func">rect</span><span class="typ-punct">(</span>
+          width<span class="typ-punct">:</span> <span class="typ-num">100%</span><span class="typ-punct">,</span>
+          height<span class="typ-punct">:</span> <span class="typ-num">2cm</span><span class="typ-punct">,</span>
+          <span class="typ-func">place</span><span class="typ-punct">(</span>horizon <span class="typ-op">+</span> right<span class="typ-punct">,</span> <span class="typ-func">square</span><span class="typ-punct">(</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
         <span class="typ-punct">)</span>
-        </code></pre><div class="preview"><img src="/assets/docs/2f21fdc6427bee49b180be0a51e8155d.png" alt="Preview" width="480" height="190"/></div></div>
+
+        <span class="typ-func">#</span><span class="typ-func">place</span><span class="typ-punct">(</span>
+          top <span class="typ-op">+</span> left<span class="typ-punct">,</span>
+          dx<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">5pt</span><span class="typ-punct">,</span>
+          <span class="typ-func">square</span><span class="typ-punct">(</span>size<span class="typ-punct">:</span> <span class="typ-num">5pt</span><span class="typ-punct">,</span> fill<span class="typ-punct">:</span> red<span class="typ-punct">)</span><span class="typ-punct">,</span>
+        <span class="typ-punct">)</span>
+        </code></pre><div class="preview"><img src="/assets/docs/53c8eb9bccd11c631e9e24875bc3b418.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="effect-on-other-elements">Effect on the position of other elements</h2>
+        <p>Overlaid elements don't take space in the flow of content, but a <code>place</code>
+        call inserts an invisible block-level element in the flow. This can
+        affect the layout by breaking the current paragraph. To avoid this,
+        you can wrap the <code>place</code> call in a <a href="/docs/reference/layout/box/" title="`box`"><code>box</code></a> when the call is made
+        in the middle of a paragraph. The alignment and offsets will then be
+        relative to this zero-size box. To make sure it doesn't interfere with
+        spacing, the box should be attached to a word using a word joiner.</p>
+        <p>For example, the following defines a function for attaching an annotation
+        to the following word:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> <span class="typ-func">annotate</span><span class="typ-punct">(</span><span class="typ-op">..</span>args<span class="typ-punct">)</span> <span class="typ-op">=</span> <span class="typ-punct">{</span>
+          <span class="typ-func">box</span><span class="typ-punct">(</span><span class="typ-func">place</span><span class="typ-punct">(</span><span class="typ-op">..</span>args<span class="typ-punct">)</span><span class="typ-punct">)</span>
+          sym<span class="typ-punct">.</span>wj
+          <span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">0pt</span><span class="typ-punct">,</span> weak<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span>
+        <span class="typ-punct">}</span>
+
+        A placed <span class="typ-func">#</span><span class="typ-func">annotate</span><span class="typ-punct">(</span><span class="typ-func">square</span><span class="typ-punct">(</span><span class="typ-punct">)</span><span class="typ-punct">,</span> dy<span class="typ-punct">:</span> <span class="typ-num">2pt</span><span class="typ-punct">)</span>
+        square in my text.
+        </code></pre><div class="preview"><img src="/assets/docs/08441666a4637e7a5267c2de9c646aa2.png" alt="Preview" width="480" height="190"/></div></div>
+        <p>The zero-width weak spacing serves to discard spaces between the function
+        call and the next word.</p>
       example: null
       self: false
       params:
@@ -3922,9 +4172,8 @@ children:
           <li>If <code>float</code> is <code><span class="typ-key">false</span></code>, then this can be any alignment other than <code><span class="typ-key">auto</span></code>.</li>
           <li>If <code>float</code> is <code><span class="typ-key">true</span></code>, then this must be <code><span class="typ-key">auto</span></code>, <code>top</code>, or <code>bottom</code>.</li>
           </ul>
-          <p>When an axis of the page is <code><span class="typ-key">auto</span></code> sized, all alignments relative to
-          that axis will be ignored, instead, the item will be placed in the
-          origin of the axis.</p>
+          <p>When <code>float</code> is <code><span class="typ-key">false</span></code> and no vertical alignment is specified, the
+          content is placed at the current position on the vertical axis.</p>
         example: null
         types:
         - auto
@@ -3936,11 +4185,49 @@ children:
         required: false
         variadic: false
         settable: true
+      - name: scope
+        details: |-
+          <p>Relative to which containing scope something is placed.</p>
+          <p>The parent scope is primarily used with figures and, for
+          this reason, the figure function has a mirrored <a href="/docs/reference/model/figure/#parameters-scope"><code>scope</code>
+          parameter</a>. Nonetheless, it can also be more generally
+          useful to break out of the columns. A typical example would be to
+          <a href="/docs/guides/page-setup-guide/#columns">create a single-column title section</a>
+          in a two-column document.</p>
+          <p>Note that parent-scoped placement is currently only supported if <code>float</code>
+          is <code><span class="typ-key">true</span></code>. This may change in the future.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">150pt</span><span class="typ-punct">,</span> columns<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">place</span><span class="typ-punct">(</span>
+            top <span class="typ-op">+</span> center<span class="typ-punct">,</span>
+            scope<span class="typ-punct">:</span> <span class="typ-str">&quot;parent&quot;</span><span class="typ-punct">,</span>
+            float<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span>
+            <span class="typ-func">rect</span><span class="typ-punct">(</span>width<span class="typ-punct">:</span> <span class="typ-num">80%</span><span class="typ-punct">,</span> fill<span class="typ-punct">:</span> aqua<span class="typ-punct">)</span><span class="typ-punct">,</span>
+          <span class="typ-punct">)</span>
+
+          <span class="typ-func">#</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">25</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/9f896a62e48a0c0af46a6222112933c2.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - str
+        strings:
+        - string: column
+          details: <p>Place into the current column.</p>
+        - string: parent
+          details: <p>Place relative to the parent, letting the content span over
+            all columns.</p>
+        default: <code><span class="typ-str">&quot;column&quot;</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
       - name: float
         details: |-
           <p>Whether the placed element has floating layout.</p>
-          <p>Floating elements are positioned at the top or bottom of the page,
-          displacing in-flow content.</p>
+          <p>Floating elements are positioned at the top or bottom of the parent
+          container, displacing in-flow content. They are always placed in the
+          in-flow order relative to each other, as well as before any content
+          following a later <a href="/docs/reference/layout/place/#definitions-flush" title="`place.flush`"><code>place.flush</code></a> element.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">150pt</span><span class="typ-punct">)</span>
           <span class="typ-key">#</span><span class="typ-key">let</span> <span class="typ-func">note</span><span class="typ-punct">(</span>where<span class="typ-punct">,</span> body<span class="typ-punct">)</span> <span class="typ-op">=</span> <span class="typ-func">place</span><span class="typ-punct">(</span>
@@ -3967,7 +4254,10 @@ children:
         variadic: false
         settable: true
       - name: clearance
-        details: <p>The amount of clearance the placed element has in a floating layout.</p>
+        details: |-
+          <p>The spacing between the placed element and other elements in a floating
+          layout.</p>
+          <p>Has no effect if <code>float</code> is <code><span class="typ-key">false</span></code>.</p>
         example: null
         types:
         - length
@@ -3993,7 +4283,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -4009,7 +4300,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
@@ -4029,7 +4321,38 @@ children:
         settable: false
       returns:
       - content
-      scope: []
+      scope:
+      - path:
+        - place
+        name: flush
+        title: Flush
+        keywords: []
+        oneliner: Asks the layout algorithm to place pending floating elements before
+        element: true
+        contextual: false
+        details: |-
+          <p>Asks the layout algorithm to place pending floating elements before
+          continuing with the content.</p>
+          <p>This is useful for preventing floating figures from spilling
+          into the next section.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">15</span><span class="typ-punct">)</span>
+
+          <span class="typ-func">#</span><span class="typ-func">figure</span><span class="typ-punct">(</span>
+            <span class="typ-func">rect</span><span class="typ-punct">(</span>width<span class="typ-punct">:</span> <span class="typ-num">100%</span><span class="typ-punct">,</span> height<span class="typ-punct">:</span> <span class="typ-num">50pt</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            placement<span class="typ-punct">:</span> <span class="typ-key">auto</span><span class="typ-punct">,</span>
+            caption<span class="typ-punct">:</span> <span class="typ-punct">[</span>A rectangle<span class="typ-punct">]</span><span class="typ-punct">,</span>
+          <span class="typ-punct">)</span>
+
+          <span class="typ-pol">#</span><span class="typ-pol">place</span><span class="typ-punct">.</span><span class="typ-func">flush</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+
+          This text appears after the figure.
+          </code></pre><div class="preview"><img src="/assets/docs/547fce749dadcf79da9e1c349d81617a.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params: []
+        returns:
+        - content
+        scope: []
   children: []
 - route: /docs/reference/layout/ratio/
   title: Ratio
@@ -4115,6 +4438,12 @@ children:
     - id: parameters-body
       name: body
       children: []
+    - id: parameters-gap
+      name: gap
+      children: []
+    - id: parameters-justify
+      name: justify
+      children: []
   body:
     kind: func
     content:
@@ -4129,7 +4458,7 @@ children:
         <p>Repeats content to the available space.</p>
         <p>This can be useful when implementing a custom index, reference, or outline.</p>
         <p>Space may be inserted between the instances of the body parameter, so be
-        sure to include negative space if you need the instances to overlap.</p>
+        sure to adjust the <a href="/docs/reference/layout/repeat/#parameters-justify"><code>justify</code></a> parameter accordingly.</p>
         <p>Errors if there no bounds on the available space, as it would create
         infinite content.</p>
         <h2 id="example">Example</h2>
@@ -4157,6 +4486,32 @@ children:
         required: true
         variadic: false
         settable: false
+      - name: gap
+        details: <p>The gap between each instance of the body.</p>
+        example: null
+        types:
+        - length
+        strings: []
+        default: <code><span class="typ-num">0pt</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: justify
+        details: |-
+          <p>Whether to increase the gap between instances to completely fill the
+          available space.</p>
+        example: null
+        types:
+        - bool
+        strings: []
+        default: <code><span class="typ-key">true</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
       returns:
       - content
       scope: []
@@ -4297,6 +4652,9 @@ children:
   - id: parameters
     name: Parameters
     children:
+    - id: parameters-factor
+      name: factor
+      children: []
     - id: parameters-x
       name: x
       children: []
@@ -4333,12 +4691,31 @@ children:
       example: null
       self: false
       params:
+      - name: factor
+        details: |-
+          <p>The scaling factor for both axes, as a positional argument. This is just
+          an optional shorthand notation for setting <code>x</code> and <code>y</code> to the same
+          value.</p>
+        example: null
+        types:
+        - auto
+        - length
+        - ratio
+        strings: []
+        default: <code><span class="typ-num">100%</span></code>
+        positional: true
+        named: false
+        required: false
+        variadic: false
+        settable: true
       - name: x
         details: |-
           <p>The horizontal scaling factor.</p>
           <p>The body will be mirrored horizontally if the parameter is negative.</p>
         example: null
         types:
+        - auto
+        - length
         - ratio
         strings: []
         default: <code><span class="typ-num">100%</span></code>
@@ -4353,6 +4730,8 @@ children:
           <p>The body will be mirrored vertically if the parameter is negative.</p>
         example: null
         types:
+        - auto
+        - length
         - ratio
         strings: []
         default: <code><span class="typ-num">100%</span></code>
@@ -4410,6 +4789,137 @@ children:
       - content
       scope: []
   children: []
+- route: /docs/reference/layout/skew/
+  title: Skew
+  description: Documentation for the `skew` function.
+  part: null
+  outline:
+  - id: summary
+    name: Summary
+    children: []
+  - id: example
+    name: Example
+    children: []
+  - id: parameters
+    name: Parameters
+    children:
+    - id: parameters-ax
+      name: ax
+      children: []
+    - id: parameters-ay
+      name: ay
+      children: []
+    - id: parameters-origin
+      name: origin
+      children: []
+    - id: parameters-reflow
+      name: reflow
+      children: []
+    - id: parameters-body
+      name: body
+      children: []
+  body:
+    kind: func
+    content:
+      path: []
+      name: skew
+      title: Skew
+      keywords: []
+      oneliner: Skews content.
+      element: true
+      contextual: false
+      details: |-
+        <p>Skews content.</p>
+        <p>Skews an element in horizontal and/or vertical direction. The layout will
+        act as if the element was not skewed unless you specify <code>reflow: <span class="typ-key">true</span></code>.</p>
+        <h2 id="example">Example</h2>
+        <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ax<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">12deg</span><span class="typ-punct">)</span><span class="typ-punct">[</span>
+          This is some fake italic text.
+        <span class="typ-punct">]</span>
+        </code></pre><div class="preview"><img src="/assets/docs/bcf2b72d02b0dbf6d089beecf4b8ce7f.png" alt="Preview" width="480" height="190"/></div></div>
+      example: null
+      self: false
+      params:
+      - name: ax
+        details: <p>The horizontal skewing angle.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ax<span class="typ-punct">:</span> <span class="typ-num">30deg</span><span class="typ-punct">)</span><span class="typ-punct">[</span>Skewed<span class="typ-punct">]</span>
+          </code></pre><div class="preview"><img src="/assets/docs/2e3e0c116ccc2a0beb04de1056bd0193.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - angle
+        strings: []
+        default: <code><span class="typ-num">0deg</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: ay
+        details: <p>The vertical skewing angle.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ay<span class="typ-punct">:</span> <span class="typ-num">30deg</span><span class="typ-punct">)</span><span class="typ-punct">[</span>Skewed<span class="typ-punct">]</span>
+          </code></pre><div class="preview"><img src="/assets/docs/6347eb97dc4576ff349b86226acdad0d.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - angle
+        strings: []
+        default: <code><span class="typ-num">0deg</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: origin
+        details: |-
+          <p>The origin of the skew transformation.</p>
+          <p>The origin will stay fixed during the operation.</p>
+        example: |-
+          <div class="previewed-code"><pre><code>X <span class="typ-func">#</span><span class="typ-func">box</span><span class="typ-punct">(</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ax<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">30deg</span><span class="typ-punct">,</span> origin<span class="typ-punct">:</span> center <span class="typ-op">+</span> horizon<span class="typ-punct">)</span><span class="typ-punct">[</span>X<span class="typ-punct">]</span><span class="typ-punct">)</span> X <span class="typ-escape">\</span>
+          X <span class="typ-func">#</span><span class="typ-func">box</span><span class="typ-punct">(</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ax<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">30deg</span><span class="typ-punct">,</span> origin<span class="typ-punct">:</span> bottom <span class="typ-op">+</span> left<span class="typ-punct">)</span><span class="typ-punct">[</span>X<span class="typ-punct">]</span><span class="typ-punct">)</span> X <span class="typ-escape">\</span>
+          X <span class="typ-func">#</span><span class="typ-func">box</span><span class="typ-punct">(</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ax<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">30deg</span><span class="typ-punct">,</span> origin<span class="typ-punct">:</span> top <span class="typ-op">+</span> right<span class="typ-punct">)</span><span class="typ-punct">[</span>X<span class="typ-punct">]</span><span class="typ-punct">)</span> X
+          </code></pre><div class="preview"><img src="/assets/docs/f35f6a51ae4f71d06be74ba5fb1b7ccb.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - alignment
+        strings: []
+        default: <code>center <span class="typ-op">+</span> horizon</code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: reflow
+        details: |-
+          <p>Whether the skew transformation impacts the layout.</p>
+          <p>If set to <code><span class="typ-key">false</span></code>, the skewed content will retain the bounding box of
+          the original content. If set to <code><span class="typ-key">true</span></code>, the bounding box will take the
+          transformation of the content into account and adjust the layout accordingly.</p>
+        example: |-
+          <div class="previewed-code"><pre><code>Hello <span class="typ-func">#</span><span class="typ-func">skew</span><span class="typ-punct">(</span>ay<span class="typ-punct">:</span> <span class="typ-num">30deg</span><span class="typ-punct">,</span> reflow<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span> <span class="typ-str">&quot;World&quot;</span><span class="typ-punct">)</span>!
+          </code></pre><div class="preview"><img src="/assets/docs/f65ad430b25c423bd108866ca29a7325.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - bool
+        strings: []
+        default: <code><span class="typ-key">false</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: body
+        details: <p>The content to skew.</p>
+        example: null
+        types:
+        - content
+        strings: []
+        default: null
+        positional: true
+        named: false
+        required: true
+        variadic: false
+        settable: false
+      returns:
+      - content
+      scope: []
+  children: []
 - route: /docs/reference/layout/h/
   title: Spacing (H)
   description: Documentation for the `h` function.
@@ -4420,6 +4930,9 @@ children:
     children: []
   - id: example
     name: Example
+    children: []
+  - id: fractional-spacing
+    name: Fractional Spacing
     children: []
   - id: math-spacing
     name: Math Spacing
@@ -4450,12 +4963,20 @@ children:
         according to their relative fractions.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code>First <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">1cm</span><span class="typ-punct">)</span> Second <span class="typ-escape">\</span>
-        First <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">30%</span><span class="typ-punct">)</span> Second <span class="typ-escape">\</span>
+        First <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">30%</span><span class="typ-punct">)</span> Second
+        </code></pre><div class="preview"><img src="/assets/docs/b02a615c7d8ead62904c6013c3acddcb.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="fractional-spacing">Fractional spacing</h2>
+        <p>With fractional spacing, you can align things within a line without forcing
+        a paragraph break (like <a href="/docs/reference/layout/align/" title="`align`"><code>align</code></a> would). Each fractionally sized element
+        gets space based on the ratio of its fraction to the sum of all fractions.</p>
+        <div class="previewed-code"><pre><code>First <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">1fr</span><span class="typ-punct">)</span> Second <span class="typ-escape">\</span>
+        First <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">1fr</span><span class="typ-punct">)</span> Second <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">1fr</span><span class="typ-punct">)</span> Third <span class="typ-escape">\</span>
         First <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">2fr</span><span class="typ-punct">)</span> Second <span class="typ-func">#</span><span class="typ-func">h</span><span class="typ-punct">(</span><span class="typ-num">1fr</span><span class="typ-punct">)</span> Third
-        </code></pre><div class="preview"><img src="/assets/docs/75141e42b71ab9e6bb69e34b0ae0d2e5.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/a11a34ad0a90d498d4e87a59219ac584.png" alt="Preview" width="480" height="190"/></div></div>
         <h2 id="math-spacing">Mathematical Spacing</h2>
         <p>In <a href="/docs/reference/math/">mathematical formulas</a>, you can additionally use these
-        constants to add spacing between elements: <code>thin</code>, <code>med</code>, <code>thick</code>, <code>quad</code>, <code>wide</code>.</p>
+        constants to add spacing between elements: <code>thin</code> (1/6 em), <code>med</code> (2/9 em),
+        <code>thick</code> (5/18 em), <code>quad</code> (1 em), <code>wide</code> (2 em).</p>
       example: null
       self: false
       params:

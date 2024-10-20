@@ -6,7 +6,7 @@ use ecow::{eco_format, EcoString};
 
 use crate::foundations::{cast, ty, Fold, Repr, Resolve, StyleChain};
 use crate::layout::{Abs, Em, Length, Ratio};
-use crate::util::Numeric;
+use crate::utils::Numeric;
 
 /// A length in relation to some known length.
 ///
@@ -86,6 +86,12 @@ impl Rel<Length> {
             None
         }
     }
+
+    /// Convert to a relative length with the absolute part resolved at the
+    /// given font size.
+    pub fn at(self, font_size: Abs) -> Rel<Abs> {
+        self.map(|abs| abs.at(font_size))
+    }
 }
 
 impl<T: Numeric + Debug> Debug for Rel<T> {
@@ -100,11 +106,7 @@ impl<T: Numeric + Debug> Debug for Rel<T> {
 
 impl<T: Numeric + Repr> Repr for Rel<T> {
     fn repr(&self) -> EcoString {
-        match (self.rel.is_zero(), self.abs.is_zero()) {
-            (false, false) => eco_format!("{} + {}", self.rel.repr(), self.abs.repr()),
-            (false, true) => self.rel.repr(),
-            (true, _) => self.abs.repr(),
-        }
+        eco_format!("{} + {}", self.rel.repr(), self.abs.repr())
     }
 }
 

@@ -9,7 +9,9 @@ use crate::foundations::{
     Element, Func, IntoValue, Module, NativeElement, NativeFunc, NativeFuncData,
     NativeType, Type, Value,
 };
-use crate::util::Static;
+use crate::syntax::ast::{self, AstNode};
+use crate::syntax::Span;
+use crate::utils::Static;
 use crate::Library;
 
 #[doc(inline)]
@@ -48,8 +50,14 @@ impl<'a> Scopes<'a> {
     pub fn get(&self, var: &str) -> HintedStrResult<&Value> {
         std::iter::once(&self.top)
             .chain(self.scopes.iter().rev())
-            .chain(self.base.map(|base| base.global.scope()))
             .find_map(|scope| scope.get(var))
+            .or_else(|| {
+                self.base.and_then(|base| match base.global.scope().get(var) {
+                    Some(value) => Some(value),
+                    None if var == "std" => Some(&base.std),
+                    None => None,
+                })
+            })
             .ok_or_else(|| unknown_variable(var))
     }
 
@@ -57,9 +65,20 @@ impl<'a> Scopes<'a> {
     pub fn get_in_math(&self, var: &str) -> HintedStrResult<&Value> {
         std::iter::once(&self.top)
             .chain(self.scopes.iter().rev())
-            .chain(self.base.map(|base| base.math.scope()))
             .find_map(|scope| scope.get(var))
-            .ok_or_else(|| unknown_variable(var))
+            .or_else(|| {
+                self.base.and_then(|base| match base.math.scope().get(var) {
+                    Some(value) => Some(value),
+                    None if var == "std" => Some(&base.std),
+                    None => None,
+                })
+            })
+            .ok_or_else(|| {
+                unknown_variable_math(
+                    var,
+                    self.base.is_some_and(|base| base.global.scope().get(var).is_some()),
+                )
+            })
     }
 
     /// Try to access a variable mutably.
@@ -69,28 +88,65 @@ impl<'a> Scopes<'a> {
             .find_map(|scope| scope.get_mut(var))
             .ok_or_else(|| {
                 match self.base.and_then(|base| base.global.scope().get(var)) {
-                    Some(_) => eco_format!("cannot mutate a constant: {}", var).into(),
+                    Some(_) => cannot_mutate_constant(var),
+                    _ if var == "std" => cannot_mutate_constant(var),
                     _ => unknown_variable(var),
                 }
             })?
     }
+
+    /// Check if an std variable is shadowed.
+    pub fn check_std_shadowed(&self, var: &str) -> bool {
+        self.base.is_some_and(|base| base.global.scope().get(var).is_some())
+            && std::iter::once(&self.top)
+                .chain(self.scopes.iter().rev())
+                .any(|scope| scope.get(var).is_some())
+    }
+}
+
+#[cold]
+fn cannot_mutate_constant(var: &str) -> HintedString {
+    eco_format!("cannot mutate a constant: {}", var).into()
 }
 
 /// The error message when a variable is not found.
 #[cold]
 fn unknown_variable(var: &str) -> HintedString {
-    let mut res = HintedString {
-        message: eco_format!("unknown variable: {}", var),
-        hints: vec![],
-    };
+    let mut res = HintedString::new(eco_format!("unknown variable: {}", var));
+
+    if var.contains('-') {
+        res.hint(eco_format!(
+            "if you meant to use subtraction, try adding spaces around the minus sign{}: `{}`",
+            if var.matches('-').count() > 1 { "s" } else { "" },
+            var.replace('-', " - ")
+        ));
+    }
+
+    res
+}
+
+#[cold]
+fn unknown_variable_math(var: &str, in_global: bool) -> HintedString {
+    let mut res = HintedString::new(eco_format!("unknown variable: {}", var));
 
     if matches!(var, "none" | "auto" | "false" | "true") {
-        res.hints.push(eco_format!(
-            "if you meant to use a literal, try adding a hash before it"
+        res.hint(eco_format!(
+            "if you meant to use a literal, try adding a hash before it: `#{var}`",
         ));
-    } else if var.contains('-') {
-        res.hints.push(eco_format!(
-            "if you meant to use subtraction, try adding spaces around the minus sign",
+    } else if in_global {
+        res.hint(eco_format!(
+            "`{var}` is not available directly in math, try adding a hash before it: `#{var}`",
+        ));
+    } else {
+        res.hint(eco_format!(
+            "if you meant to display multiple letters as is, try adding spaces between each letter: `{}`",
+            var.chars()
+                .flat_map(|c| [' ', c])
+                .skip(1)
+                .collect::<EcoString>()
+        ));
+        res.hint(eco_format!(
+            "or if you meant to display this as text, try placing it in quotes: `\"{var}\"`"
         ));
     }
 
@@ -129,6 +185,23 @@ impl Scope {
     /// Bind a value to a name.
     #[track_caller]
     pub fn define(&mut self, name: impl Into<EcoString>, value: impl IntoValue) {
+        self.define_spanned(name, value, Span::detached())
+    }
+
+    /// Bind a value to a name defined by an identifier.
+    #[track_caller]
+    pub fn define_ident(&mut self, ident: ast::Ident, value: impl IntoValue) {
+        self.define_spanned(ident.get().clone(), value, ident.span())
+    }
+
+    /// Bind a value to a name.
+    #[track_caller]
+    pub fn define_spanned(
+        &mut self,
+        name: impl Into<EcoString>,
+        value: impl IntoValue,
+        span: Span,
+    ) {
         let name = name.into();
 
         #[cfg(debug_assertions)]
@@ -136,8 +209,24 @@ impl Scope {
             panic!("duplicate definition: {name}");
         }
 
-        self.map
-            .insert(name, Slot::new(value.into_value(), Kind::Normal, self.category));
+        self.map.insert(
+            name,
+            Slot::new(value.into_value(), span, Kind::Normal, self.category),
+        );
+    }
+
+    /// Define a captured, immutable binding.
+    pub fn define_captured(
+        &mut self,
+        name: EcoString,
+        value: Value,
+        capturer: Capturer,
+        span: Span,
+    ) {
+        self.map.insert(
+            name,
+            Slot::new(value.into_value(), span, Kind::Captured(capturer), self.category),
+        );
     }
 
     /// Define a native function through a Rust type that shadows the function.
@@ -168,19 +257,6 @@ impl Scope {
         self.define(module.name().clone(), module);
     }
 
-    /// Define a captured, immutable binding.
-    pub fn define_captured(
-        &mut self,
-        var: impl Into<EcoString>,
-        value: impl IntoValue,
-        capturer: Capturer,
-    ) {
-        self.map.insert(
-            var.into(),
-            Slot::new(value.into_value(), Kind::Captured(capturer), self.category),
-        );
-    }
-
     /// Try to access a variable immutably.
     pub fn get(&self, var: &str) -> Option<&Value> {
         self.map.get(var).map(Slot::read)
@@ -194,14 +270,19 @@ impl Scope {
             .map(|res| res.map_err(HintedString::from))
     }
 
+    /// Get the span of a definition.
+    pub fn get_span(&self, var: &str) -> Option<Span> {
+        Some(self.map.get(var)?.span)
+    }
+
     /// Get the category of a definition.
     pub fn get_category(&self, var: &str) -> Option<Category> {
         self.map.get(var)?.category
     }
 
     /// Iterate over all definitions.
-    pub fn iter(&self) -> impl Iterator<Item = (&EcoString, &Value)> {
-        self.map.iter().map(|(k, v)| (k, v.read()))
+    pub fn iter(&self) -> impl Iterator<Item = (&EcoString, &Value, Span)> {
+        self.map.iter().map(|(k, v)| (k, v.read(), v.span))
     }
 }
 
@@ -241,6 +322,8 @@ struct Slot {
     value: Value,
     /// The kind of slot, determines how the value can be accessed.
     kind: Kind,
+    /// A span associated with the stored value.
+    span: Span,
     /// The category of the slot.
     category: Option<Category>,
 }
@@ -265,8 +348,8 @@ pub enum Capturer {
 
 impl Slot {
     /// Create a new slot.
-    fn new(value: Value, kind: Kind, category: Option<Category>) -> Self {
-        Self { value, kind, category }
+    fn new(value: Value, span: Span, kind: Kind, category: Option<Category>) -> Self {
+        Self { value, span, kind, category }
     }
 
     /// Read the value.

@@ -102,7 +102,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to a CBOR file.</p>
+        details: |-
+          <p>Path to a CBOR file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -238,7 +240,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to a CSV file.</p>
+        details: |-
+          <p>Path to a CSV file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -435,7 +439,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to a JSON file.</p>
+        details: |-
+          <p>Path to a JSON file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -563,7 +569,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to a file.</p>
+        details: |-
+          <p>Path to a file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -662,7 +670,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to a TOML file.</p>
+        details: |-
+          <p>Path to a TOML file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -830,7 +840,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to an XML file.</p>
+        details: |-
+          <p>Path to an XML file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str
@@ -947,7 +959,9 @@ children:
       self: false
       params:
       - name: path
-        details: <p>Path to a YAML file.</p>
+        details: |-
+          <p>Path to a YAML file.</p>
+          <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
         example: null
         types:
         - str

@@ -12,6 +12,7 @@ mod metadata;
 #[path = "query.rs"]
 mod query_;
 mod state;
+mod tag;
 
 pub use self::counter::*;
 pub use self::here_::*;
@@ -22,17 +23,9 @@ pub use self::locator::*;
 pub use self::metadata::*;
 pub use self::query_::*;
 pub use self::state::*;
+pub use self::tag::*;
 
-use std::fmt::{self, Debug, Formatter};
-
-use ecow::{eco_format, EcoString};
-use smallvec::SmallVec;
-
-use crate::foundations::{
-    category, elem, ty, Category, Content, Packed, Repr, Scope, Unlabellable,
-};
-use crate::model::Destination;
-use crate::realize::{Behave, Behaviour};
+use crate::foundations::{category, Category, Scope};
 
 /// Interactions between document parts.
 ///
@@ -57,61 +50,4 @@ pub fn define(global: &mut Scope) {
     global.define_func::<here>();
     global.define_func::<query>();
     global.define_func::<locate>();
-}
-
-/// Hosts metadata and ensures metadata is produced even for empty elements.
-#[elem(Behave, Unlabellable)]
-pub struct MetaElem {
-    /// Metadata that should be attached to all elements affected by this style
-    /// property.
-    ///
-    /// This must be accessed and applied to all frames produced by elements
-    /// that manually handle styles (because their children can have varying
-    /// styles). This currently includes flow, par, and equation.
-    ///
-    /// Other elements don't manually need to handle it because their parents
-    /// that result from realization will take care of it and the metadata can
-    /// only apply to them as a whole, not part of it (because they don't manage
-    /// styles).
-    #[fold]
-    pub data: SmallVec<[Meta; 1]>,
-}
-
-impl Unlabellable for Packed<MetaElem> {}
-
-impl Behave for Packed<MetaElem> {
-    fn behaviour(&self) -> Behaviour {
-        Behaviour::Invisible
-    }
-}
-
-/// Meta information that isn't visible or renderable.
-#[ty]
-#[derive(Clone, PartialEq, Hash)]
-pub enum Meta {
-    /// An internal or external link to a destination.
-    Link(Destination),
-    /// An identifiable element that produces something within the area this
-    /// metadata is attached to.
-    Elem(Content),
-    /// Indicates that content should be hidden. This variant doesn't appear
-    /// in the final frames as it is removed alongside the content that should
-    /// be hidden.
-    Hide,
-}
-
-impl Debug for Meta {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self {
-            Self::Link(dest) => write!(f, "Link({dest:?})"),
-            Self::Elem(content) => write!(f, "Elem({:?})", content.func()),
-            Self::Hide => f.pad("Hide"),
-        }
-    }
-}
-
-impl Repr for Meta {
-    fn repr(&self) -> EcoString {
-        eco_format!("{self:?}")
-    }
 }

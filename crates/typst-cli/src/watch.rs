@@ -10,9 +10,10 @@ use codespan_reporting::term::{self, termcolor};
 use ecow::eco_format;
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher as _};
 use same_file::is_same_file;
-use typst::diag::StrResult;
+use typst::diag::{bail, StrResult};
+use typst::utils::format_duration;
 
-use crate::args::{CompileCommand, Input};
+use crate::args::{CompileCommand, Input, Output};
 use crate::compile::compile_once;
 use crate::timings::Timer;
 use crate::world::{SystemWorld, WorldCreationError};
@@ -20,8 +21,12 @@ use crate::{print_error, terminal};
 
 /// Execute a watching compilation command.
 pub fn watch(mut timer: Timer, mut command: CompileCommand) -> StrResult<()> {
+    let Output::Path(output) = command.output() else {
+        bail!("cannot write document to stdout in watch mode");
+    };
+
     // Create a file system watcher.
-    let mut watcher = Watcher::new(command.output())?;
+    let mut watcher = Watcher::new(output)?;
 
     // Create the world that serves sources, files, and fonts.
     // Additionally, if any files do not exist, wait until they do.
@@ -281,7 +286,7 @@ impl Status {
         out.set_color(&color)?;
         write!(out, "writing to")?;
         out.reset()?;
-        writeln!(out, " {}", output.display())?;
+        writeln!(out, " {output}")?;
 
         writeln!(out)?;
         writeln!(out, "[{timestamp}] {}", self.message())?;
@@ -291,11 +296,13 @@ impl Status {
     }
 
     fn message(&self) -> String {
-        match self {
+        match *self {
             Self::Compiling => "compiling ...".into(),
-            Self::Success(duration) => format!("compiled successfully in {duration:.2?}"),
+            Self::Success(duration) => {
+                format!("compiled successfully in {}", format_duration(duration))
+            }
             Self::PartialSuccess(duration) => {
-                format!("compiled with warnings in {duration:.2?}")
+                format!("compiled with warnings in {}", format_duration(duration))
             }
             Self::Error => "compiled with errors".into(),
         }

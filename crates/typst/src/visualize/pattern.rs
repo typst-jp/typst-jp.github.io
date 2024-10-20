@@ -1,15 +1,15 @@
 use std::hash::Hash;
 use std::sync::Arc;
 
-use comemo::Prehashed;
 use ecow::{eco_format, EcoString};
 
 use crate::diag::{bail, SourceResult};
 use crate::engine::Engine;
 use crate::foundations::{func, repr, scope, ty, Content, Smart, StyleChain};
-use crate::layout::{Abs, Axes, Frame, LayoutMultiple, Length, Regions, Size};
+use crate::introspection::Locator;
+use crate::layout::{layout_frame, Abs, Axes, Frame, Length, Region, Size};
 use crate::syntax::{Span, Spanned};
-use crate::util::Numeric;
+use crate::utils::{LazyHash, Numeric};
 use crate::visualize::RelativeTo;
 use crate::World;
 
@@ -19,7 +19,7 @@ use crate::World;
 /// pattern is repeated in a grid-like fashion, covering the entire area of an
 /// element that is filled or stroked. The pattern is defined by a tile size and
 /// a body defining the content of each cell. You can also add horizontal or
-/// vertical spacing between the cells of the patterng.
+/// vertical spacing between the cells of the pattern.
 ///
 /// # Examples
 ///
@@ -102,7 +102,7 @@ pub struct Pattern(Arc<Repr>);
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 struct Repr {
     /// The pattern's rendered content.
-    frame: Prehashed<Frame>,
+    frame: LazyHash<Frame>,
     /// The pattern's tile size.
     size: Size,
     /// The pattern's tile spacing.
@@ -190,9 +190,10 @@ impl Pattern {
         // Layout the pattern.
         let world = engine.world;
         let library = world.library();
+        let locator = Locator::root();
         let styles = StyleChain::new(&library.styles);
-        let pod = Regions::one(region, Axes::splat(false));
-        let mut frame = body.layout(engine, styles, pod)?.into_frame();
+        let pod = Region::new(region, Axes::splat(false));
+        let mut frame = layout_frame(engine, &body, locator, styles, pod)?;
 
         // Set the size of the frame if the size is enforced.
         if let Smart::Custom(size) = size {
@@ -209,7 +210,7 @@ impl Pattern {
 
         Ok(Self(Arc::new(Repr {
             size: frame.size(),
-            frame: Prehashed::new(frame),
+            frame: LazyHash::new(frame),
             spacing: spacing.v.map(|l| l.abs),
             relative,
         })))

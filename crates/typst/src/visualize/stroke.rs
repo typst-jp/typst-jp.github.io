@@ -1,12 +1,12 @@
 use ecow::EcoString;
 
-use crate::diag::{SourceResult, StrResult};
+use crate::diag::{HintedStrResult, SourceResult};
 use crate::foundations::{
     cast, dict, func, scope, ty, Args, Cast, Dict, Fold, FromValue, NoneValue, Repr,
     Resolve, Smart, StyleChain, Value,
 };
 use crate::layout::{Abs, Length};
-use crate::util::{Numeric, Scalar};
+use crate::utils::{Numeric, Scalar};
 use crate::visualize::{Color, Gradient, Paint, Pattern};
 
 /// Defines how to draw a line.
@@ -378,7 +378,7 @@ cast! {
     },
     mut dict: Dict => {
         // Get a value by key, accepting either Auto or something convertible to type T.
-        fn take<T: FromValue>(dict: &mut Dict, key: &str) -> StrResult<Smart<T>> {
+        fn take<T: FromValue>(dict: &mut Dict, key: &str) -> HintedStrResult<Smart<T>> {
             Ok(dict.take(key).ok().map(Smart::<T>::from_value)
                 .transpose()?.unwrap_or(Smart::Auto))
         }

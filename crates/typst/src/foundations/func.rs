@@ -12,7 +12,7 @@ use crate::foundations::{
     Selector, Type, Value,
 };
 use crate::syntax::{ast, Span, SyntaxNode};
-use crate::util::{LazyHash, Static};
+use crate::utils::{singleton, LazyHash, Static};
 
 #[doc(inline)]
 pub use typst_macros::func;
@@ -24,7 +24,7 @@ pub use typst_macros::func;
 /// Additionally, you can pass any number of trailing content blocks arguments
 /// to a function _after_ the normal argument list. If the normal argument list
 /// would become empty, it can be omitted. Typst supports positional and named
-/// arguments. The former are identified by position and type, while the later
+/// arguments. The former are identified by position and type, while the latter
 /// are written as `name: value`.
 ///
 /// Within math mode, function calls have special behaviour. See the
@@ -81,6 +81,10 @@ pub use typst_macros::func;
 /// body evaluates to the result of joining all expressions preceding the
 /// `return`.
 ///
+/// Functions that don't return any meaningful value return [`none`] instead.
+/// The return type of such functions is not explicitly specified in the
+/// documentation. (An example of this is [`array.push`]).
+///
 /// ```example
 /// #let alert(body, fill: red) = {
 ///   set text(white)
@@ -101,6 +105,12 @@ pub use typst_macros::func;
 ///   KEEP OFF TRACKS
 /// ]
 /// ```
+///
+/// # Importing functions
+/// Functions can be imported from one file ([`module`]($scripting/#modules)) into
+/// another using `{import}`. For example, assume that we have defined the `alert`
+/// function from the previous example in a file called `foo.typ`. We can import
+/// it into another file by writing `{import "foo.typ": alert}`.
 ///
 /// # Unnamed functions { #unnamed }
 /// You can also created an unnamed function without creating a binding by
@@ -206,11 +216,11 @@ impl Func {
 
     /// Get details about the function's return type.
     pub fn returns(&self) -> Option<&'static CastInfo> {
-        static CONTENT: Lazy<CastInfo> =
-            Lazy::new(|| CastInfo::Type(Type::of::<Content>()));
         match &self.repr {
             Repr::Native(native) => Some(&native.0.returns),
-            Repr::Element(_) => Some(&CONTENT),
+            Repr::Element(_) => {
+                Some(singleton!(CastInfo, CastInfo::Type(Type::of::<Content>())))
+            }
             Repr::Closure(_) => None,
             Repr::With(with) => with.0.returns(),
         }
@@ -291,9 +301,9 @@ impl Func {
                 closure,
                 engine.world,
                 engine.introspector,
+                engine.traced,
+                TrackedMut::reborrow_mut(&mut engine.sink),
                 engine.route.track(),
-                engine.locator.track(),
-                TrackedMut::reborrow_mut(&mut engine.tracer),
                 context,
                 args,
             ),
@@ -346,7 +356,7 @@ impl Func {
     /// #show heading.where(level: 2): set text(blue)
     /// = Section
     /// == Subsection
-    /// === Sub-subection
+    /// === Sub-subsection
     /// ```
     #[func]
     pub fn where_(
@@ -440,14 +450,22 @@ pub trait NativeFunc {
 /// Defines a native function.
 #[derive(Debug)]
 pub struct NativeFuncData {
+    /// Invokes the function from Typst.
     pub function: fn(&mut Engine, Tracked<Context>, &mut Args) -> SourceResult<Value>,
+    /// The function's normal name (e.g. `align`), as exposed to Typst.
     pub name: &'static str,
+    /// The function's title case name (e.g. `Align`).
     pub title: &'static str,
+    /// The documentation for this function as a string.
     pub docs: &'static str,
+    /// A list of alternate search terms for this function.
     pub keywords: &'static [&'static str],
+    /// Whether this function makes use of context.
     pub contextual: bool,
     pub scope: Lazy<Scope>,
+    /// A list of parameter information for each parameter.
     pub params: Lazy<Vec<ParamInfo>>,
+    /// Information about the return value of this function.
     pub returns: Lazy<CastInfo>,
 }
 

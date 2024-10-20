@@ -1,7 +1,9 @@
 use std::num::NonZeroUsize;
 use std::sync::Arc;
 
-use super::layout::{CellGrid, Repeatable, RowPiece};
+use super::cells::CellGrid;
+use super::layout::RowPiece;
+use super::repeated::Repeatable;
 use crate::foundations::{AlternativeFold, Fold};
 use crate::layout::Abs;
 use crate::visualize::Stroke;
@@ -597,15 +599,17 @@ pub(super) fn hline_stroke_at_column(
 
 #[cfg(test)]
 mod test {
-    use super::super::layout::Entry;
+    use super::super::cells::Entry;
     use super::*;
     use crate::foundations::Content;
+    use crate::introspection::Locator;
     use crate::layout::{Axes, Cell, Sides, Sizing};
-    use crate::util::NonZeroExt;
+    use crate::utils::NonZeroExt;
 
-    fn sample_cell() -> Cell {
+    fn sample_cell() -> Cell<'static> {
         Cell {
             body: Content::default(),
+            locator: Locator::root(),
             fill: None,
             colspan: NonZeroUsize::ONE,
             rowspan: NonZeroUsize::ONE,
@@ -615,9 +619,10 @@ mod test {
         }
     }
 
-    fn cell_with_colspan_rowspan(colspan: usize, rowspan: usize) -> Cell {
+    fn cell_with_colspan_rowspan(colspan: usize, rowspan: usize) -> Cell<'static> {
         Cell {
             body: Content::default(),
+            locator: Locator::root(),
             fill: None,
             colspan: NonZeroUsize::try_from(colspan).unwrap(),
             rowspan: NonZeroUsize::try_from(rowspan).unwrap(),
@@ -627,7 +632,7 @@ mod test {
         }
     }
 
-    fn sample_grid_for_vlines(gutters: bool) -> CellGrid {
+    fn sample_grid_for_vlines(gutters: bool) -> CellGrid<'static> {
         const COLS: usize = 4;
         const ROWS: usize = 6;
         let entries = vec![
@@ -1150,7 +1155,7 @@ mod test {
         }
     }
 
-    fn sample_grid_for_hlines(gutters: bool) -> CellGrid {
+    fn sample_grid_for_hlines(gutters: bool) -> CellGrid<'static> {
         const COLS: usize = 4;
         const ROWS: usize = 9;
         let entries = vec![

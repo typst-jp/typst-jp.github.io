@@ -5,7 +5,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem};
 use ecow::EcoString;
 
 use crate::foundations::{cast, repr, Fold, Repr, Value};
-use crate::util::{Numeric, Scalar};
+use crate::utils::{Numeric, Scalar};
 
 /// An absolute length.
 #[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -54,7 +54,7 @@ impl Abs {
 
     /// Get the value of this absolute length in raw units.
     pub const fn to_raw(self) -> f64 {
-        (self.0).get()
+        self.0.get()
     }
 
     /// Get the value of this absolute length in a unit.
@@ -110,12 +110,17 @@ impl Abs {
     /// Whether the other absolute length fits into this one (i.e. is smaller).
     /// Allows for a bit of slack.
     pub fn fits(self, other: Self) -> bool {
-        self.0 + 1e-6 >= other.0
+        self.0 + AbsUnit::EPS >= other.0
     }
 
     /// Compares two absolute lengths for whether they are approximately equal.
     pub fn approx_eq(self, other: Self) -> bool {
-        self == other || (self - other).to_raw().abs() < 1e-6
+        self == other || (self - other).to_raw().abs() < AbsUnit::EPS
+    }
+
+    /// Whether the size is close to zero or negative.
+    pub fn approx_empty(self) -> bool {
+        self.to_raw() <= AbsUnit::EPS
     }
 
     /// Returns a number that represent the sign of this length
@@ -162,7 +167,7 @@ impl Add for Abs {
     }
 }
 
-sub_impl!(Abs - Abs -> Abs);
+typst_utils::sub_impl!(Abs - Abs -> Abs);
 
 impl Mul<f64> for Abs {
     type Output = Self;
@@ -196,10 +201,10 @@ impl Div for Abs {
     }
 }
 
-assign_impl!(Abs += Abs);
-assign_impl!(Abs -= Abs);
-assign_impl!(Abs *= f64);
-assign_impl!(Abs /= f64);
+typst_utils::assign_impl!(Abs += Abs);
+typst_utils::assign_impl!(Abs -= Abs);
+typst_utils::assign_impl!(Abs *= f64);
+typst_utils::assign_impl!(Abs /= f64);
 
 impl Rem for Abs {
     type Output = Self;
@@ -246,13 +251,19 @@ pub enum AbsUnit {
 }
 
 impl AbsUnit {
+    /// The epsilon for approximate length comparisons.
+    const EPS: f64 = 1e-4;
+
     /// How many raw units correspond to a value of `1.0` in this unit.
-    fn raw_scale(self) -> f64 {
+    const fn raw_scale(self) -> f64 {
+        // We choose a raw scale which has an integer conversion value to all
+        // four units of interest, so that whole numbers in all units can be
+        // represented accurately.
         match self {
-            AbsUnit::Pt => 1.0,
-            AbsUnit::Mm => 2.83465,
-            AbsUnit::Cm => 28.3465,
-            AbsUnit::In => 72.0,
+            AbsUnit::Pt => 127.0,
+            AbsUnit::Mm => 360.0,
+            AbsUnit::Cm => 3600.0,
+            AbsUnit::In => 9144.0,
         }
     }
 }

@@ -9,27 +9,25 @@ pub use self::contribs::*;
 pub use self::html::*;
 pub use self::model::*;
 
-use comemo::Prehashed;
+use std::collections::HashSet;
+
 use ecow::{eco_format, EcoString};
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use serde_yaml as yaml;
 use typst::diag::{bail, StrResult};
-use typst::foundations::AutoValue;
-use typst::foundations::Bytes;
-use typst::foundations::NoneValue;
 use typst::foundations::{
-    CastInfo, Category, Func, Module, ParamInfo, Repr, Scope, Smart, Type, Value,
-    FOUNDATIONS,
+    AutoValue, Bytes, CastInfo, Category, Func, Module, NoneValue, ParamInfo, Repr,
+    Scope, Smart, Type, Value, FOUNDATIONS,
 };
 use typst::introspection::INTROSPECTION;
 use typst::layout::{Abs, Margin, PageElem, LAYOUT};
 use typst::loading::DATA_LOADING;
 use typst::math::MATH;
-use typst::model::Document;
-use typst::model::MODEL;
+use typst::model::{Document, MODEL};
 use typst::symbols::SYMBOLS;
 use typst::text::{Font, FontBook, TEXT};
+use typst::utils::LazyHash;
 use typst::visualize::VISUALIZE;
 use typst::Library;
 
@@ -48,15 +46,15 @@ static GROUPS: Lazy<Vec<GroupData>> = Lazy::new(|| {
                 .module()
                 .scope()
                 .iter()
-                .filter(|(_, v)| matches!(v, Value::Func(_)))
-                .map(|(k, _)| k.clone())
+                .filter(|(_, v, _)| matches!(v, Value::Func(_)))
+                .map(|(k, _, _)| k.clone())
                 .collect();
         }
     }
     groups
 });
 
-static LIBRARY: Lazy<Prehashed<Library>> = Lazy::new(|| {
+static LIBRARY: Lazy<LazyHash<Library>> = Lazy::new(|| {
     let mut lib = Library::default();
     let scope = lib.global.scope_mut();
 
@@ -73,16 +71,16 @@ static LIBRARY: Lazy<Prehashed<Library>> = Lazy::new(|| {
         Abs::pt(15.0).into(),
     )))));
 
-    Prehashed::new(lib)
+    LazyHash::new(lib)
 });
 
-static FONTS: Lazy<(Prehashed<FontBook>, Vec<Font>)> = Lazy::new(|| {
+static FONTS: Lazy<(LazyHash<FontBook>, Vec<Font>)> = Lazy::new(|| {
     let fonts: Vec<_> = typst_assets::fonts()
         .chain(typst_dev_assets::fonts())
         .flat_map(|data| Font::iter(Bytes::from_static(data)))
         .collect();
     let book = FontBook::from_fonts(&fonts);
-    (Prehashed::new(book), fonts)
+    (LazyHash::new(book), fonts)
 });
 
 /// Build documentation pages.
@@ -94,11 +92,7 @@ pub fn provide(resolver: &dyn Resolver) -> Vec<PageModel> {
         md_page(resolver, base, load!("japanese.md")),
         reference_pages(resolver),
         guide_pages(resolver),
-        packages_page(resolver),
-        md_page(resolver, base, load!("changelog.md")),
-        md_page(resolver, base, load!("roadmap.md")),
-        md_page(resolver, base, load!("community.md")),
-        md_page(resolver, base, load!("glossary.md")),
+        changelog_pages(resolver),
     ]
 }
 
@@ -126,11 +120,11 @@ pub trait Resolver {
 fn md_page(resolver: &dyn Resolver, parent: &str, md: &str) -> PageModel {
     assert!(parent.starts_with('/') && parent.ends_with('/'));
     let html = Html::markdown(resolver, md, Some(0));
-    let title: EcoString = html.title().expect("chapter lacks a title").into();
+    let title = html.title().expect("chapter lacks a title");
     PageModel {
-        route: eco_format!("{parent}{}/", urlify(&title)),
-        title,
-        description: html.description().unwrap(),
+        route: eco_format!("{parent}{}/", urlify(title)),
+        title: title.into(),
+        description: html.description().expect("chapter lacks a description"),
         part: None,
         outline: html.outline(),
         body: BodyModel::Html(html),
@@ -185,21 +179,27 @@ fn guide_pages(resolver: &dyn Resolver) -> PageModel {
     page
 }
 
-/// Build the packages section.
-fn packages_page(resolver: &dyn Resolver) -> PageModel {
-    PageModel {
-        route: eco_format!("{}packages/", resolver.base()),
-        title: "Packages".into(),
-        description: "Packages for Typst.".into(),
-        part: None,
-        outline: vec![],
-        body: BodyModel::Packages(Html::markdown(
-            resolver,
-            load!("reference/packages.md"),
-            Some(1),
-        )),
-        children: vec![],
-    }
+/// Build the changelog section.
+fn changelog_pages(resolver: &dyn Resolver) -> PageModel {
+    let mut page = md_page(resolver, resolver.base(), load!("changelog/welcome.md"));
+    let base = format!("{}changelog/", resolver.base());
+    page.children = vec![
+        md_page(resolver, &base, load!("changelog/0.12.0.md")),
+        md_page(resolver, &base, load!("changelog/0.11.1.md")),
+        md_page(resolver, &base, load!("changelog/0.11.0.md")),
+        md_page(resolver, &base, load!("changelog/0.10.0.md")),
+        md_page(resolver, &base, load!("changelog/0.9.0.md")),
+        md_page(resolver, &base, load!("changelog/0.8.0.md")),
+        md_page(resolver, &base, load!("changelog/0.7.0.md")),
+        md_page(resolver, &base, load!("changelog/0.6.0.md")),
+        md_page(resolver, &base, load!("changelog/0.5.0.md")),
+        md_page(resolver, &base, load!("changelog/0.4.0.md")),
+        md_page(resolver, &base, load!("changelog/0.3.0.md")),
+        md_page(resolver, &base, load!("changelog/0.2.0.md")),
+        md_page(resolver, &base, load!("changelog/0.1.0.md")),
+        md_page(resolver, &base, load!("changelog/earlier.md")),
+    ];
+    page
 }
 
 /// Create a page for a category.
@@ -253,23 +253,28 @@ fn category_page(resolver: &dyn Resolver, category: Category) -> PageModel {
         shorthands = Some(ShorthandsModel { markup, math });
     }
 
+    let mut skip = HashSet::new();
+    if category == MATH {
+        skip = GROUPS
+            .iter()
+            .filter(|g| g.category == category.name())
+            .flat_map(|g| &g.filter)
+            .map(|s| s.as_str())
+            .collect();
+
+        // Already documented in the text category.
+        skip.insert("text");
+    }
+
     // Add values and types.
     let scope = module.scope();
-    for (name, value) in scope.iter() {
+    for (name, value, _) in scope.iter() {
         if scope.get_category(name) != Some(category) {
             continue;
         }
 
-        if category == MATH {
-            // Skip grouped functions.
-            if GROUPS.iter().flat_map(|group| &group.filter).any(|f| f == name) {
-                continue;
-            }
-
-            // Already documented in the text category.
-            if name == "text" {
-                continue;
-            }
+        if skip.contains(name.as_str()) {
+            continue;
         }
 
         match value {
@@ -482,7 +487,7 @@ fn casts(
 fn scope_models(resolver: &dyn Resolver, name: &str, scope: &Scope) -> Vec<FuncModel> {
     scope
         .iter()
-        .filter_map(|(_, value)| {
+        .filter_map(|(_, value, _)| {
             let Value::Func(func) = value else { return None };
             Some(func_model(resolver, func, &[name], true))
         })
@@ -561,7 +566,7 @@ fn group_page(
     let mut outline_items = vec![];
     for name in &group.filter {
         let value = group.module().scope().get(name).unwrap();
-        let Value::Func(func) = value else { panic!("not a function") };
+        let Ok(ref func) = value.clone().cast::<Func>() else { panic!("not a function") };
         let func = func_model(resolver, func, &path, true);
         let id_base = urlify(&eco_format!("functions-{}", func.name));
         let children = func_outline(&func, &id_base);
@@ -668,7 +673,7 @@ fn symbols_page(resolver: &dyn Resolver, parent: &str, group: &GroupData) -> Pag
 /// Produce a symbol list's model.
 fn symbols_model(resolver: &dyn Resolver, group: &GroupData) -> SymbolsModel {
     let mut list = vec![];
-    for (name, value) in group.module().scope().iter() {
+    for (name, value, _) in group.module().scope().iter() {
         let Value::Symbol(symbol) = value else { continue };
         let complete = |variant: &str| {
             if variant.is_empty() {
@@ -680,15 +685,15 @@ fn symbols_model(resolver: &dyn Resolver, group: &GroupData) -> SymbolsModel {
 
         for (variant, c) in symbol.variants() {
             let shorthand = |list: &[(&'static str, char)]| {
-                list.iter().copied().find(|&(_, x)| x == c).map(|(s, _)| s)
+                list.iter().copied().find(|&(_, x)| x == c.char()).map(|(s, _)| s)
             };
 
             list.push(SymbolModel {
                 name: complete(variant),
-                markup_shorthand: shorthand(typst::syntax::ast::Shorthand::MARKUP_LIST),
-                math_shorthand: shorthand(typst::syntax::ast::Shorthand::MATH_LIST),
-                codepoint: c as u32,
-                accent: typst::symbols::Symbol::combining_accent(c).is_some(),
+                markup_shorthand: shorthand(typst::syntax::ast::Shorthand::LIST),
+                math_shorthand: shorthand(typst::syntax::ast::MathShorthand::LIST),
+                codepoint: c.char() as _,
+                accent: typst::math::Accent::combine(c.char()).is_some(),
                 alternates: symbol
                     .variants()
                     .filter(|(other, _)| other != &variant)
@@ -740,7 +745,7 @@ pub fn urlify(title: &str) -> EcoString {
             .chars()
             .map(|c| c.to_ascii_lowercase())
             .map(|c| match c {
-                'a'..='z' | '0'..='9' => c,
+                'a'..='z' | '0'..='9' | '.' => c,
                 _ => '-',
             })
             .collect(),
@@ -820,7 +825,6 @@ mod tests {
     use std::io::Write;
     use std::path::Path;
     use typst::model::Document;
-    use typst::visualize::Color;
 
     #[test]
     fn test_docs() {
@@ -851,11 +855,10 @@ mod tests {
 
         fn example(&self, _: u128, source: Option<Html>, document: &Document) -> Html {
             let page = document.pages.first().unwrap();
-            let frame = &page.frame;
             // convert frames to a png
             let ppi = 2.0;
             // the first frame is the main frame
-            let pixmap = typst_render::render(frame, ppi, Color::WHITE);
+            let pixmap = typst_render::render(page, ppi);
             // Get a random filename by md5
             match source {
                 Some(source) => {

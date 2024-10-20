@@ -243,169 +243,169 @@ children:
         types:
         - str
         strings:
-        - string: annual-reviews
-          details: <p>Annual Reviews (sorted by order of appearance)</p>
-        - string: pensoft
-          details: <p>Pensoft Journals</p>
-        - string: annual-reviews-author-date
-          details: <p>Annual Reviews (author-date)</p>
-        - string: the-lancet
-          details: <p>The Lancet</p>
-        - string: elsevier-with-titles
-          details: <p>Elsevier (numeric, with titles)</p>
-        - string: gb-7714-2015-author-date
-          details: <p>China National Standard GB/T 7714-2015 (author-date, 中文)</p>
-        - string: royal-society-of-chemistry
-          details: <p>Royal Society of Chemistry</p>
+        - string: alphanumeric
+          details: <p>Alphanumeric</p>
         - string: american-anthropological-association
           details: <p>American Anthropological Association</p>
-        - string: sage-vancouver
-          details: <p>SAGE - Vancouver</p>
-        - string: british-medical-journal
-          details: <p>BMJ</p>
-        - string: frontiers
-          details: <p>Frontiers journals</p>
-        - string: elsevier-harvard
-          details: <p>Elsevier - Harvard (with titles)</p>
-        - string: gb-7714-2005-numeric
-          details: <p>China National Standard GB/T 7714-2005 (numeric, 中文)</p>
-        - string: angewandte-chemie
-          details: <p>Angewandte Chemie International Edition</p>
-        - string: gb-7714-2015-note
-          details: <p>China National Standard GB/T 7714-2015 (note, 中文)</p>
-        - string: springer-basic-author-date
-          details: <p>Springer - Basic (author-date)</p>
-        - string: trends
-          details: <p>Trends journals</p>
+        - string: american-chemical-society
+          details: <p>American Chemical Society</p>
         - string: american-geophysical-union
           details: <p>American Geophysical Union</p>
+        - string: american-institute-of-aeronautics-and-astronautics
+          details: <p>American Institute of Aeronautics and Astronautics</p>
+        - string: american-institute-of-physics
+          details: <p>American Institute of Physics 4th edition</p>
+        - string: american-medical-association
+          details: <p>American Medical Association 11th edition</p>
+        - string: american-meteorological-society
+          details: <p>American Meteorological Society</p>
+        - string: american-physics-society
+          details: <p>American Physical Society</p>
+        - string: american-physiological-society
+          details: <p>American Physiological Society</p>
         - string: american-political-science-association
           details: <p>American Political Science Association</p>
         - string: american-psychological-association
           details: <p>American Psychological Association 7th edition</p>
+        - string: american-society-for-microbiology
+          details: <p>American Society for Microbiology</p>
+        - string: american-society-of-civil-engineers
+          details: <p>American Society of Civil Engineers</p>
+        - string: american-society-of-mechanical-engineers
+          details: <p>American Society of Mechanical Engineers</p>
+        - string: american-sociological-association
+          details: <p>American Sociological Association 6th/7th edition</p>
+        - string: angewandte-chemie
+          details: <p>Angewandte Chemie International Edition</p>
+        - string: annual-reviews
+          details: <p>Annual Reviews (sorted by order of appearance)</p>
+        - string: annual-reviews-author-date
+          details: <p>Annual Reviews (author-date)</p>
+        - string: associacao-brasileira-de-normas-tecnicas
+          details: <p>Associação Brasileira de Normas Técnicas (Português - Brasil)</p>
+        - string: association-for-computing-machinery
+          details: <p>Association for Computing Machinery</p>
+        - string: biomed-central
+          details: <p>BioMed Central</p>
+        - string: bristol-university-press
+          details: <p>Bristol University Press</p>
+        - string: british-medical-journal
+          details: <p>BMJ</p>
         - string: cell
           details: <p>Cell</p>
-        - string: spie
-          details: <p>SPIE journals</p>
-        - string: harvard-cite-them-right
-          details: <p>Cite Them Right 12th edition - Harvard</p>
-        - string: american-institute-of-aeronautics-and-astronautics
-          details: <p>American Institute of Aeronautics and Astronautics</p>
-        - string: council-of-science-editors-author-date
-          details: <p>Council of Science Editors, Name-Year (author-date)</p>
+        - string: chicago-author-date
+          details: <p>Chicago Manual of Style 17th edition (author-date)</p>
+        - string: chicago-fullnotes
+          details: <p>Chicago Manual of Style 17th edition (full note)</p>
+        - string: chicago-notes
+          details: <p>Chicago Manual of Style 17th edition (note)</p>
         - string: copernicus
           details: <p>Copernicus Publications</p>
-        - string: sist02
-          details: <p>SIST02 (日本語)</p>
-        - string: springer-socpsych-author-date
-          details: <p>Springer - SocPsych (author-date)</p>
-        - string: modern-language-association-8
-          details: <p>Modern Language Association 8th edition</p>
-        - string: nature
-          details: <p>Nature</p>
-        - string: iso-690-numeric
-          details: <p>ISO-690 (numeric, English)</p>
-        - string: springer-mathphys
-          details: <p>Springer - MathPhys (numeric, brackets)</p>
-        - string: springer-lecture-notes-in-computer-science
-          details: <p>Springer - Lecture Notes in Computer Science</p>
-        - string: future-science
-          details: <p>Future Science Group</p>
+        - string: council-of-science-editors
+          details: <p>Council of Science Editors, Citation-Sequence (numeric, brackets)</p>
+        - string: council-of-science-editors-author-date
+          details: <p>Council of Science Editors, Name-Year (author-date)</p>
         - string: current-opinion
           details: <p>Current Opinion journals</p>
         - string: deutsche-gesellschaft-für-psychologie
           details: <p>Deutsche Gesellschaft für Psychologie 5. Auflage (Deutsch)</p>
-        - string: american-meteorological-society
-          details: <p>American Meteorological Society</p>
-        - string: modern-humanities-research-association
-          details: <p>Modern Humanities Research Association 3rd edition (note with
-            bibliography)</p>
-        - string: american-society-of-civil-engineers
-          details: <p>American Society of Civil Engineers</p>
-        - string: chicago-notes
-          details: <p>Chicago Manual of Style 17th edition (note)</p>
-        - string: institute-of-electrical-and-electronics-engineers
-          details: <p>IEEE</p>
         - string: deutsche-sprache
           details: <p>Deutsche Sprache (Deutsch)</p>
-        - string: gb-7714-2015-numeric
-          details: <p>China National Standard GB/T 7714-2015 (numeric, 中文)</p>
-        - string: bristol-university-press
-          details: <p>Bristol University Press</p>
-        - string: association-for-computing-machinery
-          details: <p>Association for Computing Machinery</p>
-        - string: associacao-brasileira-de-normas-tecnicas
-          details: <p>Associação Brasileira de Normas Técnicas (Português - Brasil)</p>
-        - string: american-medical-association
-          details: <p>American Medical Association 11th edition</p>
+        - string: elsevier-harvard
+          details: <p>Elsevier - Harvard (with titles)</p>
         - string: elsevier-vancouver
           details: <p>Elsevier - Vancouver</p>
-        - string: chicago-author-date
-          details: <p>Chicago Manual of Style 17th edition (author-date)</p>
-        - string: vancouver
-          details: <p>Vancouver</p>
-        - string: chicago-fullnotes
-          details: <p>Chicago Manual of Style 17th edition (full note)</p>
-        - string: turabian-author-date
-          details: <p>Turabian 9th edition (author-date)</p>
-        - string: springer-fachzeitschriften-medizin-psychologie
-          details: <p>Springer - Fachzeitschriften Medizin Psychologie (Deutsch)</p>
-        - string: thieme
-          details: <p>Thieme-German (Deutsch)</p>
-        - string: taylor-and-francis-national-library-of-medicine
-          details: <p>Taylor &amp; Francis - National Library of Medicine</p>
-        - string: american-chemical-society
-          details: <p>American Chemical Society</p>
-        - string: american-institute-of-physics
-          details: <p>American Institute of Physics 4th edition</p>
-        - string: taylor-and-francis-chicago-author-date
-          details: <p>Taylor &amp; Francis - Chicago Manual of Style (author-date)</p>
+        - string: elsevier-with-titles
+          details: <p>Elsevier (numeric, with titles)</p>
+        - string: frontiers
+          details: <p>Frontiers journals</p>
+        - string: future-medicine
+          details: <p>Future Medicine journals</p>
+        - string: future-science
+          details: <p>Future Science Group</p>
+        - string: gb-7714-2005-numeric
+          details: <p>China National Standard GB/T 7714-2005 (numeric, 中文)</p>
+        - string: gb-7714-2015-author-date
+          details: <p>China National Standard GB/T 7714-2015 (author-date, 中文)</p>
+        - string: gb-7714-2015-note
+          details: <p>China National Standard GB/T 7714-2015 (note, 中文)</p>
+        - string: gb-7714-2015-numeric
+          details: <p>China National Standard GB/T 7714-2015 (numeric, 中文)</p>
         - string: gost-r-705-2008-numeric
           details: <p>Russian GOST R 7.0.5-2008 (numeric)</p>
+        - string: harvard-cite-them-right
+          details: <p>Cite Them Right 12th edition - Harvard</p>
+        - string: institute-of-electrical-and-electronics-engineers
+          details: <p>IEEE</p>
         - string: institute-of-physics-numeric
           details: <p>Institute of Physics (numeric)</p>
         - string: iso-690-author-date
           details: <p>ISO-690 (author-date, English)</p>
-        - string: the-institution-of-engineering-and-technology
-          details: <p>The Institution of Engineering and Technology</p>
-        - string: american-society-for-microbiology
-          details: <p>American Society for Microbiology</p>
-        - string: multidisciplinary-digital-publishing-institute
-          details: <p>Multidisciplinary Digital Publishing Institute</p>
-        - string: springer-basic
-          details: <p>Springer - Basic (numeric, brackets)</p>
-        - string: springer-humanities-author-date
-          details: <p>Springer - Humanities (author-date)</p>
-        - string: turabian-fullnote-8
-          details: <p>Turabian 8th edition (full note)</p>
+        - string: iso-690-numeric
+          details: <p>ISO-690 (numeric, English)</p>
         - string: karger
           details: <p>Karger journals</p>
-        - string: springer-vancouver
-          details: <p>Springer - Vancouver (brackets)</p>
-        - string: vancouver-superscript
-          details: <p>Vancouver (superscript)</p>
-        - string: american-physics-society
-          details: <p>American Physical Society</p>
         - string: mary-ann-liebert-vancouver
           details: <p>Mary Ann Liebert - Vancouver</p>
-        - string: american-society-of-mechanical-engineers
-          details: <p>American Society of Mechanical Engineers</p>
-        - string: council-of-science-editors
-          details: <p>Council of Science Editors, Citation-Sequence (numeric, brackets)</p>
-        - string: american-physiological-society
-          details: <p>American Physiological Society</p>
-        - string: future-medicine
-          details: <p>Future Medicine journals</p>
-        - string: biomed-central
-          details: <p>BioMed Central</p>
-        - string: public-library-of-science
-          details: <p>Public Library of Science</p>
-        - string: american-sociological-association
-          details: <p>American Sociological Association 6th edition</p>
+        - string: modern-humanities-research-association
+          details: <p>Modern Humanities Research Association 4th edition (note with
+            bibliography)</p>
         - string: modern-language-association
           details: <p>Modern Language Association 9th edition</p>
-        - string: alphanumeric
-          details: <p>Alphanumeric</p>
+        - string: modern-language-association-8
+          details: <p>Modern Language Association 8th edition</p>
+        - string: multidisciplinary-digital-publishing-institute
+          details: <p>Multidisciplinary Digital Publishing Institute</p>
+        - string: nature
+          details: <p>Nature</p>
+        - string: pensoft
+          details: <p>Pensoft Journals</p>
+        - string: public-library-of-science
+          details: <p>Public Library of Science</p>
+        - string: royal-society-of-chemistry
+          details: <p>Royal Society of Chemistry</p>
+        - string: sage-vancouver
+          details: <p>SAGE - Vancouver</p>
+        - string: sist02
+          details: <p>SIST02 (日本語)</p>
+        - string: spie
+          details: <p>SPIE journals</p>
+        - string: springer-basic
+          details: <p>Springer - Basic (numeric, brackets)</p>
+        - string: springer-basic-author-date
+          details: <p>Springer - Basic (author-date)</p>
+        - string: springer-fachzeitschriften-medizin-psychologie
+          details: <p>Springer - Fachzeitschriften Medizin Psychologie (Deutsch)</p>
+        - string: springer-humanities-author-date
+          details: <p>Springer - Humanities (author-date)</p>
+        - string: springer-lecture-notes-in-computer-science
+          details: <p>Springer - Lecture Notes in Computer Science</p>
+        - string: springer-mathphys
+          details: <p>Springer - MathPhys (numeric, brackets)</p>
+        - string: springer-socpsych-author-date
+          details: <p>Springer - SocPsych (author-date)</p>
+        - string: springer-vancouver
+          details: <p>Springer - Vancouver (brackets)</p>
+        - string: taylor-and-francis-chicago-author-date
+          details: <p>Taylor &amp; Francis - Chicago Manual of Style (author-date)</p>
+        - string: taylor-and-francis-national-library-of-medicine
+          details: <p>Taylor &amp; Francis - National Library of Medicine</p>
+        - string: the-institution-of-engineering-and-technology
+          details: <p>The Institution of Engineering and Technology</p>
+        - string: the-lancet
+          details: <p>The Lancet</p>
+        - string: thieme
+          details: <p>Thieme-German (Deutsch)</p>
+        - string: trends
+          details: <p>Trends journals</p>
+        - string: turabian-author-date
+          details: <p>Turabian 9th edition (author-date)</p>
+        - string: turabian-fullnote-8
+          details: <p>Turabian 8th edition (full note)</p>
+        - string: vancouver
+          details: <p>Vancouver</p>
+        - string: vancouver-superscript
+          details: <p>Vancouver (superscript)</p>
         default: <code><span class="typ-str">&quot;ieee&quot;</span></code>
         positional: false
         named: true
@@ -503,14 +503,16 @@ children:
       params:
       - name: tight
         details: |-
-          <p>If this is <code><span class="typ-key">false</span></code>, the items are spaced apart with
-          <a href="/docs/reference/model/list/#parameters-spacing">list spacing</a>. If it is <code><span class="typ-key">true</span></code>, they use normal
-          <a href="/docs/reference/model/par/#parameters-leading">leading</a> instead. This makes the list more compact, which
-          can look better if the items are short.</p>
+          <p>Defines the default <a href="/docs/reference/model/list/#parameters-spacing">spacing</a> of the list. If it is
+          <code><span class="typ-key">false</span></code>, the items are spaced apart with
+          <a href="/docs/reference/model/par/#parameters-spacing">paragraph spacing</a>. If it is <code><span class="typ-key">true</span></code>, they use
+          <a href="/docs/reference/model/par/#parameters-leading">paragraph leading</a> instead. This makes the list more
+          compact, which can look better if the items are short.</p>
           <p>In markup mode, the value of this parameter is determined based on
           whether items are separated with a blank line. If items directly follow
           each other, this is set to <code><span class="typ-key">true</span></code>; if items are separated by a blank
-          line, this is set to <code><span class="typ-key">false</span></code>.</p>
+          line, this is set to <code><span class="typ-key">false</span></code>. The markup-defined tightness cannot be
+          overridden with set rules.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-marker">-</span> If a list has a lot of text, and
             maybe other inline content, it
@@ -587,13 +589,14 @@ children:
         settable: true
       - name: spacing
         details: |-
-          <p>The spacing between the items of a wide (non-tight) list.</p>
-          <p>If set to <code><span class="typ-key">auto</span></code>, uses the spacing <a href="/docs/reference/layout/block/#parameters-below">below blocks</a>.</p>
+          <p>The spacing between the items of the list.</p>
+          <p>If set to <code><span class="typ-key">auto</span></code>, uses paragraph <a href="/docs/reference/model/par/#parameters-leading"><code>leading</code></a> for tight
+          lists and paragraph <a href="/docs/reference/model/par/#parameters-spacing"><code>spacing</code></a> for wide (non-tight)
+          lists.</p>
         example: null
         types:
         - auto
-        - relative
-        - fraction
+        - length
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -804,169 +807,169 @@ children:
         - auto
         - str
         strings:
-        - string: annual-reviews
-          details: <p>Annual Reviews (sorted by order of appearance)</p>
-        - string: pensoft
-          details: <p>Pensoft Journals</p>
-        - string: annual-reviews-author-date
-          details: <p>Annual Reviews (author-date)</p>
-        - string: the-lancet
-          details: <p>The Lancet</p>
-        - string: elsevier-with-titles
-          details: <p>Elsevier (numeric, with titles)</p>
-        - string: gb-7714-2015-author-date
-          details: <p>China National Standard GB/T 7714-2015 (author-date, 中文)</p>
-        - string: royal-society-of-chemistry
-          details: <p>Royal Society of Chemistry</p>
+        - string: alphanumeric
+          details: <p>Alphanumeric</p>
         - string: american-anthropological-association
           details: <p>American Anthropological Association</p>
-        - string: sage-vancouver
-          details: <p>SAGE - Vancouver</p>
-        - string: british-medical-journal
-          details: <p>BMJ</p>
-        - string: frontiers
-          details: <p>Frontiers journals</p>
-        - string: elsevier-harvard
-          details: <p>Elsevier - Harvard (with titles)</p>
-        - string: gb-7714-2005-numeric
-          details: <p>China National Standard GB/T 7714-2005 (numeric, 中文)</p>
-        - string: angewandte-chemie
-          details: <p>Angewandte Chemie International Edition</p>
-        - string: gb-7714-2015-note
-          details: <p>China National Standard GB/T 7714-2015 (note, 中文)</p>
-        - string: springer-basic-author-date
-          details: <p>Springer - Basic (author-date)</p>
-        - string: trends
-          details: <p>Trends journals</p>
+        - string: american-chemical-society
+          details: <p>American Chemical Society</p>
         - string: american-geophysical-union
           details: <p>American Geophysical Union</p>
+        - string: american-institute-of-aeronautics-and-astronautics
+          details: <p>American Institute of Aeronautics and Astronautics</p>
+        - string: american-institute-of-physics
+          details: <p>American Institute of Physics 4th edition</p>
+        - string: american-medical-association
+          details: <p>American Medical Association 11th edition</p>
+        - string: american-meteorological-society
+          details: <p>American Meteorological Society</p>
+        - string: american-physics-society
+          details: <p>American Physical Society</p>
+        - string: american-physiological-society
+          details: <p>American Physiological Society</p>
         - string: american-political-science-association
           details: <p>American Political Science Association</p>
         - string: american-psychological-association
           details: <p>American Psychological Association 7th edition</p>
+        - string: american-society-for-microbiology
+          details: <p>American Society for Microbiology</p>
+        - string: american-society-of-civil-engineers
+          details: <p>American Society of Civil Engineers</p>
+        - string: american-society-of-mechanical-engineers
+          details: <p>American Society of Mechanical Engineers</p>
+        - string: american-sociological-association
+          details: <p>American Sociological Association 6th/7th edition</p>
+        - string: angewandte-chemie
+          details: <p>Angewandte Chemie International Edition</p>
+        - string: annual-reviews
+          details: <p>Annual Reviews (sorted by order of appearance)</p>
+        - string: annual-reviews-author-date
+          details: <p>Annual Reviews (author-date)</p>
+        - string: associacao-brasileira-de-normas-tecnicas
+          details: <p>Associação Brasileira de Normas Técnicas (Português - Brasil)</p>
+        - string: association-for-computing-machinery
+          details: <p>Association for Computing Machinery</p>
+        - string: biomed-central
+          details: <p>BioMed Central</p>
+        - string: bristol-university-press
+          details: <p>Bristol University Press</p>
+        - string: british-medical-journal
+          details: <p>BMJ</p>
         - string: cell
           details: <p>Cell</p>
-        - string: spie
-          details: <p>SPIE journals</p>
-        - string: harvard-cite-them-right
-          details: <p>Cite Them Right 12th edition - Harvard</p>
-        - string: american-institute-of-aeronautics-and-astronautics
-          details: <p>American Institute of Aeronautics and Astronautics</p>
-        - string: council-of-science-editors-author-date
-          details: <p>Council of Science Editors, Name-Year (author-date)</p>
+        - string: chicago-author-date
+          details: <p>Chicago Manual of Style 17th edition (author-date)</p>
+        - string: chicago-fullnotes
+          details: <p>Chicago Manual of Style 17th edition (full note)</p>
+        - string: chicago-notes
+          details: <p>Chicago Manual of Style 17th edition (note)</p>
         - string: copernicus
           details: <p>Copernicus Publications</p>
-        - string: sist02
-          details: <p>SIST02 (日本語)</p>
-        - string: springer-socpsych-author-date
-          details: <p>Springer - SocPsych (author-date)</p>
-        - string: modern-language-association-8
-          details: <p>Modern Language Association 8th edition</p>
-        - string: nature
-          details: <p>Nature</p>
-        - string: iso-690-numeric
-          details: <p>ISO-690 (numeric, English)</p>
-        - string: springer-mathphys
-          details: <p>Springer - MathPhys (numeric, brackets)</p>
-        - string: springer-lecture-notes-in-computer-science
-          details: <p>Springer - Lecture Notes in Computer Science</p>
-        - string: future-science
-          details: <p>Future Science Group</p>
+        - string: council-of-science-editors
+          details: <p>Council of Science Editors, Citation-Sequence (numeric, brackets)</p>
+        - string: council-of-science-editors-author-date
+          details: <p>Council of Science Editors, Name-Year (author-date)</p>
         - string: current-opinion
           details: <p>Current Opinion journals</p>
         - string: deutsche-gesellschaft-für-psychologie
           details: <p>Deutsche Gesellschaft für Psychologie 5. Auflage (Deutsch)</p>
-        - string: american-meteorological-society
-          details: <p>American Meteorological Society</p>
-        - string: modern-humanities-research-association
-          details: <p>Modern Humanities Research Association 3rd edition (note with
-            bibliography)</p>
-        - string: american-society-of-civil-engineers
-          details: <p>American Society of Civil Engineers</p>
-        - string: chicago-notes
-          details: <p>Chicago Manual of Style 17th edition (note)</p>
-        - string: institute-of-electrical-and-electronics-engineers
-          details: <p>IEEE</p>
         - string: deutsche-sprache
           details: <p>Deutsche Sprache (Deutsch)</p>
-        - string: gb-7714-2015-numeric
-          details: <p>China National Standard GB/T 7714-2015 (numeric, 中文)</p>
-        - string: bristol-university-press
-          details: <p>Bristol University Press</p>
-        - string: association-for-computing-machinery
-          details: <p>Association for Computing Machinery</p>
-        - string: associacao-brasileira-de-normas-tecnicas
-          details: <p>Associação Brasileira de Normas Técnicas (Português - Brasil)</p>
-        - string: american-medical-association
-          details: <p>American Medical Association 11th edition</p>
+        - string: elsevier-harvard
+          details: <p>Elsevier - Harvard (with titles)</p>
         - string: elsevier-vancouver
           details: <p>Elsevier - Vancouver</p>
-        - string: chicago-author-date
-          details: <p>Chicago Manual of Style 17th edition (author-date)</p>
-        - string: vancouver
-          details: <p>Vancouver</p>
-        - string: chicago-fullnotes
-          details: <p>Chicago Manual of Style 17th edition (full note)</p>
-        - string: turabian-author-date
-          details: <p>Turabian 9th edition (author-date)</p>
-        - string: springer-fachzeitschriften-medizin-psychologie
-          details: <p>Springer - Fachzeitschriften Medizin Psychologie (Deutsch)</p>
-        - string: thieme
-          details: <p>Thieme-German (Deutsch)</p>
-        - string: taylor-and-francis-national-library-of-medicine
-          details: <p>Taylor &amp; Francis - National Library of Medicine</p>
-        - string: american-chemical-society
-          details: <p>American Chemical Society</p>
-        - string: american-institute-of-physics
-          details: <p>American Institute of Physics 4th edition</p>
-        - string: taylor-and-francis-chicago-author-date
-          details: <p>Taylor &amp; Francis - Chicago Manual of Style (author-date)</p>
+        - string: elsevier-with-titles
+          details: <p>Elsevier (numeric, with titles)</p>
+        - string: frontiers
+          details: <p>Frontiers journals</p>
+        - string: future-medicine
+          details: <p>Future Medicine journals</p>
+        - string: future-science
+          details: <p>Future Science Group</p>
+        - string: gb-7714-2005-numeric
+          details: <p>China National Standard GB/T 7714-2005 (numeric, 中文)</p>
+        - string: gb-7714-2015-author-date
+          details: <p>China National Standard GB/T 7714-2015 (author-date, 中文)</p>
+        - string: gb-7714-2015-note
+          details: <p>China National Standard GB/T 7714-2015 (note, 中文)</p>
+        - string: gb-7714-2015-numeric
+          details: <p>China National Standard GB/T 7714-2015 (numeric, 中文)</p>
         - string: gost-r-705-2008-numeric
           details: <p>Russian GOST R 7.0.5-2008 (numeric)</p>
+        - string: harvard-cite-them-right
+          details: <p>Cite Them Right 12th edition - Harvard</p>
+        - string: institute-of-electrical-and-electronics-engineers
+          details: <p>IEEE</p>
         - string: institute-of-physics-numeric
           details: <p>Institute of Physics (numeric)</p>
         - string: iso-690-author-date
           details: <p>ISO-690 (author-date, English)</p>
-        - string: the-institution-of-engineering-and-technology
-          details: <p>The Institution of Engineering and Technology</p>
-        - string: american-society-for-microbiology
-          details: <p>American Society for Microbiology</p>
-        - string: multidisciplinary-digital-publishing-institute
-          details: <p>Multidisciplinary Digital Publishing Institute</p>
-        - string: springer-basic
-          details: <p>Springer - Basic (numeric, brackets)</p>
-        - string: springer-humanities-author-date
-          details: <p>Springer - Humanities (author-date)</p>
-        - string: turabian-fullnote-8
-          details: <p>Turabian 8th edition (full note)</p>
+        - string: iso-690-numeric
+          details: <p>ISO-690 (numeric, English)</p>
         - string: karger
           details: <p>Karger journals</p>
-        - string: springer-vancouver
-          details: <p>Springer - Vancouver (brackets)</p>
-        - string: vancouver-superscript
-          details: <p>Vancouver (superscript)</p>
-        - string: american-physics-society
-          details: <p>American Physical Society</p>
         - string: mary-ann-liebert-vancouver
           details: <p>Mary Ann Liebert - Vancouver</p>
-        - string: american-society-of-mechanical-engineers
-          details: <p>American Society of Mechanical Engineers</p>
-        - string: council-of-science-editors
-          details: <p>Council of Science Editors, Citation-Sequence (numeric, brackets)</p>
-        - string: american-physiological-society
-          details: <p>American Physiological Society</p>
-        - string: future-medicine
-          details: <p>Future Medicine journals</p>
-        - string: biomed-central
-          details: <p>BioMed Central</p>
-        - string: public-library-of-science
-          details: <p>Public Library of Science</p>
-        - string: american-sociological-association
-          details: <p>American Sociological Association 6th edition</p>
+        - string: modern-humanities-research-association
+          details: <p>Modern Humanities Research Association 4th edition (note with
+            bibliography)</p>
         - string: modern-language-association
           details: <p>Modern Language Association 9th edition</p>
-        - string: alphanumeric
-          details: <p>Alphanumeric</p>
+        - string: modern-language-association-8
+          details: <p>Modern Language Association 8th edition</p>
+        - string: multidisciplinary-digital-publishing-institute
+          details: <p>Multidisciplinary Digital Publishing Institute</p>
+        - string: nature
+          details: <p>Nature</p>
+        - string: pensoft
+          details: <p>Pensoft Journals</p>
+        - string: public-library-of-science
+          details: <p>Public Library of Science</p>
+        - string: royal-society-of-chemistry
+          details: <p>Royal Society of Chemistry</p>
+        - string: sage-vancouver
+          details: <p>SAGE - Vancouver</p>
+        - string: sist02
+          details: <p>SIST02 (日本語)</p>
+        - string: spie
+          details: <p>SPIE journals</p>
+        - string: springer-basic
+          details: <p>Springer - Basic (numeric, brackets)</p>
+        - string: springer-basic-author-date
+          details: <p>Springer - Basic (author-date)</p>
+        - string: springer-fachzeitschriften-medizin-psychologie
+          details: <p>Springer - Fachzeitschriften Medizin Psychologie (Deutsch)</p>
+        - string: springer-humanities-author-date
+          details: <p>Springer - Humanities (author-date)</p>
+        - string: springer-lecture-notes-in-computer-science
+          details: <p>Springer - Lecture Notes in Computer Science</p>
+        - string: springer-mathphys
+          details: <p>Springer - MathPhys (numeric, brackets)</p>
+        - string: springer-socpsych-author-date
+          details: <p>Springer - SocPsych (author-date)</p>
+        - string: springer-vancouver
+          details: <p>Springer - Vancouver (brackets)</p>
+        - string: taylor-and-francis-chicago-author-date
+          details: <p>Taylor &amp; Francis - Chicago Manual of Style (author-date)</p>
+        - string: taylor-and-francis-national-library-of-medicine
+          details: <p>Taylor &amp; Francis - National Library of Medicine</p>
+        - string: the-institution-of-engineering-and-technology
+          details: <p>The Institution of Engineering and Technology</p>
+        - string: the-lancet
+          details: <p>The Lancet</p>
+        - string: thieme
+          details: <p>Thieme-German (Deutsch)</p>
+        - string: trends
+          details: <p>Trends journals</p>
+        - string: turabian-author-date
+          details: <p>Turabian 9th edition (author-date)</p>
+        - string: turabian-fullnote-8
+          details: <p>Turabian 8th edition (full note)</p>
+        - string: vancouver
+          details: <p>Vancouver</p>
+        - string: vancouver-superscript
+          details: <p>Vancouver (superscript)</p>
         default: <code><span class="typ-key">auto</span></code>
         positional: false
         named: true
@@ -1015,7 +1018,7 @@ children:
         <p>All documents are automatically wrapped in a <code>document</code> element. You cannot
         create a document element yourself. This function is only used with
         <a href="/docs/reference/styling/#set-rules">set rules</a> to specify document metadata. Such a set
-        rule must appear before any of the document's contents.</p>
+        rule must not occur inside of any layout container.</p>
         <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">document</span><span class="typ-punct">(</span>title<span class="typ-punct">:</span> <span class="typ-punct">[</span>Hello<span class="typ-punct">]</span><span class="typ-punct">)</span>
 
         This has no visible output, but
@@ -1121,7 +1124,8 @@ children:
       path: []
       name: emph
       title: Emphasis
-      keywords: []
+      keywords:
+      - italic
       oneliner: Emphasizes content by toggling italics.
       element: true
       contextual: false
@@ -1191,6 +1195,9 @@ children:
       children: []
     - id: parameters-placement
       name: placement
+      children: []
+    - id: parameters-scope
+      name: scope
       children: []
     - id: parameters-caption
       name: caption
@@ -1345,6 +1352,38 @@ children:
         - alignment
         strings: []
         default: <code><span class="typ-key">none</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: scope
+        details: |-
+          <p>Relative to which containing scope the figure is placed.</p>
+          <p>Set this to <code><span class="typ-str">&quot;parent&quot;</span></code> to create a full-width figure in a two-column
+          document.</p>
+          <p>Has no effect if <code>placement</code> is <code><span class="typ-key">none</span></code>.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">page</span><span class="typ-punct">(</span>height<span class="typ-punct">:</span> <span class="typ-num">250pt</span><span class="typ-punct">,</span> columns<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span>
+
+          <span class="typ-heading">= Introduction</span>
+          <span class="typ-func">#</span><span class="typ-func">figure</span><span class="typ-punct">(</span>
+            placement<span class="typ-punct">:</span> bottom<span class="typ-punct">,</span>
+            scope<span class="typ-punct">:</span> <span class="typ-str">&quot;parent&quot;</span><span class="typ-punct">,</span>
+            caption<span class="typ-punct">:</span> <span class="typ-punct">[</span>A glacier<span class="typ-punct">]</span><span class="typ-punct">,</span>
+            <span class="typ-func">image</span><span class="typ-punct">(</span><span class="typ-str">&quot;glacier.jpg&quot;</span><span class="typ-punct">,</span> width<span class="typ-punct">:</span> <span class="typ-num">60%</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+          <span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">lorem</span><span class="typ-punct">(</span><span class="typ-num">60</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/57ceb5974ee15ce07788df4104ee085d.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - str
+        strings:
+        - string: column
+          details: <p>Place into the current column.</p>
+        - string: parent
+          details: <p>Place relative to the parent, letting the content span over
+            all columns.</p>
+        default: <code><span class="typ-str">&quot;column&quot;</span></code>
         positional: false
         named: true
         required: false
@@ -1723,8 +1762,8 @@ children:
         contextual: false
         details: |-
           <p>An entry in a footnote list.</p>
-          <p>This function is not intended to be called directly. Instead, it is used
-          in set and show rules to customize footnote listings.</p>
+          <p>This function is not intended to be called directly. Instead, it is used in
+          set and show rules to customize footnote listings.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">show</span> footnote<span class="typ-punct">.</span><span class="typ-func">entry</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">text</span><span class="typ-punct">(</span>red<span class="typ-punct">)</span>
 
@@ -1732,9 +1771,10 @@ children:
           <span class="typ-func">#</span><span class="typ-func">footnote</span><span class="typ-punct">[</span>It&#39;s down here<span class="typ-punct">]</span>
           has red text!
           </code></pre><div class="preview"><img src="/assets/docs/e07bed06d522a25126bd74abd9d30066.png" alt="Preview" width="480" height="190"/></div></div>
-          <p><em>Note:</em> Set and show rules for <code>footnote.entry</code> must be defined at the
-          beginning of the document in order to work correctly. See <a href="https://github.com/typst/typst/issues/1467#issuecomment-1588799440">here</a> for
-          more information.</p>
+          <p><em>Note:</em> Footnote entry properties must be uniform across each page run (a
+          page run is a sequence of pages without an explicit pagebreak in between).
+          For this reason, set and show rules for footnote entries should be defined
+          before any page content, typically at the very start of the document.</p>
         self: false
         params:
         - name: note
@@ -1780,9 +1820,9 @@ children:
           - content
           strings: []
           default: <code><span class="typ-func">line</span><span class="typ-punct">(</span>length<span
-            class="typ-punct">:</span> <span class="typ-num">30%</span><span class="typ-punct">,</span>
-            stroke<span class="typ-punct">:</span> <span class="typ-num">0.5pt</span><span
-            class="typ-punct">)</span></code>
+            class="typ-punct">:</span> <span class="typ-num">30%</span> <span class="typ-op">+</span>
+            <span class="typ-num">0pt</span><span class="typ-punct">,</span> stroke<span
+            class="typ-punct">:</span> <span class="typ-num">0.5pt</span><span class="typ-punct">)</span></code>
           positional: false
           named: true
           required: false
@@ -1884,6 +1924,9 @@ children:
       children: []
     - id: parameters-bookmarked
       name: bookmarked
+      children: []
+    - id: parameters-hanging-indent
+      name: hanging-indent
       children: []
     - id: parameters-body
       name: body
@@ -2092,6 +2135,25 @@ children:
         types:
         - auto
         - bool
+        strings: []
+        default: <code><span class="typ-key">auto</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: hanging-indent
+        details: |-
+          <p>The indent all but the first line of a heading should have.</p>
+          <p>The default value of <code><span class="typ-key">auto</span></code> indicates that the subsequent heading
+          lines will be indented based on the width of the numbering.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">heading</span><span class="typ-punct">(</span>numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;1.&quot;</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">heading</span><span class="typ-punct">[</span>A very, very, very, very, very, very long heading<span class="typ-punct">]</span>
+          </code></pre><div class="preview"><img src="/assets/docs/77198026b01555b3d9dd5d0f8210713f.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - auto
+        - length
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -2357,14 +2419,16 @@ children:
       params:
       - name: tight
         details: |-
-          <p>If this is <code><span class="typ-key">false</span></code>, the items are spaced apart with
-          <a href="/docs/reference/model/enum/#parameters-spacing">enum spacing</a>. If it is <code><span class="typ-key">true</span></code>, they use normal
-          <a href="/docs/reference/model/par/#parameters-leading">leading</a> instead. This makes the enumeration more
+          <p>Defines the default <a href="/docs/reference/model/enum/#parameters-spacing">spacing</a> of the enumeration. If it
+          is <code><span class="typ-key">false</span></code>, the items are spaced apart with
+          <a href="/docs/reference/model/par/#parameters-spacing">paragraph spacing</a>. If it is <code><span class="typ-key">true</span></code>, they use
+          <a href="/docs/reference/model/par/#parameters-leading">paragraph leading</a> instead. This makes the list more
           compact, which can look better if the items are short.</p>
           <p>In markup mode, the value of this parameter is determined based on
           whether items are separated with a blank line. If items directly follow
           each other, this is set to <code><span class="typ-key">true</span></code>; if items are separated by a blank
-          line, this is set to <code><span class="typ-key">false</span></code>.</p>
+          line, this is set to <code><span class="typ-key">false</span></code>. The markup-defined tightness cannot be
+          overridden with set rules.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-marker">+</span> If an enum has a lot of text, and
             maybe other inline content, it
@@ -2438,9 +2502,9 @@ children:
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">enum</span><span class="typ-punct">(</span>numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;1.a)&quot;</span><span class="typ-punct">,</span> full<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span>
           <span class="typ-marker">+</span> Cook
             <span class="typ-marker">+</span> Heat water
-            <span class="typ-marker">+</span> Add integredients
+            <span class="typ-marker">+</span> Add ingredients
           <span class="typ-marker">+</span> Eat
-          </code></pre><div class="preview"><img src="/assets/docs/89cae67aed31e7f8a3ade0fdcbb3bc35.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/89c476c711867e248b6d6605baa6c445.png" alt="Preview" width="480" height="190"/></div></div>
         types:
         - bool
         strings: []
@@ -2476,13 +2540,14 @@ children:
         settable: true
       - name: spacing
         details: |-
-          <p>The spacing between the items of a wide (non-tight) enumeration.</p>
-          <p>If set to <code><span class="typ-key">auto</span></code>, uses the spacing <a href="/docs/reference/layout/block/#parameters-below">below blocks</a>.</p>
+          <p>The spacing between the items of the enumeration.</p>
+          <p>If set to <code><span class="typ-key">auto</span></code>, uses paragraph <a href="/docs/reference/model/par/#parameters-leading"><code>leading</code></a> for tight
+          enumerations and paragraph <a href="/docs/reference/model/par/#parameters-spacing"><code>spacing</code></a> for wide
+          (non-tight) enumerations.</p>
         example: null
         types:
         - auto
-        - relative
-        - fraction
+        - length
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false
@@ -2599,6 +2664,9 @@ children:
   - id: example
     name: Example
     children: []
+  - id: numbering-patterns-and-numbering-functions
+    name: Numbering Patterns And Numbering Functions
+    children: []
   - id: parameters
     name: Parameters
     children:
@@ -2638,18 +2706,32 @@ children:
           <span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">,</span>
         <span class="typ-punct">)</span>
         </code></pre><div class="preview"><img src="/assets/docs/c49443caf46299c5a909ea27c0c42f0c.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="numbering-patterns-and-numbering-functions">Numbering patterns and numbering functions</h2>
+        <p>There are multiple instances where you can provide a numbering pattern or
+        function in Typst. For example, when defining how to number
+        <a href="/docs/reference/model/heading/">headings</a> or <a href="/docs/reference/model/figure/">figures</a>. Every time, the expected format
+        is the same as the one described below for the
+        <a href="/docs/reference/model/numbering/#parameters-numbering"><code>numbering</code></a> parameter.</p>
+        <p>The following example illustrates that a numbering function is just a
+        regular <a href="/docs/reference/foundations/function/" title="function">function</a> that accepts numbers and returns <a href="/docs/reference/foundations/content/" title="`content`"><code>content</code></a>.</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> <span class="typ-func">unary</span><span class="typ-punct">(</span><span class="typ-op">..</span><span class="typ-punct">,</span> last<span class="typ-punct">)</span> <span class="typ-op">=</span> <span class="typ-str">&quot;|&quot;</span> <span class="typ-op">*</span> last
+        <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">heading</span><span class="typ-punct">(</span>numbering<span class="typ-punct">:</span> unary<span class="typ-punct">)</span>
+        <span class="typ-heading">= First heading</span>
+        <span class="typ-heading">= Second heading</span>
+        <span class="typ-heading">= Third heading</span>
+        </code></pre><div class="preview"><img src="/assets/docs/23c05f576c9d548d7cb95b198224ecf5.png" alt="Preview" width="480" height="190"/></div></div>
       example: null
       self: false
       params:
       - name: numbering
         details: |-
           <p>Defines how the numbering works.</p>
-          <p><strong>Counting symbols</strong> are <code>1</code>, <code>a</code>, <code>A</code>, <code>i</code>, <code>I</code>, <code>一</code>, <code>壹</code>, <code>あ</code>, <code>い</code>, <code>ア</code>, <code>イ</code>, <code>א</code>, <code>가</code>,
-          <code>ㄱ</code>, and <code>*</code>. They are replaced by the number in the sequence, in the
-          given case.</p>
+          <p><strong>Counting symbols</strong> are <code>1</code>, <code>a</code>, <code>A</code>, <code>i</code>, <code>I</code>, <code>一</code>, <code>壹</code>, <code>あ</code>, <code>い</code>,
+          <code>ア</code>, <code>イ</code>, <code>א</code>, <code>가</code>, <code>ㄱ</code>, <code>*</code>, <code>①</code>, and <code>⓵</code>. They are replaced by the
+          number in the sequence, preserving the original case.</p>
           <p>The <code>*</code> character means that symbols should be used to count, in the
-          order of <code>*</code>, <code>†</code>, <code>‡</code>, <code>§</code>, <code>¶</code>, and <code>‖</code>. If there are more than six
-          items, the number is represented using multiple symbols.</p>
+          order of <code>*</code>, <code>†</code>, <code>‡</code>, <code>§</code>, <code>¶</code>, <code>‖</code>. If there are more than six
+          items, the number is represented using repeated symbols.</p>
           <p><strong>Suffixes</strong> are all characters after the last counting symbol. They are
           repeated as-is at the end of any rendered number.</p>
           <p><strong>Prefixes</strong> are all characters that are neither counting symbols nor
@@ -2947,7 +3029,7 @@ children:
       - name: fill
         details: |-
           <p>Content to fill the space between the title and the page number. Can be
-          set to <code>none</code> to disable filling.</p>
+          set to <code><span class="typ-key">none</span></code> to disable filling.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">outline</span><span class="typ-punct">(</span>fill<span class="typ-punct">:</span> <span class="typ-func">line</span><span class="typ-punct">(</span>length<span class="typ-punct">:</span> <span class="typ-num">100%</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
 
@@ -3104,6 +3186,9 @@ children:
     - id: parameters-leading
       name: leading
       children: []
+    - id: parameters-spacing
+      name: spacing
+      children: []
     - id: parameters-justify
       name: justify
       children: []
@@ -3119,6 +3204,27 @@ children:
     - id: parameters-body
       name: body
       children: []
+  - id: definitions
+    name: Definitions
+    children:
+    - id: definitions-line
+      name: Paragraph Line
+      children:
+      - id: definitions-line-numbering
+        name: numbering
+        children: []
+      - id: definitions-line-number-align
+        name: number-align
+        children: []
+      - id: definitions-line-number-margin
+        name: number-margin
+        children: []
+      - id: definitions-line-number-clearance
+        name: number-clearance
+        children: []
+      - id: definitions-line-numbering-scope
+        name: numbering-scope
+        children: []
   body:
     kind: func
     content:
@@ -3135,9 +3241,9 @@ children:
         properties, it can also be used to explicitly render its argument onto a
         paragraph of its own.</p>
         <h2 id="example">Example</h2>
-        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">show</span> <span class="typ-func">par</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">block</span><span class="typ-punct">(</span>spacing<span class="typ-punct">:</span> <span class="typ-num">0.65em</span><span class="typ-punct">)</span>
-        <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">par</span><span class="typ-punct">(</span>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">par</span><span class="typ-punct">(</span>
           first-line-indent<span class="typ-punct">:</span> <span class="typ-num">1em</span><span class="typ-punct">,</span>
+          spacing<span class="typ-punct">:</span> <span class="typ-num">0.65em</span><span class="typ-punct">,</span>
           justify<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">,</span>
         <span class="typ-punct">)</span>
 
@@ -3151,17 +3257,48 @@ children:
         Without loss of generality,
         let <span class="typ-math-delim">$</span>a<span class="typ-math-delim">$</span> be the smallest of the
         three integers. Then, we <span class="typ-escape">...</span>
-        </code></pre><div class="preview"><img src="/assets/docs/4ad0c7e875ca044b839c4c85e8b6cb15.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/6fc94211d5ad3ae310d85891f4867593.png" alt="Preview" width="480" height="190"/></div></div>
       example: null
       self: false
       params:
       - name: leading
-        details: <p>The spacing between lines.</p>
+        details: |-
+          <p>The spacing between lines.</p>
+          <p>Leading defines the spacing between the <a href="/docs/reference/text/text/#parameters-bottom-edge">bottom edge</a>
+          of one line and the <a href="/docs/reference/text/text/#parameters-top-edge">top edge</a> of the following line. By
+          default, these two properties are up to the font, but they can also be
+          configured manually with a text set rule.</p>
+          <p>By setting top edge, bottom edge, and leading, you can also configure a
+          consistent baseline-to-baseline distance. You could, for instance, set
+          the leading to <code><span class="typ-num">1em</span></code>, the top-edge to <code><span class="typ-num">0.8em</span></code>, and the bottom-edge
+          to <code><span class="typ-op">-</span><span class="typ-num">0.2em</span></code> to get a baseline gap of exactly <code><span class="typ-num">2em</span></code>. The exact
+          distribution of the top- and bottom-edge values affects the bounds of
+          the first and last line.</p>
         example: null
         types:
         - length
         strings: []
         default: <code><span class="typ-num">0.65em</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: spacing
+        details: |-
+          <p>The spacing between paragraphs.</p>
+          <p>Just like leading, this defines the spacing between the bottom edge of a
+          paragraph's last line and the top edge of the next paragraph's first
+          line.</p>
+          <p>When a paragraph is adjacent to a <a href="/docs/reference/layout/block/" title="`block`"><code>block</code></a> that is not a paragraph,
+          that block's <a href="/docs/reference/layout/block/#parameters-above"><code>above</code></a> or <a href="/docs/reference/layout/block/#parameters-below"><code>below</code></a> property
+          takes precedence over the paragraph spacing. Headings, for instance,
+          reduce the spacing below them by default for a better look.</p>
+        example: null
+        types:
+        - length
+        strings: []
+        default: <code><span class="typ-num">1.2em</span></code>
         positional: false
         named: true
         required: false
@@ -3232,8 +3369,7 @@ children:
           <p>By typographic convention, paragraph breaks are indicated either by some
           space between paragraphs or by indented first lines. Consider reducing
           the <a href="/docs/reference/layout/block/#parameters-spacing">paragraph spacing</a> to the <a href="/docs/reference/model/par/#parameters-leading"><code>leading</code></a>
-          when using this property (e.g. using
-          <code><span class="typ-key">#</span><span class="typ-key">show</span> <span class="typ-func">par</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">block</span><span class="typ-punct">(</span>spacing<span class="typ-punct">:</span> <span class="typ-num">0.65em</span><span class="typ-punct">)</span></code>).</p>
+          when using this property (e.g. using <code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">par</span><span class="typ-punct">(</span>spacing<span class="typ-punct">:</span> <span class="typ-num">0.65em</span><span class="typ-punct">)</span></code>).</p>
         example: null
         types:
         - length
@@ -3270,7 +3406,202 @@ children:
         settable: false
       returns:
       - content
-      scope: []
+      scope:
+      - path:
+        - par
+        name: line
+        title: Paragraph Line
+        keywords:
+        - line numbering
+        oneliner: A paragraph line.
+        element: true
+        contextual: false
+        details: |-
+          <p>A paragraph line.</p>
+          <p>This element is exclusively used for line number configuration through set
+          rules and cannot be placed.</p>
+          <p>The <a href="/docs/reference/model/par/#definitions-line-numbering"><code>numbering</code></a> option is used to enable line
+          numbers by specifying a numbering format.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;1&quot;</span><span class="typ-punct">)</span>
+
+          Roses are red. <span class="typ-escape">\</span>
+          Violets are blue. <span class="typ-escape">\</span>
+          Typst is there for you.
+          </code></pre><div class="preview"><img src="/assets/docs/05b80287a51104e48bb5b4d065c7452f.png" alt="Preview" width="480" height="190"/></div></div>
+          <p>The <code>numbering</code> option takes either a predefined
+          <a href="/docs/reference/model/numbering/">numbering pattern</a> or a function returning styled content. You
+          can disable line numbers for text inside certain elements by setting the
+          numbering to <code><span class="typ-key">none</span></code> using show-set rules.</p>
+          <div class="previewed-code"><pre><code><span class="typ-comment">// Styled red line numbers.</span>
+          <span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>
+            numbering<span class="typ-punct">:</span> n <span class="typ-op">=&gt;</span> <span class="typ-func">text</span><span class="typ-punct">(</span>red<span class="typ-punct">)</span><span class="typ-punct">[</span><span class="typ-pol">#</span><span class="typ-pol">n</span><span class="typ-punct">]</span>
+          <span class="typ-punct">)</span>
+
+          <span class="typ-comment">// Disable numbers inside figures.</span>
+          <span class="typ-key">#</span><span class="typ-key">show</span> <span class="typ-func">figure</span><span class="typ-punct">:</span> <span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>
+            numbering<span class="typ-punct">:</span> <span class="typ-key">none</span>
+          <span class="typ-punct">)</span>
+
+          Roses are red. <span class="typ-escape">\</span>
+          Violets are blue.
+
+          <span class="typ-func">#</span><span class="typ-func">figure</span><span class="typ-punct">(</span>
+            caption<span class="typ-punct">:</span> <span class="typ-punct">[</span>Without line numbers.<span class="typ-punct">]</span>
+          <span class="typ-punct">)</span><span class="typ-punct">[</span>
+            Lorem ipsum <span class="typ-escape">\</span>
+            dolor sit amet
+          <span class="typ-punct">]</span>
+
+          The text above is a sample <span class="typ-escape">\</span>
+          originating from distant times.
+          </code></pre><div class="preview"><img src="/assets/docs/d4bced55ad58a39d64488f4ea8a4f0c3.png" alt="Preview" width="480" height="190"/></div></div>
+          <p>This element exposes further options which may be used to control other
+          aspects of line numbering, such as its <a href="/docs/reference/model/par/#definitions-line-number-align">alignment</a>
+          or <a href="/docs/reference/model/par/#definitions-line-number-margin">margin</a>. In addition, you can control whether
+          the numbering is reset on each page through the
+          <a href="/docs/reference/model/par/#definitions-line-numbering-scope"><code>numbering-scope</code></a> option.</p>
+        self: false
+        params:
+        - name: numbering
+          details: |-
+            <p>How to number each line. Accepts a
+            <a href="/docs/reference/model/numbering/">numbering pattern or function</a>.</p>
+          example: |-
+            <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;I&quot;</span><span class="typ-punct">)</span>
+
+            Roses are red. <span class="typ-escape">\</span>
+            Violets are blue. <span class="typ-escape">\</span>
+            Typst is there for you.
+            </code></pre><div class="preview"><img src="/assets/docs/dc3a1deec9339dfc5e0212107456598b.png" alt="Preview" width="480" height="190"/></div></div>
+          types:
+          - none
+          - str
+          - function
+          strings: []
+          default: <code><span class="typ-key">none</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: true
+        - name: number-align
+          details: |-
+            <p>The alignment of line numbers associated with each line.</p>
+            <p>The default of <code><span class="typ-key">auto</span></code> indicates a smart default where numbers grow
+            horizontally away from the text, considering the margin they're in and
+            the current text direction.</p>
+          example: |-
+            <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>
+              numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;I&quot;</span><span class="typ-punct">,</span>
+              number-align<span class="typ-punct">:</span> left<span class="typ-punct">,</span>
+            <span class="typ-punct">)</span>
+
+            Hello world! <span class="typ-escape">\</span>
+            Today is a beautiful day <span class="typ-escape">\</span>
+            For exploring the world.
+            </code></pre><div class="preview"><img src="/assets/docs/19af005e7549a91f6313af4fbe59a0ae.png" alt="Preview" width="480" height="190"/></div></div>
+          types:
+          - auto
+          - alignment
+          strings: []
+          default: <code><span class="typ-key">auto</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: true
+        - name: number-margin
+          details: |-
+            <p>The margin at which line numbers appear.</p>
+            <p><em>Note:</em> In a multi-column document, the line numbers for paragraphs
+            inside the last column will always appear on the <code>end</code> margin (right
+            margin for left-to-right text and left margin for right-to-left),
+            regardless of this configuration. That behavior cannot be changed at
+            this moment.</p>
+          example: |-
+            <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>
+              numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;1&quot;</span><span class="typ-punct">,</span>
+              number-margin<span class="typ-punct">:</span> right<span class="typ-punct">,</span>
+            <span class="typ-punct">)</span>
+
+            <span class="typ-heading">= Report</span>
+            <span class="typ-marker">-</span> Brightness: Dark, yet darker
+            <span class="typ-marker">-</span> Readings: Negative
+            </code></pre><div class="preview"><img src="/assets/docs/404762a064d6063f425a33b2b750584f.png" alt="Preview" width="480" height="190"/></div></div>
+          types:
+          - alignment
+          strings: []
+          default: <code>start</code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: true
+        - name: number-clearance
+          details: |-
+            <p>The distance between line numbers and text.</p>
+            <p>The default value of <code><span class="typ-key">auto</span></code> results in a clearance that is adaptive to
+            the page width and yields reasonable results in most cases.</p>
+          example: |-
+            <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>
+              numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;1&quot;</span><span class="typ-punct">,</span>
+              number-clearance<span class="typ-punct">:</span> <span class="typ-num">4pt</span><span class="typ-punct">,</span>
+            <span class="typ-punct">)</span>
+
+            Typesetting <span class="typ-escape">\</span>
+            Styling <span class="typ-escape">\</span>
+            Layout
+            </code></pre><div class="preview"><img src="/assets/docs/e8e77a87b0b6d7160ac53f29fda614e4.png" alt="Preview" width="480" height="190"/></div></div>
+          types:
+          - auto
+          - length
+          strings: []
+          default: <code><span class="typ-key">auto</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: true
+        - name: numbering-scope
+          details: |-
+            <p>Controls when to reset line numbering.</p>
+            <p><em>Note:</em> The line numbering scope must be uniform across each page run (a
+            page run is a sequence of pages without an explicit pagebreak in
+            between). For this reason, set rules for it should be defined before any
+            page content, typically at the very start of the document.</p>
+          example: |-
+            <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> par<span class="typ-punct">.</span><span class="typ-func">line</span><span class="typ-punct">(</span>
+              numbering<span class="typ-punct">:</span> <span class="typ-str">&quot;1&quot;</span><span class="typ-punct">,</span>
+              numbering-scope<span class="typ-punct">:</span> <span class="typ-str">&quot;page&quot;</span><span class="typ-punct">,</span>
+            <span class="typ-punct">)</span>
+
+            First line <span class="typ-escape">\</span>
+            Second line
+            <span class="typ-func">#</span><span class="typ-func">pagebreak</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+            First line again <span class="typ-escape">\</span>
+            Second line again
+            </code></pre><div class="preview"><img src="/assets/docs/5d18091750a47f478849ec2ffadb6d99.png" alt="Preview" width="480" height="190"/></div></div>
+          types:
+          - str
+          strings:
+          - string: document
+            details: |-
+              <p>Indicates the line number counter spans the whole document, that is,
+              is never automatically reset.</p>
+          - string: page
+            details: |-
+              <p>Indicates the line number counter should be reset at the start of every
+              new page.</p>
+          default: <code><span class="typ-str">&quot;document&quot;</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: true
+        returns:
+        - content
+        scope: []
   children: []
 - route: /docs/reference/model/parbreak/
   title: Paragraph Break
@@ -3574,10 +3905,10 @@ children:
         <span class="typ-heading">== Performance</span> <span class="typ-label">&lt;perf&gt;</span>
         <span class="typ-ref">@slow</span> demonstrates what slow
         software looks like.
-        <span class="typ-math-delim">$</span> O(n) = 2<span class="typ-math-op">^</span>n <span class="typ-math-delim">$</span> <span class="typ-label">&lt;slow&gt;</span>
+        <span class="typ-math-delim">$</span> T(n) = O(2<span class="typ-math-op">^</span>n) <span class="typ-math-delim">$</span> <span class="typ-label">&lt;slow&gt;</span>
 
         <span class="typ-func">#</span><span class="typ-func">bibliography</span><span class="typ-punct">(</span><span class="typ-str">&quot;works.bib&quot;</span><span class="typ-punct">)</span>
-        </code></pre><div class="preview"><img src="/assets/docs/3492082c98f2903651fb394f3d2e9472.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/c3f3d948c90c3d086d0ba15c70b636af.png" alt="Preview" width="480" height="190"/></div></div>
         <h2 id="syntax">Syntax</h2>
         <p>This function also has dedicated syntax: A reference to a label can be
         created by typing an <code>@</code> followed by the name of the label (e.g.
@@ -3597,10 +3928,10 @@ children:
           <span class="typ-key">let</span> el <span class="typ-op">=</span> it<span class="typ-punct">.</span>element
           <span class="typ-key">if</span> el <span class="typ-op">!=</span> <span class="typ-key">none</span> <span class="typ-key">and</span> el<span class="typ-punct">.</span><span class="typ-func">func</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-op">==</span> eq <span class="typ-punct">{</span>
             <span class="typ-comment">// Override equation references.</span>
-            <span class="typ-func">numbering</span><span class="typ-punct">(</span>
+            <span class="typ-func">link</span><span class="typ-punct">(</span>el<span class="typ-punct">.</span><span class="typ-func">location</span><span class="typ-punct">(</span><span class="typ-punct">)</span><span class="typ-punct">,</span><span class="typ-func">numbering</span><span class="typ-punct">(</span>
               el<span class="typ-punct">.</span>numbering<span class="typ-punct">,</span>
               <span class="typ-op">..</span><span class="typ-func">counter</span><span class="typ-punct">(</span>eq<span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">at</span><span class="typ-punct">(</span>el<span class="typ-punct">.</span><span class="typ-func">location</span><span class="typ-punct">(</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
-            <span class="typ-punct">)</span>
+            <span class="typ-punct">)</span><span class="typ-punct">)</span>
           <span class="typ-punct">}</span> <span class="typ-key">else</span> <span class="typ-punct">{</span>
             <span class="typ-comment">// Other references as usual.</span>
             it
@@ -3610,7 +3941,7 @@ children:
         <span class="typ-heading">= Beginnings</span> <span class="typ-label">&lt;beginning&gt;</span>
         In <span class="typ-ref">@beginning</span> we prove <span class="typ-ref">@pythagoras</span>.
         <span class="typ-math-delim">$</span> a<span class="typ-math-op">^</span>2 + b<span class="typ-math-op">^</span>2 = c<span class="typ-math-op">^</span>2 <span class="typ-math-delim">$</span> <span class="typ-label">&lt;pythagoras&gt;</span>
-        </code></pre><div class="preview"><img src="/assets/docs/670ed605e234dd0e2bb76e690e91de9b.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/c5f79b803ab3336fc7f125aa3b5e7535.png" alt="Preview" width="480" height="190"/></div></div>
       example: null
       self: false
       params:
@@ -3697,7 +4028,9 @@ children:
       path: []
       name: strong
       title: Strong Emphasis
-      keywords: []
+      keywords:
+      - bold
+      - weight
       oneliner: Strongly emphasizes content by increasing the font weight.
       element: true
       contextual: false
@@ -3910,9 +4243,9 @@ children:
         your presentation by arranging unrelated content in a grid. In the former
         case, a table is the right choice, while in the latter case, a grid is more
         appropriate. Furthermore, Typst will annotate its output in the future such
-        that screenreaders will annouce content in <code>table</code> as tabular while a grid's
-        content will be announced no different than multiple content blocks in the
-        document flow.</p>
+        that screenreaders will announce content in <code>table</code> as tabular while a
+        grid's content will be announced no different than multiple content blocks
+        in the document flow.</p>
         <p>Note that, to override a particular cell's properties or apply show rules on
         table cells, you can use the <a href="/docs/reference/model/table/#definitions-cell"><code>table.cell</code></a> element. See its
         documentation for more information.</p>
@@ -3927,7 +4260,7 @@ children:
           inset<span class="typ-punct">:</span> <span class="typ-num">10pt</span><span class="typ-punct">,</span>
           align<span class="typ-punct">:</span> horizon<span class="typ-punct">,</span>
           table<span class="typ-punct">.</span><span class="typ-func">header</span><span class="typ-punct">(</span>
-            <span class="typ-punct">[</span><span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span><span class="typ-strong">*Area*</span><span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span><span class="typ-strong">*Parameters*</span><span class="typ-punct">]</span><span class="typ-punct">,</span>
+            <span class="typ-punct">[</span><span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span><span class="typ-strong">*Volume*</span><span class="typ-punct">]</span><span class="typ-punct">,</span> <span class="typ-punct">[</span><span class="typ-strong">*Parameters*</span><span class="typ-punct">]</span><span class="typ-punct">,</span>
           <span class="typ-punct">)</span><span class="typ-punct">,</span>
           <span class="typ-func">image</span><span class="typ-punct">(</span><span class="typ-str">&quot;cylinder.svg&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
           <span class="typ-math-delim">$</span> <span class="typ-pol">pi</span> h <span class="typ-punct">(</span>D<span class="typ-math-op">^</span>2 <span class="typ-escape">-</span> d<span class="typ-math-op">^</span>2<span class="typ-punct">)</span> <span class="typ-math-op">/</span> 4 <span class="typ-math-delim">$</span><span class="typ-punct">,</span>
@@ -3940,7 +4273,7 @@ children:
           <span class="typ-math-delim">$</span> <span class="typ-func">sqrt</span><span class="typ-punct">(</span>2<span class="typ-punct">)</span> <span class="typ-math-op">/</span> 12 a<span class="typ-math-op">^</span>3 <span class="typ-math-delim">$</span><span class="typ-punct">,</span>
           <span class="typ-punct">[</span><span class="typ-math-delim">$</span>a<span class="typ-math-delim">$</span>: edge length<span class="typ-punct">]</span>
         <span class="typ-punct">)</span>
-        </code></pre><div class="preview"><img src="/assets/docs/291ffba835d6b37da3942ed85abc7ad5.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/e132e6f0ed4993141cbe7f5dabf83c69.png" alt="Preview" width="480" height="190"/></div></div>
         <p>Much like with grids, you can use <a href="/docs/reference/model/table/#definitions-cell"><code>table.cell</code></a> to customize
         the appearance and the position of each cell.</p>
         <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">table</span><span class="typ-punct">(</span>
@@ -4020,8 +4353,9 @@ children:
         settable: true
       - name: gutter
         details: |-
-          <p>The gaps between rows and columns. See the <a href="/docs/reference/layout/grid/">grid documentation</a>
-          for more information on gutters.</p>
+          <p>The gaps between rows and columns. This is a shorthand for setting
+          <code>column-gutter</code> and <code>row-gutter</code> to the same value. See the <a href="/docs/reference/layout/grid/">grid
+          documentation</a> for more information on gutters.</p>
         example: null
         types:
         - auto
@@ -4190,7 +4524,8 @@ children:
         - dictionary
         - function
         strings: []
-        default: <code><span class="typ-num">5pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">5pt</span></code>
         positional: false
         named: true
         required: false
@@ -4231,7 +4566,18 @@ children:
           <p>Perhaps the most important use case of <code>table<span class="typ-punct">.</span>cell</code> is to make a cell span
           multiple columns and/or rows with the <code>colspan</code> and <code>rowspan</code> fields.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">table</span><span class="typ-punct">(</span>
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">show</span> table<span class="typ-punct">.</span>cell<span class="typ-punct">.</span><span class="typ-func">where</span><span class="typ-punct">(</span>y<span class="typ-punct">:</span> <span class="typ-num">0</span><span class="typ-punct">)</span><span class="typ-punct">:</span> <span class="typ-func">strong</span>
+          <span class="typ-key">#</span><span class="typ-key">set</span> <span class="typ-func">table</span><span class="typ-punct">(</span>
+            stroke<span class="typ-punct">:</span> <span class="typ-punct">(</span>x<span class="typ-punct">,</span> y<span class="typ-punct">)</span> <span class="typ-op">=&gt;</span> <span class="typ-key">if</span> y <span class="typ-op">==</span> <span class="typ-num">0</span> <span class="typ-punct">{</span>
+              <span class="typ-punct">(</span>bottom<span class="typ-punct">:</span> <span class="typ-num">0.7pt</span> <span class="typ-op">+</span> black<span class="typ-punct">)</span>
+            <span class="typ-punct">}</span><span class="typ-punct">,</span>
+            align<span class="typ-punct">:</span> <span class="typ-punct">(</span>x<span class="typ-punct">,</span> y<span class="typ-punct">)</span> <span class="typ-op">=&gt;</span> <span class="typ-punct">(</span>
+              <span class="typ-key">if</span> x <span class="typ-op">&gt;</span> <span class="typ-num">0</span> <span class="typ-punct">{</span> center <span class="typ-punct">}</span>
+              <span class="typ-key">else</span> <span class="typ-punct">{</span> left <span class="typ-punct">}</span>
+            <span class="typ-punct">)</span>
+          <span class="typ-punct">)</span>
+
+          <span class="typ-func">#</span><span class="typ-func">table</span><span class="typ-punct">(</span>
             columns<span class="typ-punct">:</span> <span class="typ-num">3</span><span class="typ-punct">,</span>
             table<span class="typ-punct">.</span><span class="typ-func">header</span><span class="typ-punct">(</span>
               <span class="typ-punct">[</span>Substance<span class="typ-punct">]</span><span class="typ-punct">,</span>
@@ -4245,7 +4591,7 @@ children:
             <span class="typ-punct">[</span>Potassium Hydroxide<span class="typ-punct">]</span><span class="typ-punct">,</span>
             table<span class="typ-punct">.</span><span class="typ-func">cell</span><span class="typ-punct">(</span>colspan<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span><span class="typ-punct">[</span>24.7<span class="typ-punct">]</span><span class="typ-punct">,</span>
           <span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/fe2170650b3ad4cae5e69b85359932ef.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/f2bc91ad03d6122aa9a52a7d3fad7f0b.png" alt="Preview" width="480" height="190"/></div></div>
           <p>For example, you can override the fill, alignment or inset for a single
           cell:</p>
           <div class="previewed-code"><pre><code><span class="typ-comment">// You can also import those.</span>
@@ -4877,14 +5223,16 @@ children:
       params:
       - name: tight
         details: |-
-          <p>If this is <code><span class="typ-key">false</span></code>, the items are spaced apart with
-          <a href="/docs/reference/model/terms/#parameters-spacing">term list spacing</a>. If it is <code><span class="typ-key">true</span></code>, they use normal
-          <a href="/docs/reference/model/par/#parameters-leading">leading</a> instead. This makes the term list more compact,
-          which can look better if the items are short.</p>
+          <p>Defines the default <a href="/docs/reference/model/terms/#parameters-spacing">spacing</a> of the term list. If it is
+          <code><span class="typ-key">false</span></code>, the items are spaced apart with
+          <a href="/docs/reference/model/par/#parameters-spacing">paragraph spacing</a>. If it is <code><span class="typ-key">true</span></code>, they use
+          <a href="/docs/reference/model/par/#parameters-leading">paragraph leading</a> instead. This makes the list more
+          compact, which can look better if the items are short.</p>
           <p>In markup mode, the value of this parameter is determined based on
           whether items are separated with a blank line. If items directly follow
           each other, this is set to <code><span class="typ-key">true</span></code>; if items are separated by a blank
-          line, this is set to <code><span class="typ-key">false</span></code>.</p>
+          line, this is set to <code><span class="typ-key">false</span></code>. The markup-defined tightness cannot be
+          overridden with set rules.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-marker">/</span> <span class="typ-term">Fact</span><span class="typ-punct">:</span> If a term list has a lot
             of text, and maybe other inline
@@ -4959,13 +5307,14 @@ children:
         settable: true
       - name: spacing
         details: |-
-          <p>The spacing between the items of a wide (non-tight) term list.</p>
-          <p>If set to <code><span class="typ-key">auto</span></code>, uses the spacing <a href="/docs/reference/layout/block/#parameters-below">below blocks</a>.</p>
+          <p>The spacing between the items of the term list.</p>
+          <p>If set to <code><span class="typ-key">auto</span></code>, uses paragraph <a href="/docs/reference/model/par/#parameters-leading"><code>leading</code></a> for tight
+          term lists and paragraph <a href="/docs/reference/model/par/#parameters-spacing"><code>spacing</code></a> for wide
+          (non-tight) term lists.</p>
         example: null
         types:
         - auto
-        - relative
-        - fraction
+        - length
         strings: []
         default: <code><span class="typ-key">auto</span></code>
         positional: false

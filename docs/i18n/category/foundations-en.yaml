@@ -55,6 +55,10 @@ body:
       route: /docs/reference/foundations/datetime/
       oneliner: Represents a date, a time, or a combination of both.
       code: true
+    - name: decimal
+      route: /docs/reference/foundations/decimal/
+      oneliner: A fixed-point decimal number type.
+      code: true
     - name: dictionary
       route: /docs/reference/foundations/dictionary/
       oneliner: A map from string keys to values.
@@ -156,6 +160,15 @@ children:
   - id: definitions
     name: Definitions
     children:
+    - id: definitions-at
+      name: At
+      children:
+      - id: definitions-at-key
+        name: key
+        children: []
+      - id: definitions-at-default
+        name: default
+        children: []
     - id: definitions-pos
       name: Positional
       children: []
@@ -227,6 +240,52 @@ children:
         - arguments
         scope: []
       scope:
+      - path:
+        - arguments
+        name: at
+        title: At
+        keywords: []
+        oneliner: Returns the positional argument at the specified index, or the named
+        element: false
+        contextual: false
+        details: |-
+          <p>Returns the positional argument at the specified index, or the named
+          argument with the specified name.</p>
+          <p>If the key is an <a href="/docs/reference/foundations/int/">integer</a>, this is equivalent to first calling
+          <a href="/docs/reference/foundations/arguments/#definitions-pos"><code>pos</code></a> and then <a href="/docs/reference/foundations/array/#definitions-at" title="`array.at`"><code>array.at</code></a>. If it is a <a href="/docs/reference/foundations/str/">string</a>,
+          this is equivalent to first calling <a href="/docs/reference/foundations/arguments/#definitions-named"><code>named</code></a> and then
+          <a href="/docs/reference/foundations/dictionary/#definitions-at" title="`dictionary.at`"><code>dictionary.at</code></a>.</p>
+        example: null
+        self: true
+        params:
+        - name: key
+          details: <p>The index or name of the argument to get.</p>
+          example: null
+          types:
+          - int
+          - str
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: default
+          details: <p>A default value to return if the key is invalid.</p>
+          example: null
+          types:
+          - any
+          strings: []
+          default: null
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        returns:
+        - any
+        scope: []
       - path:
         - arguments
         name: pos
@@ -386,6 +445,9 @@ children:
     - id: definitions-zip
       name: Zip
       children:
+      - id: definitions-zip-exact
+        name: exact
+        children: []
       - id: definitions-zip-others
         name: others
         children: []
@@ -458,6 +520,12 @@ children:
       - id: definitions-chunks-exact
         name: exact
         children: []
+    - id: definitions-windows
+      name: Windows
+      children:
+      - id: definitions-windows-window-size
+        name: window-size
+        children: []
     - id: definitions-sorted
       name: Sorted
       children:
@@ -469,6 +537,15 @@ children:
       children:
       - id: definitions-dedup-key
         name: key
+        children: []
+    - id: definitions-to-dict
+      name: To Dict
+      children: []
+    - id: definitions-reduce
+      name: Reduce
+      children:
+      - id: definitions-reduce-reducer
+        name: reducer
         children: []
   body:
     kind: type
@@ -685,13 +762,15 @@ children:
         name: insert
         title: Insert
         keywords: []
-        oneliner: Inserts a value into the array at the specified index. Fails with
-          an
+        oneliner: Inserts a value into the array at the specified index, shifting
+          all
         element: false
         contextual: false
         details: |-
-          <p>Inserts a value into the array at the specified index. Fails with an
-          error if the index is out of bounds.</p>
+          <p>Inserts a value into the array at the specified index, shifting all
+          subsequent elements to the right. Fails with an error if the index is
+          out of bounds.</p>
+          <p>To replace an element of an array, use <a href="/docs/reference/foundations/array/#definitions-at"><code>at</code></a>.</p>
         example: null
         self: true
         params:
@@ -772,11 +851,11 @@ children:
         title: Slice
         keywords: []
         oneliner: Extracts a subslice of the array. Fails with an error if the start
-          or
+          or end
         element: false
         contextual: false
         details: |-
-          <p>Extracts a subslice of the array. Fails with an error if the start or
+          <p>Extracts a subslice of the array. Fails with an error if the start or end
           index is out of bounds.</p>
         example: null
         self: true
@@ -1091,6 +1170,21 @@ children:
         example: null
         self: true
         params:
+        - name: exact
+          details: |-
+            <p>Whether all arrays have to have the same length.
+            For example, <code><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">zip</span><span class="typ-punct">(</span><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span><span class="typ-punct">,</span> exact<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span></code> produces an
+            error.</p>
+          example: null
+          types:
+          - bool
+          strings: []
+          default: <code><span class="typ-key">false</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
         - name: others
           details: <p>The arrays to zip with.</p>
           example: null
@@ -1441,6 +1535,38 @@ children:
         scope: []
       - path:
         - array
+        name: windows
+        title: Windows
+        keywords: []
+        oneliner: Returns sliding windows of `window-size` elements over an array.
+        element: false
+        contextual: false
+        details: |-
+          <p>Returns sliding windows of <code>window-size</code> elements over an array.</p>
+          <p>If the array length is less than <code>window-size</code>, this will return an empty array.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> array <span class="typ-op">=</span> <span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">,</span> <span class="typ-num">4</span><span class="typ-punct">,</span> <span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">6</span><span class="typ-punct">,</span> <span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-num">8</span><span class="typ-punct">)</span>
+          <span class="typ-pol">#</span><span class="typ-pol">array</span><span class="typ-punct">.</span><span class="typ-func">windows</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/8502236b398e01811829a9df4f60de04.png" alt="Preview" width="480" height="190"/></div></div>
+        self: true
+        params:
+        - name: window-size
+          details: <p>How many elements each window will contain.</p>
+          example: null
+          types:
+          - int
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        returns:
+        - array
+        scope: []
+      - path:
+        - array
         name: sorted
         title: Sorted
         keywords: []
@@ -1505,6 +1631,68 @@ children:
           settable: false
         returns:
         - array
+        scope: []
+      - path:
+        - array
+        name: to-dict
+        title: To Dict
+        keywords: []
+        oneliner: Converts an array of pairs into a dictionary.
+        element: false
+        contextual: false
+        details: |-
+          <p>Converts an array of pairs into a dictionary.
+          The first value of each pair is the key, the second the value.</p>
+          <p>If the same key occurs multiple times, the last value is selected.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-punct">#</span><span class="typ-punct">(</span>
+            <span class="typ-punct">(</span><span class="typ-str">&quot;apples&quot;</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-str">&quot;peaches&quot;</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-punct">(</span><span class="typ-str">&quot;apples&quot;</span><span class="typ-punct">,</span> <span class="typ-num">5</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+          <span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">to-dict</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/38bf2b861377d56939f2e9910ced826f.png" alt="Preview" width="480" height="190"/></div></div>
+        self: true
+        params: []
+        returns:
+        - dictionary
+        scope: []
+      - path:
+        - array
+        name: reduce
+        title: Reduce
+        keywords: []
+        oneliner: Reduces the elements to a single one, by repeatedly applying a reducing
+        element: false
+        contextual: false
+        details: |-
+          <p>Reduces the elements to a single one, by repeatedly applying a reducing
+          operation.</p>
+          <p>If the array is empty, returns <code><span class="typ-key">none</span></code>, otherwise, returns the result
+          of the reduction.</p>
+          <p>The reducing function is a closure with two arguments: an &quot;accumulator&quot;,
+          and an element.</p>
+          <p>For arrays with at least one element, this is the same as <a href="/docs/reference/foundations/array/#definitions-fold" title="`array.fold`"><code>array.fold</code></a>
+          with the first element of the array as the initial accumulator value,
+          folding every subsequent element into it.</p>
+        example: null
+        self: true
+        params:
+        - name: reducer
+          details: |-
+            <p>The reducing function. Must have two parameters: One for the
+            accumulated value and one for an item.</p>
+          example: null
+          types:
+          - function
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        returns:
+        - any
         scope: []
   children: []
 - route: /docs/reference/foundations/assert/
@@ -1951,11 +2139,11 @@ children:
         title: Slice
         keywords: []
         oneliner: Extracts a subslice of the bytes. Fails with an error if the start
-          or
+          or end
         element: false
         contextual: false
         details: |-
-          <p>Extracts a subslice of the bytes. Fails with an error if the start or
+          <p>Extracts a subslice of the bytes. Fails with an error if the start or end
           index is out of bounds.</p>
         example: null
         self: true
@@ -2287,7 +2475,7 @@ children:
         <p>Module for calculations and processing of numeric values.</p>
         <p>These definitions are part of the <code>calc</code> module and not imported by default.
         In addition to the functions listed below, the <code>calc</code> module also defines
-        the constants <code>pi</code>, <code>tau</code>, <code>e</code>, <code>inf</code>, and <code>nan</code>.</p>
+        the constants <code>pi</code>, <code>tau</code>, <code>e</code>, and <code>inf</code>.</p>
       functions:
       - path:
         - calc
@@ -2301,8 +2489,9 @@ children:
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">abs</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">abs</span><span class="typ-punct">(</span><span class="typ-num">5pt</span> <span class="typ-op">-</span> <span class="typ-num">2cm</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">abs</span><span class="typ-punct">(</span><span class="typ-num">2fr</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/e510ee8d00f4e2c888a53ba546c26c14.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">abs</span><span class="typ-punct">(</span><span class="typ-num">2fr</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">abs</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-342.440&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/88c5e57b0553009825b7fcb754db5919.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -2315,6 +2504,7 @@ children:
           - angle
           - ratio
           - fraction
+          - decimal
           strings: []
           default: null
           positional: true
@@ -2335,16 +2525,20 @@ children:
         contextual: false
         details: <p>Raises a value to some exponent.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">pow</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/d58c2fba1429f6271ecfa7220f6d8199.png" alt="Preview" width="480" height="190"/></div></div>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">pow</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">pow</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;2.5&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/4b5c9213d648d07837738306519dd34c.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: base
-          details: <p>The base of the power.</p>
+          details: |-
+            <p>The base of the power.</p>
+            <p>If this is a <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a>, the exponent can only be an <a href="/docs/reference/foundations/int/">integer</a>.</p>
           example: null
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -2368,6 +2562,7 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
@@ -2487,10 +2682,9 @@ children:
           <p>When called with an integer or a float, they will be interpreted as
           radians.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">sin</span><span class="typ-punct">(</span><span class="typ-num">90deg</span><span class="typ-punct">)</span> <span class="typ-op">==</span> calc<span class="typ-punct">.</span><span class="typ-func">sin</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">270deg</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">sin</span><span class="typ-punct">(</span><span class="typ-num">1.5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">sin</span><span class="typ-punct">(</span><span class="typ-num">1.5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">sin</span><span class="typ-punct">(</span><span class="typ-num">90deg</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/9a343f290b69c6546ce3068c8c32d9ea.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/a19cb0d1fdbcedc7c99c89fbf3c90fec.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: angle
@@ -2523,10 +2717,9 @@ children:
           <p>When called with an integer or a float, they will be interpreted as
           radians.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">cos</span><span class="typ-punct">(</span><span class="typ-num">90deg</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">cos</span><span class="typ-punct">(</span><span class="typ-num">1.5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">cos</span><span class="typ-punct">(</span><span class="typ-num">1.5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">cos</span><span class="typ-punct">(</span><span class="typ-num">90deg</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/5eefa7a2d93c8b89041d62c4187a2c30.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/d8787c444f722297a8d51354995d724a.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: angle
@@ -3097,11 +3290,15 @@ children:
         details: |-
           <p>Rounds a number down to the nearest integer.</p>
           <p>If the number is already an integer, it is returned unchanged.</p>
+          <p>Note that this function will always return an <a href="/docs/reference/foundations/int/">integer</a>, and will
+          error if the resulting <a href="/docs/reference/foundations/float/" title="`float`"><code>float</code></a> or <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a> is larger than the maximum
+          64-bit signed integer or smaller than the minimum for that type.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">floor</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">floor</span><span class="typ-punct">(</span><span class="typ-num">500.1</span><span class="typ-punct">)</span>
           <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">floor</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">floor</span><span class="typ-punct">(</span><span class="typ-num">500.1</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/61eb20d7f3cd6373b777b4b105768cc6.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">floor</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">floor</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-3.14&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-op">-</span><span class="typ-num">4</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/7250aa6779d292f0841f01fb92280d9f.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -3110,6 +3307,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3131,11 +3329,15 @@ children:
         details: |-
           <p>Rounds a number up to the nearest integer.</p>
           <p>If the number is already an integer, it is returned unchanged.</p>
+          <p>Note that this function will always return an <a href="/docs/reference/foundations/int/">integer</a>, and will
+          error if the resulting <a href="/docs/reference/foundations/float/" title="`float`"><code>float</code></a> or <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a> is larger than the maximum
+          64-bit signed integer or smaller than the minimum for that type.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">ceil</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">4</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">ceil</span><span class="typ-punct">(</span><span class="typ-num">500.1</span><span class="typ-punct">)</span>
           <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">ceil</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">ceil</span><span class="typ-punct">(</span><span class="typ-num">500.1</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/69b2ab694eb4909e595d80cf4942bd27.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">ceil</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">4</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">ceil</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-3.14&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/21685689e6370997f711812b2ea75313.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -3144,6 +3346,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3165,11 +3368,15 @@ children:
         details: |-
           <p>Returns the integer part of a number.</p>
           <p>If the number is already an integer, it is returned unchanged.</p>
+          <p>Note that this function will always return an <a href="/docs/reference/foundations/int/">integer</a>, and will
+          error if the resulting <a href="/docs/reference/foundations/float/" title="`float`"><code>float</code></a> or <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a> is larger than the maximum
+          64-bit signed integer or smaller than the minimum for that type.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">trunc</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">trunc</span><span class="typ-punct">(</span><span class="typ-num">15.9</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">trunc</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
           <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">trunc</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">3.7</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">trunc</span><span class="typ-punct">(</span><span class="typ-num">15.9</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/a8f77e7eaa51dc0a953d69933f1e263f.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">trunc</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;8493.12949582390&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">8493</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/da38c613cde795c6d89079f6043bca28.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -3178,6 +3385,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3200,9 +3408,10 @@ children:
           <p>Returns the fractional part of a number.</p>
           <p>If the number is an integer, returns <code>0</code>.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">fract</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">0</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">fract</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">3.1</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/e95d212f509a3f674b880f65d01a720a.png" alt="Preview" width="480" height="190"/></div></div>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">fract</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">3.1</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">fract</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">0</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">fract</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;234.23949211&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;0.23949211&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/a984f3a7bebd06b77e7e468c167645fa.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -3211,6 +3420,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3221,23 +3431,45 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
         name: round
         title: Round
         keywords: []
-        oneliner: Rounds a number to the nearest integer.
+        oneliner: Rounds a number to the nearest integer away from zero.
         element: false
         contextual: false
         details: |-
-          <p>Rounds a number to the nearest integer.</p>
+          <p>Rounds a number to the nearest integer away from zero.</p>
           <p>Optionally, a number of decimal places can be specified.</p>
+          <p>If the number of digits is negative, its absolute value will indicate the
+          amount of significant integer digits to remove before the decimal point.</p>
+          <p>Note that this function will return the same type as the operand. That is,
+          applying <code>round</code> to a <a href="/docs/reference/foundations/float/" title="`float`"><code>float</code></a> will return a <code>float</code>, and to a <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a>,
+          another <code>decimal</code>. You may explicitly convert the output of this function to
+          an integer with <a href="/docs/reference/foundations/int/" title="`int`"><code>int</code></a>, but note that such a conversion will error if the
+          <code>float</code> or <code>decimal</code> is larger than the maximum 64-bit signed integer or
+          smaller than the minimum integer.</p>
+          <p>In addition, this function can error if there is an attempt to round beyond
+          the maximum or minimum integer or <code>decimal</code>. If the number is a <code>float</code>,
+          such an attempt will cause <code>float<span class="typ-punct">.</span>inf</code> or <code><span class="typ-op">-</span>float<span class="typ-punct">.</span>inf</code> to be returned
+          for maximum and minimum respectively.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
-          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3.5</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">4</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3.1415</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/909cf2add30990bd12abe88252ffd37d.png" alt="Preview" width="480" height="190"/></div></div>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3.1415</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3.5</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">4.0</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3333.45</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">2</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3300.0</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">48953.45</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-op">-</span><span class="typ-num">49000.0</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-num">3333</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">2</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">3300</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">48953</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-op">-</span><span class="typ-num">49000</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-6.5&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-7&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;7.123456789&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-num">6</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;7.123457&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;3333.45&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">2</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;3300&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">round</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-48953.45&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> digits<span class="typ-punct">:</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;-49000&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/d492129fb8d03a180f7b99d22f6a26c2.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -3246,6 +3478,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3254,7 +3487,10 @@ children:
           variadic: false
           settable: false
         - name: digits
-          details: <p>The number of decimal places.</p>
+          details: |-
+            <p>If positive, the number of decimal places.</p>
+            <p>If negative, the number of significant integer digits that should be
+            removed before the decimal point.</p>
           example: null
           types:
           - int
@@ -3268,6 +3504,7 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
@@ -3279,10 +3516,12 @@ children:
         contextual: false
         details: <p>Clamps a number between a minimum and maximum value.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">10</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">5</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">4</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">10</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">5</span><span class="typ-punct">)</span>
           <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">6</span><span class="typ-punct">,</span> <span class="typ-num">10</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-num">6</span><span class="typ-punct">)</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">4</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/73b6c954f13326954ddededb400d41c2.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;5.45&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> <span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;45.9&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;5.45&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          <span class="typ-func">#</span><span class="typ-func">assert</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span><span class="typ-func">clamp</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;5.45&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;6.75&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> <span class="typ-num">12</span><span class="typ-punct">)</span> <span class="typ-op">==</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;6.75&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/852e98fde1f643b04057171340e4a904.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -3291,6 +3530,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3304,6 +3544,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3317,6 +3558,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3327,6 +3569,7 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
@@ -3339,8 +3582,8 @@ children:
         details: <p>Determines the minimum of a sequence of values.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">min</span><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">20</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">,</span> <span class="typ-num">6</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">min</span><span class="typ-punct">(</span><span class="typ-str">&quot;typst&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;in&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;beta&quot;</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/fb22eeb2bde8fae1b41f607e630f4657.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">min</span><span class="typ-punct">(</span><span class="typ-str">&quot;typst&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;is&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;cool&quot;</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/411cb18fd81e000e28a105cb205dfca5.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: values
@@ -3371,8 +3614,8 @@ children:
         details: <p>Determines the maximum of a sequence of values.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">max</span><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">5</span><span class="typ-punct">,</span> <span class="typ-num">20</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">,</span> <span class="typ-num">6</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">max</span><span class="typ-punct">(</span><span class="typ-str">&quot;typst&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;in&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;beta&quot;</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/0cc0245e974c507873103cb34aacc634.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">max</span><span class="typ-punct">(</span><span class="typ-str">&quot;typst&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;is&quot;</span><span class="typ-punct">,</span> <span class="typ-str">&quot;cool&quot;</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/387cc7b41a296991d227d66fe7a9396a.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: values
@@ -3466,6 +3709,8 @@ children:
           <p>Calculates the remainder of two numbers.</p>
           <p>The value <code>calc.rem(x, y)</code> always has the same sign as <code>x</code>, and is smaller
           in magnitude than <code>y</code>.</p>
+          <p>This can error if given a <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a> input and the dividend is too small in
+          magnitude compared to the divisor.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem</span><span class="typ-punct">(</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem</span><span class="typ-punct">(</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
@@ -3481,6 +3726,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3494,6 +3740,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3504,6 +3751,7 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
@@ -3522,8 +3770,9 @@ children:
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">div-euclid</span><span class="typ-punct">(</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">div-euclid</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">div-euclid</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">div-euclid</span><span class="typ-punct">(</span><span class="typ-num">1.75</span><span class="typ-punct">,</span> <span class="typ-num">0.5</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/bd780ec1a24e5250e30b9845c23817e7.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">div-euclid</span><span class="typ-punct">(</span><span class="typ-num">1.75</span><span class="typ-punct">,</span> <span class="typ-num">0.5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">div-euclid</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;1.75&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;0.5&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/e35b988805ca89c9d732f56afb3564f2.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: dividend
@@ -3532,6 +3781,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3545,6 +3795,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3555,6 +3806,7 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
@@ -3566,16 +3818,20 @@ children:
         contextual: false
         details: |-
           <p>This calculates the least nonnegative remainder of a division.</p>
-          <p>Warning: Due to a floating point round-off error, the remainder may equal the absolute
-          value of the divisor if the dividend is much smaller in magnitude than the divisor
-          and the dividend is negative. This only applies for floating point inputs.</p>
+          <p>Warning: Due to a floating point round-off error, the remainder may equal
+          the absolute value of the divisor if the dividend is much smaller in
+          magnitude than the divisor and the dividend is negative. This only applies
+          for floating point inputs.</p>
+          <p>In addition, this can error if given a <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a> input and the dividend is
+          too small in magnitude compared to the divisor.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem-euclid</span><span class="typ-punct">(</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem-euclid</span><span class="typ-punct">(</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem-euclid</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem-euclid</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">7</span><span class="typ-punct">,</span> <span class="typ-op">-</span><span class="typ-num">3</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem</span><span class="typ-punct">(</span><span class="typ-num">1.75</span><span class="typ-punct">,</span> <span class="typ-num">0.5</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/44d12330a4ce0842a3cc47a4628cac5f.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem-euclid</span><span class="typ-punct">(</span><span class="typ-num">1.75</span><span class="typ-punct">,</span> <span class="typ-num">0.5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">rem-euclid</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;1.75&quot;</span><span class="typ-punct">)</span><span class="typ-punct">,</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;0.5&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/8b16f866e2600cceda15a7455417aa61.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: dividend
@@ -3584,6 +3840,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3597,6 +3854,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3607,6 +3865,7 @@ children:
         returns:
         - int
         - float
+        - decimal
         scope: []
       - path:
         - calc
@@ -3616,7 +3875,11 @@ children:
         oneliner: Calculates the quotient (floored division) of two numbers.
         element: false
         contextual: false
-        details: <p>Calculates the quotient (floored division) of two numbers.</p>
+        details: |-
+          <p>Calculates the quotient (floored division) of two numbers.</p>
+          <p>Note that this function will always return an <a href="/docs/reference/foundations/int/">integer</a>, and will
+          error if the resulting <a href="/docs/reference/foundations/float/" title="`float`"><code>float</code></a> or <a href="/docs/reference/foundations/decimal/" title="`decimal`"><code>decimal</code></a> is larger than the maximum
+          64-bit signed integer or smaller than the minimum for that type.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-str">&quot;quo&quot;</span>(a, b) <span class="typ-math-op">&amp;</span>= <span class="typ-func">floor</span><span class="typ-punct">(</span>a<span class="typ-math-op">/</span>b<span class="typ-punct">)</span> <span class="typ-escape">\</span>
             <span class="typ-str">&quot;quo&quot;</span>(14, 5) <span class="typ-math-op">&amp;</span>= <span class="typ-pol">#</span><span class="typ-pol">calc</span><span class="typ-punct">.</span><span class="typ-func">quo</span><span class="typ-punct">(</span><span class="typ-num">14</span><span class="typ-punct">,</span> <span class="typ-num">5</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
@@ -3630,6 +3893,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3643,6 +3907,7 @@ children:
           types:
           - int
           - float
+          - decimal
           strings: []
           default: null
           positional: true
@@ -3882,6 +4147,9 @@ children:
   - id: example
     name: Example
     children: []
+  - id: datetime-and-duration
+    name: Datetime And Duration
+    children: []
   - id: format
     name: Format
     children: []
@@ -3980,6 +4248,24 @@ children:
           <span class="typ-str">&quot;h:[hour repr:12][period]&quot;</span>
         <span class="typ-punct">)</span>
         </code></pre><div class="preview"><img src="/assets/docs/c7feef8e99a37cb24589ba0f7c6af3c0.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="datetime-and-duration">Datetime and Duration</h2>
+        <p>You can get a <a href="/docs/reference/foundations/duration/" title="duration">duration</a> by subtracting two datetime:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> first-of-march <span class="typ-op">=</span> <span class="typ-func">datetime</span><span class="typ-punct">(</span>day<span class="typ-punct">:</span> <span class="typ-num">1</span><span class="typ-punct">,</span> month<span class="typ-punct">:</span> <span class="typ-num">3</span><span class="typ-punct">,</span> year<span class="typ-punct">:</span> <span class="typ-num">2024</span><span class="typ-punct">)</span>
+        <span class="typ-key">#</span><span class="typ-key">let</span> first-of-jan <span class="typ-op">=</span> <span class="typ-func">datetime</span><span class="typ-punct">(</span>day<span class="typ-punct">:</span> <span class="typ-num">1</span><span class="typ-punct">,</span> month<span class="typ-punct">:</span> <span class="typ-num">1</span><span class="typ-punct">,</span> year<span class="typ-punct">:</span> <span class="typ-num">2024</span><span class="typ-punct">)</span>
+        <span class="typ-key">#</span><span class="typ-key">let</span> distance <span class="typ-op">=</span> first-of-march <span class="typ-op">-</span> first-of-jan
+        <span class="typ-pol">#</span><span class="typ-pol">distance</span><span class="typ-punct">.</span><span class="typ-func">hours</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+        </code></pre><div class="preview"><img src="/assets/docs/fd567bf8218591feeaa098442fca4f04.png" alt="Preview" width="480" height="190"/></div></div>
+        <p>You can also add/subtract a datetime and a duration to retrieve a new,
+        offset datetime:</p>
+        <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> date <span class="typ-op">=</span> <span class="typ-func">datetime</span><span class="typ-punct">(</span>day<span class="typ-punct">:</span> <span class="typ-num">1</span><span class="typ-punct">,</span> month<span class="typ-punct">:</span> <span class="typ-num">3</span><span class="typ-punct">,</span> year<span class="typ-punct">:</span> <span class="typ-num">2024</span><span class="typ-punct">)</span>
+        <span class="typ-key">#</span><span class="typ-key">let</span> two-days <span class="typ-op">=</span> <span class="typ-func">duration</span><span class="typ-punct">(</span>days<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span>
+        <span class="typ-key">#</span><span class="typ-key">let</span> two-days-earlier <span class="typ-op">=</span> date <span class="typ-op">-</span> two-days
+        <span class="typ-key">#</span><span class="typ-key">let</span> two-days-later <span class="typ-op">=</span> date <span class="typ-op">+</span> two-days
+
+        <span class="typ-pol">#</span><span class="typ-pol">date</span><span class="typ-punct">.</span><span class="typ-func">display</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+        <span class="typ-pol">#</span><span class="typ-pol">two-days-earlier</span><span class="typ-punct">.</span><span class="typ-func">display</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+        <span class="typ-pol">#</span><span class="typ-pol">two-days-later</span><span class="typ-punct">.</span><span class="typ-func">display</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+        </code></pre><div class="preview"><img src="/assets/docs/583e21e6a1ed0e8ec288b8a3556b5daf.png" alt="Preview" width="480" height="190"/></div></div>
         <h2 id="format">Format</h2>
         <p>You can specify a customized formatting using the
         <a href="/docs/reference/foundations/datetime/#definitions-display"><code>display</code></a> method. The format of a datetime is
@@ -4386,6 +4672,156 @@ children:
         - none
         - int
         scope: []
+  children: []
+- route: /docs/reference/foundations/decimal/
+  title: Decimal
+  description: Documentation for the Decimal type.
+  part: null
+  outline:
+  - id: summary
+    name: Summary
+    children: []
+  - id: example
+    name: Example
+    children: []
+  - id: construction-and-casts
+    name: Construction And Casts
+    children: []
+  - id: operations
+    name: Operations
+    children: []
+  - id: displaying-decimals
+    name: Displaying Decimals
+    children: []
+  - id: precision-and-limits
+    name: Precision And Limits
+    children: []
+  - id: constructor
+    name: Constructor
+    children:
+    - id: constructor-value
+      name: value
+      children: []
+  body:
+    kind: type
+    content:
+      name: decimal
+      title: Decimal
+      keywords: []
+      oneliner: A fixed-point decimal number type.
+      details: |-
+        <p>A fixed-point decimal number type.</p>
+        <p>This type should be used for precise arithmetic operations on numbers
+        represented in base 10. A typical use case is representing currency.</p>
+        <h2 id="example">Example</h2>
+        <div class="previewed-code"><pre><code>Decimal: <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;0.1&quot;</span><span class="typ-punct">)</span> <span class="typ-op">+</span> <span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;0.2&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+        Float: <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-num">0.1</span> <span class="typ-op">+</span> <span class="typ-num">0.2</span><span class="typ-punct">)</span>
+        </code></pre><div class="preview"><img src="/assets/docs/3b535bfe2422a5241839c6ccc5f91ef1.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="construction-and-casts">Construction and casts</h2>
+        <p>To create a decimal number, use the <code><span class="typ-func">decimal</span><span class="typ-punct">(</span>string<span class="typ-punct">)</span></code> constructor, such as
+        in <code><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;3.141592653&quot;</span><span class="typ-punct">)</span></code> <strong>(note the double quotes!)</strong>. This
+        constructor preserves all given fractional digits, provided they are
+        representable as per the limits specified below (otherwise, an error is
+        raised).</p>
+        <p>You can also convert any <a href="/docs/reference/foundations/int/">integer</a> to a decimal with the
+        <code><span class="typ-func">decimal</span><span class="typ-punct">(</span>int<span class="typ-punct">)</span></code> constructor, e.g. <code><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-num">59</span><span class="typ-punct">)</span></code>. However, note that
+        constructing a decimal from a <a href="/docs/reference/foundations/float/">floating-point number</a>, while
+        supported, <strong>is an imprecise conversion and therefore discouraged.</strong> A
+        warning will be raised if Typst detects that there was an accidental <code>float</code>
+        to <code>decimal</code> cast through its constructor, e.g. if writing <code><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-num">3.14</span><span class="typ-punct">)</span></code>
+        (note the lack of double quotes, indicating this is an accidental <code>float</code>
+        cast and therefore imprecise). It is recommended to use strings for
+        constant decimal values instead (e.g. <code><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;3.14&quot;</span><span class="typ-punct">)</span></code>).</p>
+        <p>The precision of a <code>float</code> to <code>decimal</code> cast can be slightly improved by
+        rounding the result to 15 digits with <a href="/docs/reference/foundations/calc/#functions-round"><code>calc.round</code></a>, but there
+        are still no precision guarantees for that kind of conversion.</p>
+        <h2 id="operations">Operations</h2>
+        <p>Basic arithmetic operations are supported on two decimals and on pairs of
+        decimals and integers.</p>
+        <p>Built-in operations between <code>float</code> and <code>decimal</code> are not supported in order
+        to guard against accidental loss of precision. They will raise an error
+        instead.</p>
+        <p>Certain <code>calc</code> functions, such as trigonometric functions and power between
+        two real numbers, are also only supported for <code>float</code> (although raising
+        <code>decimal</code> to integer exponents is supported). You can opt into potentially
+        imprecise operations with the <code><span class="typ-func">float</span><span class="typ-punct">(</span>decimal<span class="typ-punct">)</span></code> constructor, which casts
+        the <code>decimal</code> number into a <code>float</code>, allowing for operations without
+        precision guarantees.</p>
+        <h2 id="displaying-decimals">Displaying decimals</h2>
+        <p>To display a decimal, simply insert the value into the document. To only
+        display a certain number of digits, <a href="/docs/reference/foundations/calc/#functions-round">round</a> the decimal first.
+        Localized formatting of decimals and other numbers is not yet supported, but
+        planned for the future.</p>
+        <p>You can convert decimals to strings using the <a href="/docs/reference/foundations/str/" title="`str`"><code>str</code></a> constructor. This way,
+        you can post-process the displayed representation, e.g. to replace the
+        period with a comma (as a stand-in for proper built-in localization to
+        languages that use the comma).</p>
+        <h2 id="precision-and-limits">Precision and limits</h2>
+        <p>A <code>decimal</code> number has a limit of 28 to 29 significant base-10 digits. This
+        includes the sum of digits before and after the decimal point. As such,
+        numbers with more fractional digits have a smaller range. The maximum and
+        minimum <code>decimal</code> numbers have a value of <code><span class="typ-num">79228162514264337593543950335</span></code>
+        and <code><span class="typ-op">-</span><span class="typ-num">79228162514264337593543950335</span></code> respectively. In contrast with
+        <a href="/docs/reference/foundations/float/" title="`float`"><code>float</code></a>, this type does not support infinity or NaN, so overflowing or
+        underflowing operations will raise an error.</p>
+        <p>Typical operations between <code>decimal</code> numbers, such as addition,
+        multiplication, and <a href="/docs/reference/foundations/calc/#functions-pow">power</a> to an integer, will be highly precise
+        due to their fixed-point representation. Note, however, that multiplication
+        and division may not preserve all digits in some edge cases: while they are
+        considered precise, digits past the limits specified above are rounded off
+        and lost, so some loss of precision beyond the maximum representable digits
+        is possible. Note that this behavior can be observed not only when dividing,
+        but also when multiplying by numbers between 0 and 1, as both operations can
+        push a number's fractional digits beyond the limits described above, leading
+        to rounding. When those two operations do not surpass the digit limits, they
+        are fully precise.</p>
+      constructor:
+        path: []
+        name: decimal
+        title: Construct
+        keywords: []
+        oneliner: Converts a value to a `decimal`.
+        element: false
+        contextual: false
+        details: |-
+          <p>Converts a value to a <code>decimal</code>.</p>
+          <p>It is recommended to use a string to construct the decimal number, or an
+          <a href="/docs/reference/foundations/int/">integer</a> (if desired). The string must contain a number in the
+          format <code><span class="typ-str">&quot;3.14159&quot;</span></code> (or <code><span class="typ-str">&quot;-3.141519&quot;</span></code> for negative numbers). The
+          fractional digits are fully preserved; if that's not possible due to the
+          limit of significant digits (around 28 to 29) having been reached, an
+          error is raised as the given decimal number wouldn't be representable.</p>
+          <p>While this constructor can be used with <a href="/docs/reference/foundations/float/">floating-point numbers</a>
+          to cast them to <code>decimal</code>, doing so is <strong>discouraged</strong> as <strong>this cast is
+          inherently imprecise.</strong> It is easy to accidentally perform this cast by
+          writing <code><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-num">1.234</span><span class="typ-punct">)</span></code> (note the lack of double quotes), which is
+          why Typst will emit a warning in that case. Please write
+          <code><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;1.234&quot;</span><span class="typ-punct">)</span></code> instead for that particular case (initialization of
+          a constant decimal). Also note that floats that are NaN or infinite
+          cannot be cast to decimals and will raise an error.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;1.222222222222222&quot;</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/91f419c08a7a27f174c5a59511c26489.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: value
+          details: <p>The value that should be converted to a decimal.</p>
+          example: null
+          types:
+          - int
+          - float
+          - str
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        returns:
+        - decimal
+        scope: []
+      scope: []
   children: []
 - route: /docs/reference/foundations/dictionary/
   title: Dictionary
@@ -5069,6 +5505,21 @@ children:
     - id: definitions-signum
       name: Signum
       children: []
+    - id: definitions-from-bytes
+      name: From Bytes
+      children:
+      - id: definitions-from-bytes-bytes
+        name: bytes
+        children: []
+      - id: definitions-from-bytes-endian
+        name: endian
+        children: []
+    - id: definitions-to-bytes
+      name: To Bytes
+      children:
+      - id: definitions-to-bytes-endian
+        name: endian
+        children: []
   body:
     kind: type
     content:
@@ -5082,6 +5533,8 @@ children:
         store floats. Wherever a float is expected, you can also pass an
         <a href="/docs/reference/foundations/int/">integer</a>.</p>
         <p>You can convert a value to a float with this type's constructor.</p>
+        <p>NaN and positive infinity are available as <code>float<span class="typ-punct">.</span>nan</code> and <code>float<span class="typ-punct">.</span>inf</code>
+        respectively.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">3.14</span> <span class="typ-escape">\</span>
         <span class="typ-num">#</span><span class="typ-num">1e4</span> <span class="typ-escape">\</span>
@@ -5099,10 +5552,12 @@ children:
           <p>Converts a value to a float.</p>
           <ul>
           <li>Booleans are converted to <code>0.0</code> or <code>1.0</code>.</li>
-          <li>Integers are converted to the closest 64-bit float.</li>
+          <li>Integers are converted to the closest 64-bit float. For integers with
+          absolute value less than <code>calc<span class="typ-punct">.</span><span class="typ-func">pow</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">,</span> <span class="typ-num">53</span><span class="typ-punct">)</span></code>, this conversion is
+          exact.</li>
           <li>Ratios are divided by 100%.</li>
-          <li>Strings are parsed in base 10 to the closest 64-bit float.
-          Exponential notation is supported.</li>
+          <li>Strings are parsed in base 10 to the closest 64-bit float. Exponential
+          notation is supported.</li>
           </ul>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">float</span><span class="typ-punct">(</span><span class="typ-key">false</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
@@ -5123,6 +5578,7 @@ children:
           - float
           - ratio
           - str
+          - decimal
           strings: []
           default: null
           positional: true
@@ -5149,8 +5605,8 @@ children:
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-nan</span><span class="typ-punct">(</span><span class="typ-num">0</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-nan</span><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-nan</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span>nan<span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/218016bc68d46c30db32f1cb515d79d2.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-nan</span><span class="typ-punct">(</span>float<span class="typ-punct">.</span>nan<span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/34ec3bbec633c5586b1dbd9807825054.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params: []
         returns:
@@ -5166,13 +5622,13 @@ children:
         contextual: false
         details: |-
           <p>Checks if a float is infinite.</p>
-          <p>For floats, there is positive and negative infinity. This function
-          returns <code>true</code> if the float is either positive or negative infinity.</p>
+          <p>Floats can represent positive infinity and negative infinity. This
+          function returns <code><span class="typ-key">true</span></code> if the float is an infinity.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-infinite</span><span class="typ-punct">(</span><span class="typ-num">0</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-infinite</span><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-infinite</span><span class="typ-punct">(</span>calc<span class="typ-punct">.</span>inf<span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/315c8d7f1644b6447b4e03fcfa3f2b43.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">is-infinite</span><span class="typ-punct">(</span>float<span class="typ-punct">.</span>inf<span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/046c91047141c71feb3a7023992f815e.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params: []
         returns:
@@ -5191,18 +5647,109 @@ children:
           <ul>
           <li>If the number is positive (including <code><span class="typ-op">+</span><span class="typ-num">0.0</span></code>), returns <code><span class="typ-num">1.0</span></code>.</li>
           <li>If the number is negative (including <code><span class="typ-op">-</span><span class="typ-num">0.0</span></code>), returns <code><span class="typ-op">-</span><span class="typ-num">1.0</span></code>.</li>
-          <li>If the number is <a href="/docs/reference/foundations/nan/"><code>calc<span class="typ-punct">.</span>nan</code></a>, returns
-          <a href="/docs/reference/foundations/nan/"><code>calc<span class="typ-punct">.</span>nan</code></a>.</li>
+          <li>If the number is NaN, returns <code>float<span class="typ-punct">.</span>nan</code>.</li>
           </ul>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-num">5.0</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">5.0</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-num">0.0</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          </code></pre><div class="preview"><img src="/assets/docs/6bcf580e4539680fc32fb5fe50718939.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-pol">nan</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/2cfd3740fb289ef4a71212cae9c52aaf.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params: []
         returns:
         - float
+        scope: []
+      - path:
+        - float
+        name: from-bytes
+        title: From Bytes
+        keywords: []
+        oneliner: Converts bytes to a float.
+        element: false
+        contextual: false
+        details: <p>Converts bytes to a float.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">from-bytes</span><span class="typ-punct">(</span><span class="typ-func">bytes</span><span class="typ-punct">(</span><span class="typ-punct">(</span><span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">240</span><span class="typ-punct">,</span> <span class="typ-num">63</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-pol">#</span><span class="typ-pol">float</span><span class="typ-punct">.</span><span class="typ-func">from-bytes</span><span class="typ-punct">(</span><span class="typ-func">bytes</span><span class="typ-punct">(</span><span class="typ-punct">(</span><span class="typ-num">63</span><span class="typ-punct">,</span> <span class="typ-num">240</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">,</span> endian<span class="typ-punct">:</span> <span class="typ-str">&quot;big&quot;</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/d996caf619a0b26a0d93c2f987fb56d9.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: bytes
+          details: |-
+            <p>The bytes that should be converted to a float.</p>
+            <p>Must be of length exactly 8 so that the result fits into a 64-bit
+            float.</p>
+          example: null
+          types:
+          - bytes
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: endian
+          details: <p>The endianness of the conversion.</p>
+          example: null
+          types:
+          - str
+          strings:
+          - string: big
+            details: |-
+              <p>Big-endian byte order: The highest-value byte is at the beginning of the
+              bytes.</p>
+          - string: little
+            details: |-
+              <p>Little-endian byte order: The lowest-value byte is at the beginning of
+              the bytes.</p>
+          default: <code><span class="typ-str">&quot;little&quot;</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        returns:
+        - float
+        scope: []
+      - path:
+        - float
+        name: to-bytes
+        title: To Bytes
+        keywords: []
+        oneliner: Converts a float to bytes.
+        element: false
+        contextual: false
+        details: <p>Converts a float to bytes.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">array</span><span class="typ-punct">(</span><span class="typ-num">1.0</span><span class="typ-punct">.</span><span class="typ-func">to-bytes</span><span class="typ-punct">(</span>endian<span class="typ-punct">:</span> <span class="typ-str">&quot;big&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-func">#</span><span class="typ-func">array</span><span class="typ-punct">(</span><span class="typ-num">1.0</span><span class="typ-punct">.</span><span class="typ-func">to-bytes</span><span class="typ-punct">(</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/34d6e8bf3455515a71f71f0230763f4c.png" alt="Preview" width="480" height="190"/></div></div>
+        self: true
+        params:
+        - name: endian
+          details: <p>The endianness of the conversion.</p>
+          example: null
+          types:
+          - str
+          strings:
+          - string: big
+            details: |-
+              <p>Big-endian byte order: The highest-value byte is at the beginning of the
+              bytes.</p>
+          - string: little
+            details: |-
+              <p>Little-endian byte order: The lowest-value byte is at the beginning of
+              the bytes.</p>
+          default: <code><span class="typ-str">&quot;little&quot;</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        returns:
+        - bytes
         scope: []
   children: []
 - route: /docs/reference/foundations/function/
@@ -5224,6 +5771,9 @@ children:
     children: []
   - id: defining-functions
     name: Defining Functions
+    children: []
+  - id: importing-functions
+    name: Importing Functions
     children: []
   - id: unnamed
     name: Unnamed
@@ -5260,7 +5810,7 @@ children:
         Additionally, you can pass any number of trailing content blocks arguments
         to a function <em>after</em> the normal argument list. If the normal argument list
         would become empty, it can be omitted. Typst supports positional and named
-        arguments. The former are identified by position and type, while the later
+        arguments. The former are identified by position and type, while the latter
         are written as <code>name: value</code>.</p>
         <p>Within math mode, function calls have special behaviour. See the
         <a href="/docs/reference/math/">math documentation</a> for more details.</p>
@@ -5307,6 +5857,9 @@ children:
         optionally specify a return value. If no explicit return value is given, the
         body evaluates to the result of joining all expressions preceding the
         <code>return</code>.</p>
+        <p>Functions that don't return any meaningful value return <a href="/docs/reference/foundations/none/" title="`none`"><code>none</code></a> instead.
+        The return type of such functions is not explicitly specified in the
+        documentation. (An example of this is <a href="/docs/reference/foundations/array/#definitions-push" title="`array.push`"><code>array.push</code></a>).</p>
         <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> <span class="typ-func">alert</span><span class="typ-punct">(</span>body<span class="typ-punct">,</span> fill<span class="typ-punct">:</span> red<span class="typ-punct">)</span> <span class="typ-op">=</span> <span class="typ-punct">{</span>
           <span class="typ-key">set</span> <span class="typ-func">text</span><span class="typ-punct">(</span>white<span class="typ-punct">)</span>
           <span class="typ-key">set</span> <span class="typ-func">align</span><span class="typ-punct">(</span>center<span class="typ-punct">)</span>
@@ -5326,6 +5879,11 @@ children:
           KEEP OFF TRACKS
         <span class="typ-punct">]</span>
         </code></pre><div class="preview"><img src="/assets/docs/a46deb725efaf4d901b99ab85859e676.png" alt="Preview" width="480" height="190"/></div></div>
+        <h2 id="importing-functions">Importing functions</h2>
+        <p>Functions can be imported from one file (<a href="/docs/reference/scripting/#modules"><code>module</code></a>) into
+        another using <code><span class="typ-key">import</span></code>. For example, assume that we have defined the <code>alert</code>
+        function from the previous example in a file called <code>foo.typ</code>. We can import
+        it into another file by writing <code><span class="typ-key">import</span> <span class="typ-str">&quot;foo.typ&quot;</span><span class="typ-punct">:</span> alert</code>.</p>
         <h2 id="unnamed">Unnamed functions</h2>
         <p>You can also created an unnamed function without creating a binding by
         specifying a parameter list followed by <code>=&gt;</code> and the function body. If your
@@ -5387,8 +5945,8 @@ children:
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">show</span> heading<span class="typ-punct">.</span><span class="typ-func">where</span><span class="typ-punct">(</span>level<span class="typ-punct">:</span> <span class="typ-num">2</span><span class="typ-punct">)</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">text</span><span class="typ-punct">(</span>blue<span class="typ-punct">)</span>
           <span class="typ-heading">= Section</span>
           <span class="typ-heading">== Subsection</span>
-          <span class="typ-heading">=== Sub-subection</span>
-          </code></pre><div class="preview"><img src="/assets/docs/02f47c28d78627976e483417c5a1c92f.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-heading">=== Sub-subsection</span>
+          </code></pre><div class="preview"><img src="/assets/docs/2ad1b0c6056668fbbccf1b9db75ac341.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params:
         - name: fields
@@ -5466,6 +6024,27 @@ children:
       - id: definitions-bit-rshift-logical
         name: logical
         children: []
+    - id: definitions-from-bytes
+      name: From Bytes
+      children:
+      - id: definitions-from-bytes-bytes
+        name: bytes
+        children: []
+      - id: definitions-from-bytes-endian
+        name: endian
+        children: []
+      - id: definitions-from-bytes-signed
+        name: signed
+        children: []
+    - id: definitions-to-bytes
+      name: To Bytes
+      children:
+      - id: definitions-to-bytes-endian
+        name: endian
+        children: []
+      - id: definitions-to-bytes-size
+        name: size
+        children: []
   body:
     kind: type
     content:
@@ -5495,22 +6074,25 @@ children:
         name: int
         title: Construct
         keywords: []
-        oneliner: Converts a value to an integer.
+        oneliner: Converts a value to an integer. Raises an error if there is an attempt
         element: false
         contextual: false
         details: |-
-          <p>Converts a value to an integer.</p>
+          <p>Converts a value to an integer. Raises an error if there is an attempt
+          to produce an integer larger than the maximum 64-bit signed integer
+          or smaller than the minimum 64-bit signed integer.</p>
           <ul>
           <li>Booleans are converted to <code>0</code> or <code>1</code>.</li>
-          <li>Floats are floored to the next 64-bit integer.</li>
+          <li>Floats and decimals are truncated to the next 64-bit integer.</li>
           <li>Strings are parsed in base 10.</li>
           </ul>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">int</span><span class="typ-punct">(</span><span class="typ-key">false</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-func">#</span><span class="typ-func">int</span><span class="typ-punct">(</span><span class="typ-key">true</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-func">#</span><span class="typ-func">int</span><span class="typ-punct">(</span><span class="typ-num">2.7</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-func">#</span><span class="typ-func">int</span><span class="typ-punct">(</span><span class="typ-func">decimal</span><span class="typ-punct">(</span><span class="typ-str">&quot;3.8&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-func">int</span><span class="typ-punct">(</span><span class="typ-str">&quot;27&quot;</span><span class="typ-punct">)</span> <span class="typ-op">+</span> <span class="typ-func">int</span><span class="typ-punct">(</span><span class="typ-str">&quot;4&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/bed8f1a290541ff07b75487efc835f33.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/57a5bfaabcdcd83c335a6ec9aed49d66.png" alt="Preview" width="480" height="190"/></div></div>
         self: false
         params:
         - name: value
@@ -5521,6 +6103,7 @@ children:
           - int
           - float
           - str
+          - decimal
           strings: []
           default: null
           positional: true
@@ -5550,8 +6133,8 @@ children:
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-num">5</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">5</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-num">0</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
-          </code></pre><div class="preview"><img src="/assets/docs/bd14a549d87f8c942f6bc810481af286.png" alt="Preview" width="480" height="190"/></div></div>
+          <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-num">0</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">signum</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/246011f53eefe893bf8d6db973ee6f4b.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params: []
         returns:
@@ -5570,9 +6153,9 @@ children:
           <p>For the purposes of this function, the operand is treated as a signed
           integer of 64 bits.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">4</span><span class="typ-punct">.</span><span class="typ-func">bit-not</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">4</span><span class="typ-punct">.</span><span class="typ-func">bit-not</span><span class="typ-punct">(</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">1</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">bit-not</span><span class="typ-punct">(</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/7f7cba54ef9eb0a3cf75c261e4e159df.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/b990af7412db29bbe0f1b70960287db6.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params: []
         returns:
@@ -5688,9 +6271,9 @@ children:
           integer of 64 bits. An error will occur if the result is too large to
           fit in a 64-bit integer.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">33</span><span class="typ-punct">.</span><span class="typ-func">bit-lshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">33</span><span class="typ-punct">.</span><span class="typ-func">bit-lshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">1</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">bit-lshift</span><span class="typ-punct">(</span><span class="typ-num">3</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/4b5c2baf72dc4956b1eee15e2832d816.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/ec3aa1d82afc27fe6a252623bc55ad08.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params:
         - name: shift
@@ -5724,21 +6307,21 @@ children:
           <p>For the purposes of this function, the operand is treated as a signed
           integer of 64 bits.</p>
         example: |-
-          <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">64</span><span class="typ-punct">.</span><span class="typ-func">bit-rshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">)</span>
-          <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">8</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">bit-rshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">)</span>
+          <div class="previewed-code"><pre><code><span class="typ-num">#</span><span class="typ-num">64</span><span class="typ-punct">.</span><span class="typ-func">bit-rshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">8</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">bit-rshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
           <span class="typ-punct">#</span><span class="typ-punct">(</span><span class="typ-op">-</span><span class="typ-num">8</span><span class="typ-punct">)</span><span class="typ-punct">.</span><span class="typ-func">bit-rshift</span><span class="typ-punct">(</span><span class="typ-num">2</span><span class="typ-punct">,</span> logical<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span>
-          </code></pre><div class="preview"><img src="/assets/docs/4f500913a0f8ed85afe6d51b81471eec.png" alt="Preview" width="480" height="190"/></div></div>
+          </code></pre><div class="preview"><img src="/assets/docs/75baa55a3e2ae66a4fcdb4e57f666f9e.png" alt="Preview" width="480" height="190"/></div></div>
         self: true
         params:
         - name: shift
           details: |-
             <p>The amount of bits to shift. Must not be negative.</p>
             <p>Shifts larger than 63 are allowed and will cause the return value to
-            saturate. For non-negative numbers, the return value saturates at <code>0</code>,
-            while, for negative numbers, it saturates at <code>-1</code> if <code>logical</code> is set
-            to <code>false</code>, or <code>0</code> if it is <code>true</code>. This behavior is consistent with
-            just applying this operation multiple times. Therefore, the shift will
-            always succeed.</p>
+            saturate. For non-negative numbers, the return value saturates at
+            <code><span class="typ-num">0</span></code>, while, for negative numbers, it saturates at <code><span class="typ-op">-</span><span class="typ-num">1</span></code> if
+            <code>logical</code> is set to <code><span class="typ-key">false</span></code>, or <code><span class="typ-num">0</span></code> if it is <code><span class="typ-key">true</span></code>. This
+            behavior is consistent with just applying this operation multiple
+            times. Therefore, the shift will always succeed.</p>
           example: null
           types:
           - int
@@ -5753,9 +6336,9 @@ children:
           details: |-
             <p>Toggles whether a logical (unsigned) right shift should be performed
             instead of arithmetic right shift.
-            If this is <code>true</code>, negative operands will not preserve their sign bit,
-            and bits which appear to the left after the shift will be <code>0</code>.
-            This parameter has no effect on non-negative operands.</p>
+            If this is <code><span class="typ-key">true</span></code>, negative operands will not preserve their sign
+            bit, and bits which appear to the left after the shift will be
+            <code><span class="typ-num">0</span></code>. This parameter has no effect on non-negative operands.</p>
           example: null
           types:
           - bool
@@ -5768,6 +6351,135 @@ children:
           settable: false
         returns:
         - int
+        scope: []
+      - path:
+        - int
+        name: from-bytes
+        title: From Bytes
+        keywords: []
+        oneliner: Converts bytes to an integer.
+        element: false
+        contextual: false
+        details: <p>Converts bytes to an integer.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-pol">#</span><span class="typ-pol">int</span><span class="typ-punct">.</span><span class="typ-func">from-bytes</span><span class="typ-punct">(</span><span class="typ-func">bytes</span><span class="typ-punct">(</span><span class="typ-punct">(</span><span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">1</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-pol">#</span><span class="typ-pol">int</span><span class="typ-punct">.</span><span class="typ-func">from-bytes</span><span class="typ-punct">(</span><span class="typ-func">bytes</span><span class="typ-punct">(</span><span class="typ-punct">(</span><span class="typ-num">1</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">,</span> <span class="typ-num">0</span><span class="typ-punct">)</span><span class="typ-punct">)</span><span class="typ-punct">,</span> endian<span class="typ-punct">:</span> <span class="typ-str">&quot;big&quot;</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/25803243e8df78600f96b7b0c58fef0b.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: bytes
+          details: |-
+            <p>The bytes that should be converted to an integer.</p>
+            <p>Must be of length at most 8 so that the result fits into a 64-bit
+            signed integer.</p>
+          example: null
+          types:
+          - bytes
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: endian
+          details: <p>The endianness of the conversion.</p>
+          example: null
+          types:
+          - str
+          strings:
+          - string: big
+            details: |-
+              <p>Big-endian byte order: The highest-value byte is at the beginning of the
+              bytes.</p>
+          - string: little
+            details: |-
+              <p>Little-endian byte order: The lowest-value byte is at the beginning of
+              the bytes.</p>
+          default: <code><span class="typ-str">&quot;little&quot;</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        - name: signed
+          details: |-
+            <p>Whether the bytes should be treated as a signed integer. If this is
+            <code><span class="typ-key">true</span></code> and the most significant bit is set, the resulting number
+            will negative.</p>
+          example: null
+          types:
+          - bool
+          strings: []
+          default: <code><span class="typ-key">true</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        returns:
+        - int
+        scope: []
+      - path:
+        - int
+        name: to-bytes
+        title: To Bytes
+        keywords: []
+        oneliner: Converts an integer to bytes.
+        element: false
+        contextual: false
+        details: <p>Converts an integer to bytes.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-func">#</span><span class="typ-func">array</span><span class="typ-punct">(</span><span class="typ-num">10000</span><span class="typ-punct">.</span><span class="typ-func">to-bytes</span><span class="typ-punct">(</span>endian<span class="typ-punct">:</span> <span class="typ-str">&quot;big&quot;</span><span class="typ-punct">)</span><span class="typ-punct">)</span> <span class="typ-escape">\</span>
+          <span class="typ-func">#</span><span class="typ-func">array</span><span class="typ-punct">(</span><span class="typ-num">10000</span><span class="typ-punct">.</span><span class="typ-func">to-bytes</span><span class="typ-punct">(</span>size<span class="typ-punct">:</span> <span class="typ-num">4</span><span class="typ-punct">)</span><span class="typ-punct">)</span>
+          </code></pre><div class="preview"><img src="/assets/docs/d9b727d533eb42b76ba141a8db3211d6.png" alt="Preview" width="480" height="190"/></div></div>
+        self: true
+        params:
+        - name: endian
+          details: <p>The endianness of the conversion.</p>
+          example: null
+          types:
+          - str
+          strings:
+          - string: big
+            details: |-
+              <p>Big-endian byte order: The highest-value byte is at the beginning of the
+              bytes.</p>
+          - string: little
+            details: |-
+              <p>Little-endian byte order: The lowest-value byte is at the beginning of
+              the bytes.</p>
+          default: <code><span class="typ-str">&quot;little&quot;</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        - name: size
+          details: |-
+            <p>The size in bytes of the resulting bytes (must be at least zero). If
+            the integer is too large to fit in the specified size, the
+            conversion will truncate the remaining bytes based on the
+            endianness. To keep the same resulting value, if the endianness is
+            big-endian, the truncation will happen at the rightmost bytes.
+            Otherwise, if the endianness is little-endian, the truncation will
+            happen at the leftmost bytes.</p>
+            <p>Be aware that if the integer is negative and the size is not enough
+            to make the number fit, when passing the resulting bytes to
+            <code>int.from-bytes</code>, the resulting number might be positive, as the
+            most significant bit might not be set to 1.</p>
+          example: null
+          types:
+          - int
+          strings: []
+          default: <code><span class="typ-num">8</span></code>
+          positional: false
+          named: true
+          required: false
+          variadic: false
+          settable: false
+        returns:
+        - bytes
         scope: []
   children: []
 - route: /docs/reference/foundations/label/
@@ -5817,6 +6529,16 @@ children:
         <p>This function also has dedicated syntax: You can create a label by enclosing
         its name in angle brackets. This works both in markup and code. A label's
         name can contain letters, numbers, <code>_</code>, <code>-</code>, <code>:</code>, and <code>.</code>.</p>
+        <p>Note that there is a syntactical difference when using the dedicated syntax
+        for this function. In the code below, the <code><span class="typ-label">&lt;a&gt;</span></code> terminates the heading and
+        thus attaches to the heading itself, whereas the <code><span class="typ-func">#</span><span class="typ-func">label</span><span class="typ-punct">(</span><span class="typ-str">&quot;b&quot;</span><span class="typ-punct">)</span></code> is part of
+        the heading and thus attaches to the heading's text.</p>
+        <pre><code><span class="typ-comment">// Equivalent to `#heading[Introduction] &lt;a&gt;`.</span>
+        <span class="typ-heading">= Introduction</span> <span class="typ-label">&lt;a&gt;</span>
+
+        <span class="typ-comment">// Equivalent to `#heading[Conclusion #label(&quot;b&quot;)]`.</span>
+        <span class="typ-heading">= Conclusion <span class="typ-func">#</span><span class="typ-func">label</span><span class="typ-punct">(</span><span class="typ-str">&quot;b&quot;</span><span class="typ-punct">)</span></span>
+        </code></pre>
         <p>Currently, labels can only be attached to elements in markup mode, not in
         code mode. This might change in the future.</p>
       constructor:
@@ -6129,7 +6851,9 @@ children:
         self: false
         params:
         - name: path
-          details: <p>Path to a WebAssembly file.</p>
+          details: |-
+            <p>Path to a WebAssembly file.</p>
+            <p>For more details, see the <a href="/docs/reference/syntax/#paths">Paths section</a>.</p>
           example: null
           types:
           - str
@@ -6794,6 +7518,7 @@ children:
           - str
           - bytes
           - label
+          - decimal
           - version
           - type
           strings: []
@@ -7689,6 +8414,7 @@ children:
         zeros. This means that, for example, <code>0.8</code> is the same as <code>0.8.0</code>. As a
         special case, the empty version (that has no components at all) is the same
         as <code>0</code>, <code>0.0</code>, <code>0.0.0</code>, and so on.</p>
+        <p>The current version of the Typst compiler is available as <code>sys.version</code>.</p>
         <p>You can convert a version to an array of explicitly given components using
         the <a href="/docs/reference/foundations/array/" title="`array`"><code>array</code></a> constructor.</p>
       constructor:

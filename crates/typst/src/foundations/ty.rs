@@ -5,8 +5,10 @@ use ecow::{eco_format, EcoString};
 use once_cell::sync::Lazy;
 
 use crate::diag::StrResult;
-use crate::foundations::{cast, func, Func, NativeFuncData, Repr, Scope, Value};
-use crate::util::Static;
+use crate::foundations::{
+    cast, func, AutoValue, Func, NativeFuncData, NoneValue, Repr, Scope, Value,
+};
+use crate::utils::Static;
 
 #[rustfmt::skip]
 #[doc(inline)]
@@ -148,7 +150,14 @@ impl Debug for Type {
 
 impl Repr for Type {
     fn repr(&self) -> EcoString {
-        self.long_name().into()
+        if *self == Type::of::<AutoValue>() {
+            "type(auto)"
+        } else if *self == Type::of::<NoneValue>() {
+            "type(none)"
+        } else {
+            self.long_name()
+        }
+        .into()
     }
 }
 
@@ -189,11 +198,16 @@ pub trait NativeType {
 /// Defines a native type.
 #[derive(Debug)]
 pub struct NativeTypeData {
+    /// The type's normal name (e.g. `str`), as exposed to Typst.
     pub name: &'static str,
     pub long_name: &'static str,
+    /// The function's title case name (e.g. `String`).
     pub title: &'static str,
+    /// The documentation for this type as a string.
     pub docs: &'static str,
+    /// A list of alternate search terms for this type.
     pub keywords: &'static [&'static str],
+    /// The constructor for this type.
     pub constructor: Lazy<Option<&'static NativeFuncData>>,
     pub scope: Lazy<Scope>,
 }

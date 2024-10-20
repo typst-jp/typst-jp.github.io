@@ -23,7 +23,7 @@ $ pi(a,b,) $
 $ pi(a;b) $
 
 --- math-call-2d-semicolon-priority ---
-// If the semicolon directlry follows a hash expression, it terminates that
+// If the semicolon directly follows a hash expression, it terminates that
 // instead of indicating 2d arguments.
 $ mat(#"math" ; "wins") $
 $ mat(#"code"; "wins") $
@@ -40,9 +40,9 @@ $ mat(#"code"; "wins") $
 #let check(it, r) = test-repr(it.body.text, r)
 #check($args( a; b; )$, "(([a],), ([b],))")
 #check($args(a;  ; c)$, "(([a],), ([],), ([c],))")
-#check($args(a b,/**/; b)$, "(([([a], [ ], [b])], []), ([b],))")
-#check($args(a/**/b, ; b)$, "(([([a], [b])], []), ([b],))")
-#check($args( ;/**/a/**/b/**/; )$, "(([],), ([([a], [b])],))")
+#check($args(a b,/**/; b)$, "((sequence([a], [ ], [b]), []), ([b],))")
+#check($args(a/**/b, ; b)$, "((sequence([a], [b]), []), ([b],))")
+#check($args( ;/**/a/**/b/**/; )$, "(([],), (sequence([a], [b]),))")
 #check($args( ; , ; )$, "(([],), ([], []))")
 #check($args(/**/; // funky whitespace/trivia
     ,   /**/  ;/**/)$, "(([],), ([], []))")
@@ -81,6 +81,12 @@ $
   bx(x y)  &&quad  bx(x (y z))  &quad  bx(x y^z) \
 $
 
+--- math-call-unknown-var-hint ---
+// Error: 4-6 unknown variable: ab
+// Hint: 4-6 if you meant to display multiple letters as is, try adding spaces between each letter: `a b`
+// Hint: 4-6 or if you meant to display this as text, try placing it in quotes: `"ab"`
+$ 5ab $
+
 --- issue-3774-math-call-empty-2d-args ---
 $ mat(;,) $
 // Add some whitespace/trivia:
@@ -95,3 +101,8 @@ $ mat(
    ,1, ;
    , ,1;
 ) $
+
+--- issue-2885-math-var-only-in-global ---
+// Error: 7-10 unknown variable: rgb
+// Hint: 7-10 `rgb` is not available directly in math, try adding a hash before it: `#rgb`
+$text(rgb(0, 0, 0), "foo")$

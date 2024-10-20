@@ -89,13 +89,13 @@ setルールを書くときは、スタイルを設定したい要素の種類�
 この例では、ページサイズも設定します。
 
 ```example
-#set text(
-  font: "New Computer Modern",
-  size: 10pt
-)
 #set page(
   paper: "a6",
   margin: (x: 1.8cm, y: 1.5cm),
+)
+#set text(
+  font: "New Computer Modern",
+  size: 10pt
 )
 #set par(
   justify: true,

@@ -127,6 +127,10 @@ body:
       route: /docs/reference/math/attach
       oneliner: Subscript, superscripts, and limits.
       code: false
+    - name: binom
+      route: /docs/reference/math/binom/
+      oneliner: A binomial expression.
+      code: true
     - name: cancel
       route: /docs/reference/math/cancel/
       oneliner: Displays a diagonal line over a part of an equation.
@@ -171,6 +175,10 @@ body:
       route: /docs/reference/math/sizes
       oneliner: Forced size styles for expressions within formulas.
       code: false
+    - name: stretch
+      route: /docs/reference/math/stretch/
+      oneliner: Stretches a glyph.
+      code: true
     - name: styles
       route: /docs/reference/math/styles
       oneliner: Alternate letterforms within formulas.
@@ -259,6 +267,7 @@ children:
           <tr><td>Circumflex</td><td><code>hat</code></td><td><code>^</code></td></tr>
           <tr><td>Tilde</td><td><code>tilde</code></td><td><code>~</code></td></tr>
           <tr><td>Macron</td><td><code>macron</code></td><td><code>¯</code></td></tr>
+          <tr><td>Dash</td><td><code>dash</code></td><td><code>‾</code></td></tr>
           <tr><td>Breve</td><td><code>breve</code></td><td><code>˘</code></td></tr>
           <tr><td>Dot</td><td><code>dot</code></td><td><code>.</code></td></tr>
           <tr><td>Double dot, Diaeresis</td><td><code>dot.double</code>, <code>diaer</code></td><td><code>¨</code></td></tr>
@@ -367,6 +376,9 @@ children:
         <p>Attachments can be displayed either as sub/superscripts, or limits. Typst
         automatically decides which is more suitable depending on the base, but you
         can also control this manually with the <code>scripts</code> and <code>limits</code> functions.</p>
+        <p>If you want the base to stretch to fit long top and bottom attachments (for
+        example, an arrow with text above it), use the <a href="/docs/reference/math/stretch/"><code>stretch</code></a>
+        function.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-pol">sum</span><span class="typ-math-op">_</span><span class="typ-punct">(</span>i=0<span class="typ-punct">)</span><span class="typ-math-op">^</span>n a<span class="typ-math-op">_</span>i = 2<span class="typ-math-op">^</span><span class="typ-punct">(</span>1+i<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
         </code></pre><div class="preview"><img src="/assets/docs/575e598ddfc00ee58c3fd2f8379f5718.png" alt="Preview" width="480" height="190"/></div></div>
@@ -566,6 +578,74 @@ children:
         - content
         scope: []
   children: []
+- route: /docs/reference/math/binom/
+  title: Binomial
+  description: Documentation for the `binom` function.
+  part: null
+  outline:
+  - id: summary
+    name: Summary
+    children: []
+  - id: example
+    name: Example
+    children: []
+  - id: parameters
+    name: Parameters
+    children:
+    - id: parameters-upper
+      name: upper
+      children: []
+    - id: parameters-lower
+      name: lower
+      children: []
+  body:
+    kind: func
+    content:
+      path:
+      - math
+      name: binom
+      title: Binomial
+      keywords: []
+      oneliner: A binomial expression.
+      element: true
+      contextual: false
+      details: |-
+        <p>A binomial expression.</p>
+        <h2 id="example">Example</h2>
+        <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">binom</span><span class="typ-punct">(</span>n<span class="typ-punct">,</span> k<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+        <span class="typ-math-delim">$</span> <span class="typ-func">binom</span><span class="typ-punct">(</span>n<span class="typ-punct">,</span> k<span class="typ-math-op">_</span>1<span class="typ-punct">,</span> k<span class="typ-math-op">_</span>2<span class="typ-punct">,</span> k<span class="typ-math-op">_</span>3<span class="typ-punct">,</span> <span class="typ-escape">...</span><span class="typ-punct">,</span> k<span class="typ-math-op">_</span>m<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+        </code></pre><div class="preview"><img src="/assets/docs/ab935463fd6550366ebe54a6eac0f24c.png" alt="Preview" width="480" height="190"/></div></div>
+      example: null
+      self: false
+      params:
+      - name: upper
+        details: <p>The binomial's upper index.</p>
+        example: null
+        types:
+        - content
+        strings: []
+        default: null
+        positional: true
+        named: false
+        required: true
+        variadic: false
+        settable: false
+      - name: lower
+        details: <p>The binomial's lower index.</p>
+        example: null
+        types:
+        - content
+        strings: []
+        default: null
+        positional: true
+        named: false
+        required: true
+        variadic: true
+        settable: false
+      returns:
+      - content
+      scope: []
+  children: []
 - route: /docs/reference/math/cancel/
   title: Cancel
   description: Documentation for the `cancel` function.
@@ -689,13 +769,13 @@ children:
         details: |-
           <p>How much to rotate the cancel line.</p>
           <ul>
+          <li>If given an angle, the line is rotated by that angle clockwise with
+          respect to the y-axis.</li>
           <li>If <code><span class="typ-key">auto</span></code>, the line assumes the default angle; that is, along the
-          diagonal line of the content box.</li>
-          <li>If given an angle, the line is rotated by that angle clockwise w.r.t
-          the y-axis.</li>
-          <li>If given a function <code>angle =&gt; angle</code>, the line is rotated by the angle
-          returned by that function. The function receives the default angle as
-          its input.</li>
+          rising diagonal of the content box.</li>
+          <li>If given a function <code>angle =&gt; angle</code>, the line is rotated, with
+          respect to the y-axis, by the angle returned by that function. The
+          function receives the default angle as its input.</li>
           </ul>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">cancel</span><span class="typ-punct">(</span><span class="typ-pol">Pi</span><span class="typ-punct">)</span>
@@ -799,25 +879,24 @@ children:
       self: false
       params:
       - name: delim
-        details: <p>The delimiter to use.</p>
+        details: |-
+          <p>The delimiter to use.</p>
+          <p>Can be a single character specifying the left delimiter, in which case
+          the right delimiter is inferred. Otherwise, can be an array containing a
+          left and a right delimiter.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">cases</span><span class="typ-punct">(</span>delim<span class="typ-punct">:</span> <span class="typ-str">&quot;[&quot;</span><span class="typ-punct">)</span>
           <span class="typ-math-delim">$</span> x = <span class="typ-func">cases</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
           </code></pre><div class="preview"><img src="/assets/docs/64308d8f300a31dcea4c5b8442acdc88.png" alt="Preview" width="480" height="190"/></div></div>
         types:
+        - none
         - str
-        strings:
-        - string: (
-          details: <p>Delimit with parentheses.</p>
-        - string: '['
-          details: <p>Delimit with brackets.</p>
-        - string: '{'
-          details: <p>Delimit with curly braces.</p>
-        - string: '|'
-          details: <p>Delimit with vertical bars.</p>
-        - string: '||'
-          details: <p>Delimit with double vertical bars.</p>
-        default: <code><span class="typ-str">&quot;{&quot;</span></code>
+        - array
+        - symbol
+        strings: []
+        default: <code><span class="typ-punct">(</span><span class="typ-str">&quot;{&quot;</span><span
+          class="typ-punct">,</span> <span class="typ-str">&quot;}&quot;</span><span
+          class="typ-punct">)</span></code>
         positional: false
         named: true
         required: false
@@ -847,7 +926,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0.5em</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0.2em</span></code>
         positional: false
         named: true
         required: false
@@ -1023,6 +1103,8 @@ children:
         Prove by induction:
         <span class="typ-math-delim">$</span> <span class="typ-pol">sum</span><span class="typ-math-op">_</span><span class="typ-punct">(</span>k=1<span class="typ-punct">)</span><span class="typ-math-op">^</span>n k = <span class="typ-punct">(</span>n(n+1)<span class="typ-punct">)</span> <span class="typ-math-op">/</span> 2 <span class="typ-math-delim">$</span>
         </code></pre><div class="preview"><img src="/assets/docs/2d58c5d646f64f45aaf3c354af40ed6d.png" alt="Preview" width="480" height="190"/></div></div>
+        <p>By default, block-level equations will not break across pages. This can be
+        changed through <code><span class="typ-key">show</span> math<span class="typ-punct">.</span><span class="typ-func">equation</span><span class="typ-punct">:</span> <span class="typ-key">set</span> <span class="typ-func">block</span><span class="typ-punct">(</span>breakable<span class="typ-punct">:</span> <span class="typ-key">true</span><span class="typ-punct">)</span></code>.</p>
         <h2 id="syntax">Syntax</h2>
         <p>This function also has dedicated syntax: Write mathematical markup within
         dollar signs to create an equation. Starting and ending the equation with at
@@ -1298,9 +1380,9 @@ children:
         and floored values as well as norms.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> [a, b<span class="typ-math-op">/</span>2] <span class="typ-math-delim">$</span>
-        <span class="typ-math-delim">$</span> <span class="typ-func">lr</span><span class="typ-punct">(</span>]<span class="typ-pol">sum</span><span class="typ-math-op">_</span><span class="typ-punct">(</span>x=1<span class="typ-punct">)</span><span class="typ-math-op">^</span>n] x<span class="typ-punct">,</span> size<span class="typ-punct">:</span> <span class="typ-num">#</span><span class="typ-num">50%</span><span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+        <span class="typ-math-delim">$</span> <span class="typ-func">lr</span><span class="typ-punct">(</span>]<span class="typ-pol">sum</span><span class="typ-math-op">_</span><span class="typ-punct">(</span>x=1<span class="typ-punct">)</span><span class="typ-math-op">^</span>n]<span class="typ-punct">,</span> size<span class="typ-punct">:</span> <span class="typ-num">#</span><span class="typ-num">50%</span><span class="typ-punct">)</span> x <span class="typ-math-delim">$</span>
         <span class="typ-math-delim">$</span> <span class="typ-func">abs</span><span class="typ-punct">(</span><span class="typ-punct">(</span>x + y<span class="typ-punct">)</span> <span class="typ-math-op">/</span> 2<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
-        </code></pre><div class="preview"><img src="/assets/docs/41d20606a87dc72e3461b2b0a7ce9acf.png" alt="Preview" width="480" height="190"/></div></div>
+        </code></pre><div class="preview"><img src="/assets/docs/d4f901df0a2b7a4e2065ba41fde3ddea.png" alt="Preview" width="480" height="190"/></div></div>
       functions:
       - path:
         - math
@@ -1611,6 +1693,9 @@ children:
     - id: parameters-delim
       name: delim
       children: []
+    - id: parameters-align
+      name: align
+      children: []
     - id: parameters-augment
       name: augment
       children: []
@@ -1644,7 +1729,9 @@ children:
         preceding arguments separated by commas into an array. You can also use this
         special syntax of math function calls to define custom functions that take
         2D data.</p>
-        <p>Content in cells that are in the same row can be aligned with the <code>&amp;</code> symbol.</p>
+        <p>Content in cells can be aligned with the <a href="/docs/reference/math/mat/#parameters-align"><code>align</code></a>
+        parameter, or content in cells that are in the same row can be aligned with
+        the <code>&amp;</code> symbol.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">mat</span><span class="typ-punct">(</span>
           1<span class="typ-punct">,</span> 2<span class="typ-punct">,</span> <span class="typ-escape">...</span><span class="typ-punct">,</span> 10<span class="typ-punct">;</span>
@@ -1657,7 +1744,11 @@ children:
       self: false
       params:
       - name: delim
-        details: <p>The delimiter to use.</p>
+        details: |-
+          <p>The delimiter to use.</p>
+          <p>Can be a single character specifying the left delimiter, in which case
+          the right delimiter is inferred. Otherwise, can be an array containing a
+          left and a right delimiter.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">mat</span><span class="typ-punct">(</span>delim<span class="typ-punct">:</span> <span class="typ-str">&quot;[&quot;</span><span class="typ-punct">)</span>
           <span class="typ-math-delim">$</span> <span class="typ-func">mat</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">;</span> 3<span class="typ-punct">,</span> 4<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
@@ -1665,18 +1756,27 @@ children:
         types:
         - none
         - str
-        strings:
-        - string: (
-          details: <p>Delimit with parentheses.</p>
-        - string: '['
-          details: <p>Delimit with brackets.</p>
-        - string: '{'
-          details: <p>Delimit with curly braces.</p>
-        - string: '|'
-          details: <p>Delimit with vertical bars.</p>
-        - string: '||'
-          details: <p>Delimit with double vertical bars.</p>
-        default: <code><span class="typ-str">&quot;(&quot;</span></code>
+        - array
+        - symbol
+        strings: []
+        default: <code><span class="typ-punct">(</span><span class="typ-str">&quot;(&quot;</span><span
+          class="typ-punct">,</span> <span class="typ-str">&quot;)&quot;</span><span
+          class="typ-punct">)</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: align
+        details: <p>The horizontal alignment that each cell should have.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">mat</span><span class="typ-punct">(</span>align<span class="typ-punct">:</span> right<span class="typ-punct">)</span>
+          <span class="typ-math-delim">$</span> <span class="typ-func">mat</span><span class="typ-punct">(</span><span class="typ-escape">-</span>1<span class="typ-punct">,</span> 1<span class="typ-punct">,</span> 1<span class="typ-punct">;</span> 1<span class="typ-punct">,</span> <span class="typ-escape">-</span>1<span class="typ-punct">,</span> 1<span class="typ-punct">;</span> 1<span class="typ-punct">,</span> 1<span class="typ-punct">,</span> <span class="typ-escape">-</span>1<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+          </code></pre><div class="preview"><img src="/assets/docs/f2dc8173ba453e27a1eda57dda963992.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - alignment
+        strings: []
+        default: <code>center</code>
         positional: false
         named: true
         required: false
@@ -1726,7 +1826,9 @@ children:
         variadic: false
         settable: true
       - name: gap
-        details: <p>The gap between rows and columns.</p>
+        details: |-
+          <p>The gap between rows and columns.</p>
+          <p>This is a shorthand to set <code>row-gap</code> and <code>column-gap</code> to the same value.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">mat</span><span class="typ-punct">(</span>gap<span class="typ-punct">:</span> <span class="typ-num">1em</span><span class="typ-punct">)</span>
           <span class="typ-math-delim">$</span> <span class="typ-func">mat</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">;</span> 3<span class="typ-punct">,</span> 4<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
@@ -1734,14 +1836,15 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0pt</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0pt</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: row-gap
-        details: <p>The gap between rows. Takes precedence over <code>gap</code>.</p>
+        details: <p>The gap between rows.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">mat</span><span class="typ-punct">(</span>row-gap<span class="typ-punct">:</span> <span class="typ-num">1em</span><span class="typ-punct">)</span>
           <span class="typ-math-delim">$</span> <span class="typ-func">mat</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">;</span> 3<span class="typ-punct">,</span> 4<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
@@ -1749,14 +1852,15 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0.5em</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0.2em</span></code>
         positional: false
         named: true
         required: false
         variadic: false
         settable: true
       - name: column-gap
-        details: <p>The gap between columns. Takes precedence over <code>gap</code>.</p>
+        details: <p>The gap between columns.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">mat</span><span class="typ-punct">(</span>column-gap<span class="typ-punct">:</span> <span class="typ-num">1em</span><span class="typ-punct">)</span>
           <span class="typ-math-delim">$</span> <span class="typ-func">mat</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">;</span> 3<span class="typ-punct">,</span> 4<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
@@ -1764,7 +1868,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0.5em</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0.5em</span></code>
         positional: false
         named: true
         required: false
@@ -2020,7 +2125,8 @@ children:
         - math
         name: display
         title: Display Size
-        keywords: []
+        keywords:
+        - displaystyle
         oneliner: Forced display style in math.
         element: false
         contextual: false
@@ -2065,7 +2171,8 @@ children:
         - math
         name: inline
         title: Inline Size
-        keywords: []
+        keywords:
+        - textstyle
         oneliner: Forced inline (text) style in math.
         element: false
         contextual: false
@@ -2111,7 +2218,8 @@ children:
         - math
         name: script
         title: Script Size
-        keywords: []
+        keywords:
+        - scriptstyle
         oneliner: Forced script style in math.
         element: false
         contextual: false
@@ -2156,7 +2264,8 @@ children:
         - math
         name: sscript
         title: Script-Script Size
-        keywords: []
+        keywords:
+        - scriptscriptstyle
         oneliner: Forced second script style in math.
         element: false
         contextual: false
@@ -2198,6 +2307,80 @@ children:
         returns:
         - content
         scope: []
+  children: []
+- route: /docs/reference/math/stretch/
+  title: Stretch
+  description: Documentation for the `stretch` function.
+  part: null
+  outline:
+  - id: summary
+    name: Summary
+    children: []
+  - id: parameters
+    name: Parameters
+    children:
+    - id: parameters-body
+      name: body
+      children: []
+    - id: parameters-size
+      name: size
+      children: []
+  body:
+    kind: func
+    content:
+      path:
+      - math
+      name: stretch
+      title: Stretch
+      keywords: []
+      oneliner: Stretches a glyph.
+      element: true
+      contextual: false
+      details: |-
+        <p>Stretches a glyph.</p>
+        <p>This function can also be used to automatically stretch the base of an
+        attachment, so that it fits the top and bottom attachments.</p>
+        <p>Note that only some glyphs can be stretched, and which ones can depend on
+        the math font being used. However, most math fonts are the same in this
+        regard.</p>
+        <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> H <span class="typ-func">stretch</span><span class="typ-punct">(</span>=<span class="typ-punct">)</span><span class="typ-math-op">^</span><span class="typ-str">&quot;define&quot;</span> U + p V <span class="typ-math-delim">$</span>
+        <span class="typ-math-delim">$</span> f : X <span class="typ-func">stretch</span><span class="typ-punct">(</span><span class="typ-escape">-&gt;&gt;</span><span class="typ-punct">,</span> size<span class="typ-punct">:</span> <span class="typ-num">#</span><span class="typ-num">150%</span><span class="typ-punct">)</span><span class="typ-math-op">_</span><span class="typ-str">&quot;surjective&quot;</span> Y <span class="typ-math-delim">$</span>
+        <span class="typ-math-delim">$</span> x <span class="typ-func">stretch</span><span class="typ-punct">(</span><span class="typ-pol">harpoons</span><span class="typ-punct">.</span><span class="typ-pol">ltrb</span><span class="typ-punct">,</span> size<span class="typ-punct">:</span> <span class="typ-num">#</span><span class="typ-num">3em</span><span class="typ-punct">)</span> y
+            <span class="typ-func">stretch</span><span class="typ-punct">(</span><span class="typ-escape">\[</span><span class="typ-punct">,</span> size<span class="typ-punct">:</span> <span class="typ-num">#</span><span class="typ-num">150%</span><span class="typ-punct">)</span> z <span class="typ-math-delim">$</span>
+        </code></pre><div class="preview"><img src="/assets/docs/a21a7dc4826c9f7b5af3912da4d47f6d.png" alt="Preview" width="480" height="190"/></div></div>
+      example: null
+      self: false
+      params:
+      - name: body
+        details: <p>The glyph to stretch.</p>
+        example: null
+        types:
+        - content
+        strings: []
+        default: null
+        positional: true
+        named: false
+        required: true
+        variadic: false
+        settable: false
+      - name: size
+        details: |-
+          <p>The size to stretch to, relative to the maximum size of the glyph and
+          its attachments.</p>
+        example: null
+        types:
+        - auto
+        - relative
+        strings: []
+        default: <code><span class="typ-key">auto</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      returns:
+      - content
+      scope: []
   children: []
 - route: /docs/reference/math/styles
   title: Styles
@@ -2242,7 +2425,8 @@ children:
         - math
         name: upright
         title: Upright
-        keywords: []
+        keywords:
+        - mathup
         oneliner: Upright (non-italic) font style in math.
         element: false
         contextual: false
@@ -2271,7 +2455,8 @@ children:
         - math
         name: italic
         title: Italic
-        keywords: []
+        keywords:
+        - mathit
         oneliner: Italic font style in math.
         element: false
         contextual: false
@@ -2300,7 +2485,8 @@ children:
         - math
         name: bold
         title: Bold
-        keywords: []
+        keywords:
+        - mathbf
         oneliner: Bold font style in math.
         element: false
         contextual: false
@@ -2462,6 +2648,42 @@ children:
         name: body
         children: []
       - id: functions-overbracket-annotation
+        name: annotation
+        children: []
+    - id: functions-underparen
+      name: Underparen
+      children:
+      - id: functions-underparen-body
+        name: body
+        children: []
+      - id: functions-underparen-annotation
+        name: annotation
+        children: []
+    - id: functions-overparen
+      name: Overparen
+      children:
+      - id: functions-overparen-body
+        name: body
+        children: []
+      - id: functions-overparen-annotation
+        name: annotation
+        children: []
+    - id: functions-undershell
+      name: Undershell
+      children:
+      - id: functions-undershell-body
+        name: body
+        children: []
+      - id: functions-undershell-annotation
+        name: annotation
+        children: []
+    - id: functions-overshell
+      name: Overshell
+      children:
+      - id: functions-overshell-body
+        name: body
+        children: []
+      - id: functions-overshell-annotation
         name: annotation
         children: []
   body:
@@ -2704,6 +2926,182 @@ children:
         returns:
         - content
         scope: []
+      - path:
+        - math
+        name: underparen
+        title: Underparen
+        keywords: []
+        oneliner: A horizontal parenthesis under content, with an optional annotation
+          below.
+        element: true
+        contextual: false
+        details: <p>A horizontal parenthesis under content, with an optional annotation
+          below.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">underparen</span><span class="typ-punct">(</span>1 + 2 + <span class="typ-escape">...</span> + 5<span class="typ-punct">,</span> <span class="typ-str">&quot;numbers&quot;</span><span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+          </code></pre><div class="preview"><img src="/assets/docs/2f55e2a579885b4dcc0f8bb2447086a8.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: body
+          details: <p>The content above the parenthesis.</p>
+          example: null
+          types:
+          - content
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: annotation
+          details: <p>The optional content below the parenthesis.</p>
+          example: null
+          types:
+          - none
+          - content
+          strings: []
+          default: <code><span class="typ-key">none</span></code>
+          positional: true
+          named: false
+          required: false
+          variadic: false
+          settable: true
+        returns:
+        - content
+        scope: []
+      - path:
+        - math
+        name: overparen
+        title: Overparen
+        keywords: []
+        oneliner: A horizontal parenthesis over content, with an optional annotation
+          above.
+        element: true
+        contextual: false
+        details: <p>A horizontal parenthesis over content, with an optional annotation
+          above.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">overparen</span><span class="typ-punct">(</span>1 + 2 + <span class="typ-escape">...</span> + 5<span class="typ-punct">,</span> <span class="typ-str">&quot;numbers&quot;</span><span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+          </code></pre><div class="preview"><img src="/assets/docs/0a43d2bb26a1df9e46464218f684757b.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: body
+          details: <p>The content below the parenthesis.</p>
+          example: null
+          types:
+          - content
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: annotation
+          details: <p>The optional content above the parenthesis.</p>
+          example: null
+          types:
+          - none
+          - content
+          strings: []
+          default: <code><span class="typ-key">none</span></code>
+          positional: true
+          named: false
+          required: false
+          variadic: false
+          settable: true
+        returns:
+        - content
+        scope: []
+      - path:
+        - math
+        name: undershell
+        title: Undershell
+        keywords: []
+        oneliner: A horizontal tortoise shell bracket under content, with an optional
+          annotation below.
+        element: true
+        contextual: false
+        details: <p>A horizontal tortoise shell bracket under content, with an optional
+          annotation below.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">undershell</span><span class="typ-punct">(</span>1 + 2 + <span class="typ-escape">...</span> + 5<span class="typ-punct">,</span> <span class="typ-str">&quot;numbers&quot;</span><span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+          </code></pre><div class="preview"><img src="/assets/docs/17209d7e916a6377e2b3e274e0f7bddf.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: body
+          details: <p>The content above the tortoise shell bracket.</p>
+          example: null
+          types:
+          - content
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: annotation
+          details: <p>The optional content below the tortoise shell bracket.</p>
+          example: null
+          types:
+          - none
+          - content
+          strings: []
+          default: <code><span class="typ-key">none</span></code>
+          positional: true
+          named: false
+          required: false
+          variadic: false
+          settable: true
+        returns:
+        - content
+        scope: []
+      - path:
+        - math
+        name: overshell
+        title: Overshell
+        keywords: []
+        oneliner: A horizontal tortoise shell bracket over content, with an optional
+          annotation above.
+        element: true
+        contextual: false
+        details: <p>A horizontal tortoise shell bracket over content, with an optional
+          annotation above.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">overshell</span><span class="typ-punct">(</span>1 + 2 + <span class="typ-escape">...</span> + 5<span class="typ-punct">,</span> <span class="typ-str">&quot;numbers&quot;</span><span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+          </code></pre><div class="preview"><img src="/assets/docs/dee69b96c8eeea486aa684f82dc55d29.png" alt="Preview" width="480" height="190"/></div></div>
+        self: false
+        params:
+        - name: body
+          details: <p>The content below the tortoise shell bracket.</p>
+          example: null
+          types:
+          - content
+          strings: []
+          default: null
+          positional: true
+          named: false
+          required: true
+          variadic: false
+          settable: false
+        - name: annotation
+          details: <p>The optional content above the tortoise shell bracket.</p>
+          example: null
+          types:
+          - none
+          - content
+          strings: []
+          default: <code><span class="typ-key">none</span></code>
+          positional: true
+          named: false
+          required: false
+          variadic: false
+          settable: true
+        returns:
+        - content
+        scope: []
   children: []
 - route: /docs/reference/math/variants
   title: Variants
@@ -2766,7 +3164,8 @@ children:
         - math
         name: serif
         title: Serif
-        keywords: []
+        keywords:
+        - mathrm
         oneliner: Serif (roman) font style in math.
         element: false
         contextual: false
@@ -2795,7 +3194,8 @@ children:
         - math
         name: sans
         title: Sans Serif
-        keywords: []
+        keywords:
+        - mathsf
         oneliner: Sans-serif font style in math.
         element: false
         contextual: false
@@ -2824,7 +3224,8 @@ children:
         - math
         name: frak
         title: Fraktur
-        keywords: []
+        keywords:
+        - mathfrak
         oneliner: Fraktur font style in math.
         element: false
         contextual: false
@@ -2853,7 +3254,8 @@ children:
         - math
         name: mono
         title: Monospace
-        keywords: []
+        keywords:
+        - mathtt
         oneliner: Monospace font style in math.
         element: false
         contextual: false
@@ -2882,7 +3284,8 @@ children:
         - math
         name: bb
         title: Blackboard Bold
-        keywords: []
+        keywords:
+        - mathbb
         oneliner: Blackboard bold (double-struck) font style in math.
         element: false
         contextual: false
@@ -2916,7 +3319,9 @@ children:
         - math
         name: cal
         title: Calligraphic
-        keywords: []
+        keywords:
+        - mathcal
+        - mathscr
         oneliner: Calligraphic font style in math.
         element: false
         contextual: false
@@ -2924,6 +3329,22 @@ children:
         example: |-
           <div class="previewed-code"><pre><code>Let <span class="typ-math-delim">$</span><span class="typ-func">cal</span><span class="typ-punct">(</span>P<span class="typ-punct">)</span><span class="typ-math-delim">$</span> be the set of <span class="typ-escape">...</span>
           </code></pre><div class="preview"><img src="/assets/docs/4076bf054496eaa35f7325c6d304bf36.png" alt="Preview" width="480" height="190"/></div></div>
+          <p>This corresponds both to LaTeX's <code>\mathcal</code> and <code>\mathscr</code> as both of these
+          styles share the same Unicode codepoints. Switching between the styles is
+          thus only possible if supported by the font via
+          <a href="/docs/reference/text/text/#parameters-features">font features</a>.</p>
+          <p>For the default math font, the roundhand style is available through the
+          <code>ss01</code> feature. Therefore, you could define your own version of <code>\mathscr</code>
+          like this:</p>
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">let</span> <span class="typ-func">scr</span><span class="typ-punct">(</span>it<span class="typ-punct">)</span> <span class="typ-op">=</span> <span class="typ-func">text</span><span class="typ-punct">(</span>
+            features<span class="typ-punct">:</span> <span class="typ-punct">(</span><span class="typ-str">&quot;ss01&quot;</span><span class="typ-punct">,</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+            <span class="typ-func">box</span><span class="typ-punct">(</span><span class="typ-math-delim">$</span><span class="typ-func">cal</span><span class="typ-punct">(</span><span class="typ-pol">it</span><span class="typ-punct">)</span><span class="typ-math-delim">$</span><span class="typ-punct">)</span><span class="typ-punct">,</span>
+          <span class="typ-punct">)</span>
+
+          We establish <span class="typ-math-delim">$</span><span class="typ-func">cal</span><span class="typ-punct">(</span>P<span class="typ-punct">)</span> <span class="typ-escape">!=</span> <span class="typ-func">scr</span><span class="typ-punct">(</span>P<span class="typ-punct">)</span><span class="typ-math-delim">$</span>.
+          </code></pre><div class="preview"><img src="/assets/docs/f8f61799c48a9188b198a521737b00a4.png" alt="Preview" width="480" height="190"/></div></div>
+          <p>(The box is not conceptually necessary, but unfortunately currently needed
+          due to limitations in Typst's text style handling in math.)</p>
         self: false
         params:
         - name: body
@@ -2959,6 +3380,9 @@ children:
     - id: parameters-delim
       name: delim
       children: []
+    - id: parameters-align
+      name: align
+      children: []
     - id: parameters-gap
       name: gap
       children: []
@@ -2978,7 +3402,8 @@ children:
       contextual: false
       details: |-
         <p>A column vector.</p>
-        <p>Content in the vector's elements can be aligned with the <code>&amp;</code> symbol.</p>
+        <p>Content in the vector's elements can be aligned with the
+        <a href="/docs/reference/math/vec/#parameters-align"><code>align</code></a> parameter, or the <code>&amp;</code> symbol.</p>
         <h2 id="example">Example</h2>
         <div class="previewed-code"><pre><code><span class="typ-math-delim">$</span> <span class="typ-func">vec</span><span class="typ-punct">(</span>a<span class="typ-punct">,</span> b<span class="typ-punct">,</span> c<span class="typ-punct">)</span> <span class="typ-pol">dot</span> <span class="typ-func">vec</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">,</span> 3<span class="typ-punct">)</span>
             = a + 2b + 3c <span class="typ-math-delim">$</span>
@@ -2987,7 +3412,11 @@ children:
       self: false
       params:
       - name: delim
-        details: <p>The delimiter to use.</p>
+        details: |-
+          <p>The delimiter to use.</p>
+          <p>Can be a single character specifying the left delimiter, in which case
+          the right delimiter is inferred. Otherwise, can be an array containing a
+          left and a right delimiter.</p>
         example: |-
           <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">vec</span><span class="typ-punct">(</span>delim<span class="typ-punct">:</span> <span class="typ-str">&quot;[&quot;</span><span class="typ-punct">)</span>
           <span class="typ-math-delim">$</span> <span class="typ-func">vec</span><span class="typ-punct">(</span>1<span class="typ-punct">,</span> 2<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
@@ -2995,18 +3424,27 @@ children:
         types:
         - none
         - str
-        strings:
-        - string: (
-          details: <p>Delimit with parentheses.</p>
-        - string: '['
-          details: <p>Delimit with brackets.</p>
-        - string: '{'
-          details: <p>Delimit with curly braces.</p>
-        - string: '|'
-          details: <p>Delimit with vertical bars.</p>
-        - string: '||'
-          details: <p>Delimit with double vertical bars.</p>
-        default: <code><span class="typ-str">&quot;(&quot;</span></code>
+        - array
+        - symbol
+        strings: []
+        default: <code><span class="typ-punct">(</span><span class="typ-str">&quot;(&quot;</span><span
+          class="typ-punct">,</span> <span class="typ-str">&quot;)&quot;</span><span
+          class="typ-punct">)</span></code>
+        positional: false
+        named: true
+        required: false
+        variadic: false
+        settable: true
+      - name: align
+        details: <p>The horizontal alignment that each element should have.</p>
+        example: |-
+          <div class="previewed-code"><pre><code><span class="typ-key">#</span><span class="typ-key">set</span> math<span class="typ-punct">.</span><span class="typ-func">vec</span><span class="typ-punct">(</span>align<span class="typ-punct">:</span> right<span class="typ-punct">)</span>
+          <span class="typ-math-delim">$</span> <span class="typ-func">vec</span><span class="typ-punct">(</span><span class="typ-escape">-</span>1<span class="typ-punct">,</span> 1<span class="typ-punct">,</span> <span class="typ-escape">-</span>1<span class="typ-punct">)</span> <span class="typ-math-delim">$</span>
+          </code></pre><div class="preview"><img src="/assets/docs/5f521e91597ec3b5afcb4ca8756e929e.png" alt="Preview" width="480" height="190"/></div></div>
+        types:
+        - alignment
+        strings: []
+        default: <code>center</code>
         positional: false
         named: true
         required: false
@@ -3021,7 +3459,8 @@ children:
         types:
         - relative
         strings: []
-        default: <code><span class="typ-num">0.5em</span></code>
+        default: <code><span class="typ-num">0%</span> <span class="typ-op">+</span>
+          <span class="typ-num">0.2em</span></code>
         positional: false
         named: true
         required: false

@@ -5,24 +5,23 @@ use std::sync::Arc;
 use ecow::{eco_format, EcoString, EcoVec};
 use once_cell::sync::Lazy;
 use once_cell::unsync::Lazy as UnsyncLazy;
-use syntect::highlighting as synt;
+use syntect::highlighting::{self as synt, Theme};
 use syntect::parsing::{SyntaxDefinition, SyntaxSet, SyntaxSetBuilder};
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::diag::{At, FileError, SourceResult, StrResult};
+use super::Lang;
+use crate::diag::{At, FileError, HintedStrResult, SourceResult, StrResult};
 use crate::engine::Engine;
 use crate::foundations::{
     cast, elem, scope, Args, Array, Bytes, Content, Fold, NativeElement, Packed,
     PlainText, Show, ShowSet, Smart, StyleChain, Styles, Synthesize, Value,
 };
-use crate::layout::{BlockElem, Em, HAlignment};
+use crate::layout::{BlockBody, BlockElem, Em, HAlignment};
 use crate::model::{Figurable, ParElem};
 use crate::syntax::{split_newlines, LinkedNode, Span, Spanned};
 use crate::text::{
-    FontFamily, FontList, Hyphenate, Lang, LinebreakElem, LocalName, Region,
-    SmartQuoteElem, TextElem, TextSize,
+    FontFamily, FontList, Hyphenate, LinebreakElem, LocalName, TextElem, TextSize,
 };
-use crate::util::option_eq;
 use crate::visualize::Color;
 use crate::{syntax, World};
 
@@ -30,6 +29,7 @@ use crate::{syntax, World};
 type StyleFn<'a> =
     &'a mut dyn FnMut(usize, &LinkedNode, Range<usize>, synt::Style) -> Content;
 type LineFn<'a> = &'a mut dyn FnMut(usize, Range<usize>, &mut Vec<Content>);
+type ThemeArgType = Smart<Option<EcoString>>;
 
 /// Raw text with optional syntax highlighting.
 ///
@@ -55,6 +55,12 @@ type LineFn<'a> = &'a mut dyn FnMut(usize, Range<usize>, &mut Vec<Content>);
 /// ``` here``` the leading space is
 /// also trimmed.
 /// ````
+///
+/// You can also construct a [`raw`] element programmatically from a string (and
+/// provide the language tag via the optional [`lang`]($raw.lang) argument).
+/// ```example
+/// #raw("fn " + "main() {}", lang: "rust")
+/// ```
 ///
 /// # Syntax
 /// This function also has dedicated syntax. You can enclose text in 1 or 3+
@@ -144,9 +150,10 @@ pub struct RawElem {
     /// The language to syntax-highlight in.
     ///
     /// Apart from typical language tags known from Markdown, this supports the
-    /// `{"typ"}` and `{"typc"}` tags for
-    /// [Typst markup]($reference/syntax/#markup) and
-    /// [Typst code]($reference/syntax/#code), respectively.
+    /// `{"typ"}`, `{"typc"}`, and `{"typm"}` tags for
+    /// [Typst markup]($reference/syntax/#markup),
+    /// [Typst code]($reference/syntax/#code), and
+    /// [Typst math]($reference/syntax/#math), respectively.
     ///
     /// ````example
     /// ```typ
@@ -208,7 +215,7 @@ pub struct RawElem {
     pub syntaxes_data: Vec<Bytes>,
 
     /// The theme to use for syntax highlighting. Theme files should be in the
-    /// in the [`tmTheme` file format](https://www.sublimetext.com/docs/color_schemes_tmtheme.html).
+    /// [`tmTheme` file format](https://www.sublimetext.com/docs/color_schemes_tmtheme.html).
     ///
     /// Applying a theme only affects the color of specifically highlighted
     /// text. It does not consider the theme's foreground and background
@@ -216,6 +223,8 @@ pub struct RawElem {
     /// can apply the foreground color yourself with the [`text`] function and
     /// the background with a [filled block]($block.fill). You could also use
     /// the [`xml`] function to extract these properties from the theme.
+    ///
+    /// Additionally, you can set the theme to `{none}` to disable highlighting.
     ///
     /// ````example
     /// #set raw(theme: "halcyon.tmTheme")
@@ -233,10 +242,10 @@ pub struct RawElem {
     /// ````
     #[parse(
         let (theme_path, theme_data) = parse_theme(engine, args)?;
-        theme_path.map(Some)
+        theme_path
     )]
     #[borrowed]
-    pub theme: Option<EcoString>,
+    pub theme: ThemeArgType,
 
     /// The raw file buffer of syntax theme file.
     #[internal]
@@ -285,7 +294,11 @@ impl RawElem {
                     syntax.file_extensions.iter().map(|s| s.as_str()).collect(),
                 )
             })
-            .chain([("Typst", vec!["typ"]), ("Typst (code)", vec!["typc"])])
+            .chain([
+                ("Typst", vec!["typ"]),
+                ("Typst (code)", vec!["typc"]),
+                ("Typst (math)", vec!["typm"]),
+            ])
             .collect()
     }
 }
@@ -315,21 +328,38 @@ impl Packed<RawElem> {
         let extra_syntaxes = UnsyncLazy::new(|| {
             load_syntaxes(&elem.syntaxes(styles), &elem.syntaxes_data(styles)).unwrap()
         });
+        let non_highlighted_result = |lines: EcoVec<(EcoString, Span)>| {
+            lines.into_iter().enumerate().map(|(i, (line, line_span))| {
+                Packed::new(RawLine::new(
+                    i as i64 + 1,
+                    count,
+                    line.clone(),
+                    TextElem::packed(line).spanned(line_span),
+                ))
+                .spanned(line_span)
+            })
+        };
 
         let theme = elem.theme(styles).as_ref().as_ref().map(|theme_path| {
-            load_theme(theme_path, elem.theme_data(styles).as_ref().as_ref().unwrap())
-                .unwrap()
+            theme_path.as_ref().map(|path| {
+                load_theme(path, elem.theme_data(styles).as_ref().as_ref().unwrap())
+                    .unwrap()
+            })
         });
-
-        let theme = theme.as_deref().unwrap_or(&RAW_THEME);
+        let theme: &Theme = match theme {
+            Smart::Auto => &RAW_THEME,
+            Smart::Custom(Some(ref theme)) => theme,
+            Smart::Custom(None) => return non_highlighted_result(lines).collect(),
+        };
         let foreground = theme.settings.foreground.unwrap_or(synt::Color::BLACK);
 
         let mut seq = vec![];
-        if matches!(lang.as_deref(), Some("typ" | "typst" | "typc")) {
+        if matches!(lang.as_deref(), Some("typ" | "typst" | "typc" | "typm")) {
             let text =
                 lines.iter().map(|(s, _)| s.clone()).collect::<Vec<_>>().join("\n");
             let root = match lang.as_deref() {
                 Some("typc") => syntax::parse_code(&text),
+                Some("typm") => syntax::parse_math(&text),
                 _ => syntax::parse(&text),
             };
 
@@ -400,15 +430,7 @@ impl Packed<RawElem> {
                 );
             }
         } else {
-            seq.extend(lines.into_iter().enumerate().map(|(i, (line, line_span))| {
-                Packed::new(RawLine::new(
-                    i as i64 + 1,
-                    count,
-                    line.clone(),
-                    TextElem::packed(line).spanned(line_span),
-                ))
-                .spanned(line_span)
-            }));
+            seq.extend(non_highlighted_result(lines));
         };
 
         seq
@@ -423,7 +445,7 @@ impl Show for Packed<RawElem> {
         let mut seq = EcoVec::with_capacity((2 * lines.len()).saturating_sub(1));
         for (i, line) in lines.iter().enumerate() {
             if i != 0 {
-                seq.push(LinebreakElem::new().pack());
+                seq.push(LinebreakElem::shared().clone());
             }
 
             seq.push(line.clone().pack());
@@ -433,8 +455,10 @@ impl Show for Packed<RawElem> {
         if self.block(styles) {
             // Align the text before inserting it into the block.
             realized = realized.aligned(self.align(styles).into());
-            realized =
-                BlockElem::new().with_body(Some(realized)).pack().spanned(self.span());
+            realized = BlockElem::new()
+                .with_body(Some(BlockBody::Content(realized)))
+                .pack()
+                .spanned(self.span());
         }
 
         Ok(realized)
@@ -449,7 +473,6 @@ impl ShowSet for Packed<RawElem> {
         out.set(TextElem::set_hyphenate(Hyphenate(Smart::Custom(false))));
         out.set(TextElem::set_size(TextSize(Em::new(0.8).into())));
         out.set(TextElem::set_font(FontList(vec![FontFamily::new("DejaVu Sans Mono")])));
-        out.set(SmartQuoteElem::set_enabled(false));
         if self.block(styles) {
             out.set(ParElem::set_shrink(false));
         }
@@ -458,39 +481,7 @@ impl ShowSet for Packed<RawElem> {
 }
 
 impl LocalName for Packed<RawElem> {
-    fn local_name(lang: Lang, region: Option<Region>) -> &'static str {
-        match lang {
-            Lang::ALBANIAN => "List",
-            Lang::ARABIC => "قائمة",
-            Lang::BOKMÅL => "Utskrift",
-            Lang::CATALAN => "Llistat",
-            Lang::CHINESE if option_eq(region, "TW") => "程式",
-            Lang::CHINESE => "代码",
-            Lang::CZECH => "Seznam",
-            Lang::DANISH => "Liste",
-            Lang::DUTCH => "Listing",
-            Lang::ESTONIAN => "List",
-            Lang::FILIPINO => "Listahan",
-            Lang::FINNISH => "Listaus",
-            Lang::FRENCH => "Liste",
-            Lang::GERMAN => "Listing",
-            Lang::GREEK => "Παράθεση",
-            Lang::ITALIAN => "Codice",
-            Lang::NYNORSK => "Utskrift",
-            Lang::POLISH => "Program",
-            Lang::ROMANIAN => "Listă", // TODO: I dunno
-            Lang::RUSSIAN => "Листинг",
-            Lang::SERBIAN => "Програм",
-            Lang::SLOVENIAN => "Program",
-            Lang::SPANISH => "Listado",
-            Lang::SWEDISH => "Listing",
-            Lang::TURKISH => "Liste",
-            Lang::UKRAINIAN => "Лістинг",
-            Lang::VIETNAMESE => "Chương trình", // TODO: This may be wrong.
-            Lang::JAPANESE => "リスト",
-            Lang::ENGLISH | _ => "Listing",
-        }
-    }
+    const KEY: &'static str = "raw";
 }
 
 impl Figurable for Packed<RawElem> {}
@@ -747,7 +738,7 @@ cast! {
     SyntaxPaths,
     self => self.0.into_value(),
     v: EcoString => Self(vec![v]),
-    v: Array => Self(v.into_iter().map(Value::cast).collect::<StrResult<_>>()?),
+    v: Array => Self(v.into_iter().map(Value::cast).collect::<HintedStrResult<_>>()?),
 }
 
 impl Fold for SyntaxPaths {
@@ -816,10 +807,21 @@ fn load_theme(path: &str, bytes: &Bytes) -> StrResult<Arc<synt::Theme>> {
 fn parse_theme(
     engine: &mut Engine,
     args: &mut Args,
-) -> SourceResult<(Option<EcoString>, Option<Bytes>)> {
-    let Some(Spanned { v: path, span }) = args.named::<Spanned<EcoString>>("theme")?
+) -> SourceResult<(Option<ThemeArgType>, Option<Bytes>)> {
+    let Some(Spanned { v: path, span }) = args.named::<Spanned<ThemeArgType>>("theme")?
     else {
+        // Argument `theme` not found.
         return Ok((None, None));
+    };
+
+    let Smart::Custom(path) = path else {
+        // Argument `theme` is `auto`.
+        return Ok((Some(Smart::Auto), None));
+    };
+
+    let Some(path) = path else {
+        // Argument `theme` is `none`.
+        return Ok((Some(Smart::Custom(None)), None));
     };
 
     // Load theme file.
@@ -829,7 +831,7 @@ fn parse_theme(
     // Check that parsing works.
     let _ = load_theme(&path, &data).at(span)?;
 
-    Ok((Some(path), Some(data)))
+    Ok((Some(Smart::Custom(Some(path))), Some(data)))
 }
 
 /// The syntect syntax definitions.

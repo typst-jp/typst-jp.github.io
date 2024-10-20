@@ -4,8 +4,7 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::{fmt, fs, io, mem};
 
-use chrono::{DateTime, Datelike, Local};
-use comemo::Prehashed;
+use chrono::{DateTime, Datelike, FixedOffset, Local, Utc};
 use ecow::{eco_format, EcoString};
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
@@ -13,12 +12,16 @@ use typst::diag::{FileError, FileResult};
 use typst::foundations::{Bytes, Datetime, Dict, IntoValue};
 use typst::syntax::{FileId, Source, VirtualPath};
 use typst::text::{Font, FontBook};
+use typst::utils::LazyHash;
 use typst::{Library, World};
+use typst_kit::fonts::{FontSlot, Fonts};
+use typst_kit::package::PackageStorage;
 use typst_timing::{timed, TimingScope};
 
 use crate::args::{Input, SharedArgs};
 use crate::compile::ExportCache;
-use crate::fonts::{FontSearcher, FontSlot};
+use crate::download::PrintDownload;
+use crate::package;
 
 /// Static `FileId` allocated for stdin.
 /// This is to ensure that a file is read in the correct way.
@@ -34,16 +37,19 @@ pub struct SystemWorld {
     /// The input path.
     main: FileId,
     /// Typst's standard library.
-    library: Prehashed<Library>,
+    library: LazyHash<Library>,
     /// Metadata about discovered fonts.
-    book: Prehashed<FontBook>,
+    book: LazyHash<FontBook>,
     /// Locations of and storage for lazily loaded fonts.
     fonts: Vec<FontSlot>,
     /// Maps file ids to source files and buffers.
     slots: Mutex<HashMap<FileId, FileSlot>>,
+    /// Holds information about where packages are stored.
+    package_storage: PackageStorage,
     /// The current datetime if requested. This is stored here to ensure it is
-    /// always the same within one compilation. Reset between compilations.
-    now: OnceLock<DateTime<Local>>,
+    /// always the same within one compilation.
+    /// Reset between compilations if not [`Now::Fixed`].
+    now: Now,
     /// The export cache, used for caching output files in `typst watch`
     /// sessions.
     export_cache: ExportCache,
@@ -52,6 +58,15 @@ pub struct SystemWorld {
 impl SystemWorld {
     /// Create a new system world.
     pub fn new(command: &SharedArgs) -> Result<Self, WorldCreationError> {
+        // Set up the thread pool.
+        if let Some(jobs) = command.jobs {
+            rayon::ThreadPoolBuilder::new()
+                .num_threads(jobs)
+                .use_current_thread()
+                .build_global()
+                .ok();
+        }
+
         // Resolve the system-global input path.
         let input = match &command.input {
             Input::Stdin => None,
@@ -101,18 +116,25 @@ impl SystemWorld {
             Library::builder().with_inputs(inputs).build()
         };
 
-        let mut searcher = FontSearcher::new();
-        searcher.search(&command.font_paths);
+        let fonts = Fonts::searcher()
+            .include_system_fonts(!command.font_args.ignore_system_fonts)
+            .search_with(&command.font_args.font_paths);
+
+        let now = match command.creation_timestamp {
+            Some(time) => Now::Fixed(time),
+            None => Now::System(OnceLock::new()),
+        };
 
         Ok(Self {
             workdir: std::env::current_dir().ok(),
             root,
             main,
-            library: Prehashed::new(library),
-            book: Prehashed::new(searcher.book),
-            fonts: searcher.fonts,
+            library: LazyHash::new(library),
+            book: LazyHash::new(fonts.book),
+            fonts: fonts.fonts,
             slots: Mutex::new(HashMap::new()),
-            now: OnceLock::new(),
+            package_storage: package::storage(&command.package_storage_args),
+            now,
             export_cache: ExportCache::new(),
         })
     }
@@ -138,7 +160,9 @@ impl SystemWorld {
             .get_mut()
             .values()
             .filter(|slot| slot.accessed())
-            .filter_map(|slot| system_path(&self.root, slot.id).ok())
+            .filter_map(|slot| {
+                system_path(&self.root, slot.id, &self.package_storage).ok()
+            })
     }
 
     /// Reset the compilation state in preparation of a new compilation.
@@ -146,7 +170,9 @@ impl SystemWorld {
         for slot in self.slots.get_mut().values_mut() {
             slot.reset();
         }
-        self.now.take();
+        if let Now::System(time_lock) = &mut self.now {
+            time_lock.take();
+        }
     }
 
     /// Lookup a source file by id.
@@ -162,24 +188,24 @@ impl SystemWorld {
 }
 
 impl World for SystemWorld {
-    fn library(&self) -> &Prehashed<Library> {
+    fn library(&self) -> &LazyHash<Library> {
         &self.library
     }
 
-    fn book(&self) -> &Prehashed<FontBook> {
+    fn book(&self) -> &LazyHash<FontBook> {
         &self.book
     }
 
-    fn main(&self) -> Source {
-        self.source(self.main).unwrap()
+    fn main(&self) -> FileId {
+        self.main
     }
 
     fn source(&self, id: FileId) -> FileResult<Source> {
-        self.slot(id, |slot| slot.source(&self.root))
+        self.slot(id, |slot| slot.source(&self.root, &self.package_storage))
     }
 
     fn file(&self, id: FileId) -> FileResult<Bytes> {
-        self.slot(id, |slot| slot.file(&self.root))
+        self.slot(id, |slot| slot.file(&self.root, &self.package_storage))
     }
 
     fn font(&self, index: usize) -> Option<Font> {
@@ -187,17 +213,24 @@ impl World for SystemWorld {
     }
 
     fn today(&self, offset: Option<i64>) -> Option<Datetime> {
-        let now = self.now.get_or_init(chrono::Local::now);
+        let now = match &self.now {
+            Now::Fixed(time) => time,
+            Now::System(time) => time.get_or_init(Utc::now),
+        };
 
-        let naive = match offset {
-            None => now.naive_local(),
-            Some(o) => now.naive_utc() + chrono::Duration::try_hours(o)?,
+        // The time with the specified UTC offset, or within the local time zone.
+        let with_offset = match offset {
+            None => now.with_timezone(&Local).fixed_offset(),
+            Some(hours) => {
+                let seconds = i32::try_from(hours).ok()?.checked_mul(3600)?;
+                now.with_timezone(&FixedOffset::east_opt(seconds)?)
+            }
         };
 
         Datetime::from_ymd(
-            naive.year(),
-            naive.month().try_into().ok()?,
-            naive.day().try_into().ok()?,
+            with_offset.year(),
+            with_offset.month().try_into().ok()?,
+            with_offset.day().try_into().ok()?,
         )
     }
 }
@@ -244,9 +277,13 @@ impl FileSlot {
     }
 
     /// Retrieve the source for this file.
-    fn source(&mut self, project_root: &Path) -> FileResult<Source> {
+    fn source(
+        &mut self,
+        project_root: &Path,
+        package_storage: &PackageStorage,
+    ) -> FileResult<Source> {
         self.source.get_or_init(
-            || read(self.id, project_root),
+            || read(self.id, project_root, package_storage),
             |data, prev| {
                 let name = if prev.is_some() { "reparsing file" } else { "parsing file" };
                 let _scope = TimingScope::new(name, None);
@@ -262,9 +299,15 @@ impl FileSlot {
     }
 
     /// Retrieve the file's bytes.
-    fn file(&mut self, project_root: &Path) -> FileResult<Bytes> {
-        self.file
-            .get_or_init(|| read(self.id, project_root), |data, _| Ok(data.into()))
+    fn file(
+        &mut self,
+        project_root: &Path,
+        package_storage: &PackageStorage,
+    ) -> FileResult<Bytes> {
+        self.file.get_or_init(
+            || read(self.id, project_root, package_storage),
+            |data, _| Ok(data.into()),
+        )
     }
 }
 
@@ -310,7 +353,7 @@ impl<T: Clone> SlotCell<T> {
 
         // Read and hash the file.
         let result = timed!("loading file", load());
-        let fingerprint = timed!("hashing file", typst::util::hash128(&result));
+        let fingerprint = timed!("hashing file", typst::utils::hash128(&result));
 
         // If the file contents didn't change, yield the old processed data.
         if mem::replace(&mut self.fingerprint, fingerprint) == fingerprint {
@@ -329,13 +372,17 @@ impl<T: Clone> SlotCell<T> {
 
 /// Resolves the path of a file id on the system, downloading a package if
 /// necessary.
-fn system_path(project_root: &Path, id: FileId) -> FileResult<PathBuf> {
+fn system_path(
+    project_root: &Path,
+    id: FileId,
+    package_storage: &PackageStorage,
+) -> FileResult<PathBuf> {
     // Determine the root path relative to which the file path
     // will be resolved.
     let buf;
     let mut root = project_root;
     if let Some(spec) = id.package() {
-        buf = crate::package::prepare_package(spec)?;
+        buf = package_storage.prepare_package(spec, &mut PrintDownload(&spec))?;
         root = &buf;
     }
 
@@ -348,11 +395,15 @@ fn system_path(project_root: &Path, id: FileId) -> FileResult<PathBuf> {
 ///
 /// If the ID represents stdin it will read from standard input,
 /// otherwise it gets the file path of the ID and reads the file from disk.
-fn read(id: FileId, project_root: &Path) -> FileResult<Vec<u8>> {
+fn read(
+    id: FileId,
+    project_root: &Path,
+    package_storage: &PackageStorage,
+) -> FileResult<Vec<u8>> {
     if id == *STDIN_ID {
         read_from_stdin()
     } else {
-        read_from_disk(&system_path(project_root, id)?)
+        read_from_disk(&system_path(project_root, id, package_storage)?)
     }
 }
 
@@ -382,6 +433,15 @@ fn read_from_stdin() -> FileResult<Vec<u8>> {
 fn decode_utf8(buf: &[u8]) -> FileResult<&str> {
     // Remove UTF-8 BOM.
     Ok(std::str::from_utf8(buf.strip_prefix(b"\xef\xbb\xbf").unwrap_or(buf))?)
+}
+
+/// The current date and time.
+enum Now {
+    /// The date and time if the environment `SOURCE_DATE_EPOCH` is set.
+    /// Used for reproducible builds.
+    Fixed(DateTime<Utc>),
+    /// The current date and time if the time is not externally fixed.
+    System(OnceLock<DateTime<Utc>>),
 }
 
 /// An error that occurs during world construction.

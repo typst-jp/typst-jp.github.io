@@ -53,7 +53,7 @@ description: Typst's tutorial.
 )
 #set par(justify: true)
 #set text(
-  font: "Linux Libertine",
+  font: "Libertinus Serif",
   size: 11pt,
 )
 
@@ -61,7 +61,7 @@ description: Typst's tutorial.
 ```
 
 ここで行われていることの大半は、すでに分かりでしょう。
-テキストサイズを`{11pt}`に、フォントをLinux Libertineに設定しています。
+テキストサイズを`{11pt}`に、フォントをLibertinus Serifに設定しています。
 また、段落の両端揃えを有効にし、ページサイズをUSレターとしています。
 
 ここで、`header`は新しい引数で、各ページの上部の余白に置くコンテンツを設定できます。
@@ -80,7 +80,7 @@ description: Typst's tutorial.
 
 ```example
 >>> #set page(width: 300pt, margin: 30pt)
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 #align(center, text(17pt)[
   *A fluid dynamic model
   for glacier flow*
@@ -94,7 +94,7 @@ description: Typst's tutorial.
 
 ```example
 >>> #set page(width: 300pt, margin: 30pt)
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 >>>
 >>> #align(center, text(17pt)[
 >>>   *A fluid dynamic model
@@ -130,7 +130,7 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 学会は、アブストラクトを中央に配置することを望んでいることを忘れないでください。
 
 ```example:0,0,612,317.5
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 >>> #set par(justify: true)
 >>> #set page(
 >>>   "us-letter",
@@ -186,7 +186,7 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 
 <<< ...
 
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 >>> #set par(justify: true)
 #set page(
 >>>   "us-letter",
@@ -231,18 +231,37 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 `title`変数にコンテンツを設定した後は、関数内やマークアップ内（関数のように接頭辞に`#`をつける）で使用できます。
 こうすることで、別のタイトルに決めた場合、一箇所で簡単に変更することができます。
 
-## 段組みと見出し { #columns-and-headings }
+## Adding columns and headings { #columns-and-headings }
 上の論文は、残念ながら文字が単調にぎっしり詰まっていて読みにくい見た目をしています。
-これを修正するために、見出しを追加し、2段組のレイアウトに変更してみましょう。
-[`columns`]関数は数値と内容を受け取り、指定された列数に内容を段組みします。
-アブストラクト以降はすべて2段組みにしたいため、文書全体にcolumn関数を適用する必要があります。
+これを修正するために、見出しを追加し、2段組のレイアウトに変更してみましょう。 Fortunately, that's
+easy to do: We just need to amend our `page` set rule with the `columns`
+argument.
 
-文書全体を巨大な関数呼び出しで囲う代わりに、「以降すべて」に対してshowルールを使うことができます。
-このようなshowルールを書くには、showキーワードの直後にコロンを置き、それから関数を指定します。
-この関数は、文書の残りの部分をパラメータとして与えます。
-ここではパラメータを `rest` と宣言していますが、どのような名前を選んでもかまいません。
-この関数は、このコンテンツに対して様々な処理を適用できます。
-この例では、`columns`関数に渡します。
+
+By adding `{columns: 2}` to the argument list, we have wrapped the whole
+document in two columns. However, that would also affect the title and authors
+overview. To keep them spanning the whole page, we can wrap them in a function
+call to [`{place}`]($place). Place expects an alignment and the content it
+should place as positional arguments. Using the named `{scope}` argument, we can
+decide if the items should be placed relative to the current column or its
+parent (the page). There is one more thing to configure: If no other arguments
+are provided, `{place}` takes its content out of the flow of the document and
+positions it over the other content without affecting the layout of other
+content in its container:
+
+```example
+#place(
+  top + center,
+  rect(fill: black),
+)
+#lorem(30)
+```
+
+If we hadn't used `{place}` here, the square would be in its own line, but here
+it overlaps the few lines of text following it. Likewise, that text acts like as
+if there was no square. To change this behavior, we can pass the argument
+`{float: true}` to ensure that the space taken up by the placed item at the top
+or bottom of the page is not occupied by any other content.
 
 ```example:single
 >>> #let title = [
@@ -250,47 +269,52 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 >>>   for glacier flow
 >>> ]
 >>>
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 >>> #set par(justify: true)
->>> #set page(
->>>   "us-letter",
->>>   margin: auto,
->>>   header: align(
->>>     right + horizon,
->>>     title
->>>   ),
->>>   numbering: "1",
->>> )
 >>>
->>> #align(center, text(
->>>   17pt,
->>>   weight: "bold",
->>>   title,
->>> ))
->>>
->>> #grid(
->>>   columns: (1fr, 1fr),
->>>   align(center)[
->>>     Therese Tungsten \
->>>     Artos Institute \
->>>     #link("mailto:tung@artos.edu")
->>>   ],
->>>   align(center)[
->>>     Dr. John Doe \
->>>     Artos Institute \
->>>     #link("mailto:doe@artos.edu")
->>>   ]
->>> )
->>>
->>> #align(center)[
->>>   #set par(justify: false)
->>>   *Abstract* \
->>>   #lorem(80)
->>> ]
->>> #v(4mm)
-<<< ...
+#set page(
+>>> margin: auto,
+  paper: "us-letter",
+  header: align(
+    right + horizon,
+    title
+  ),
+  numbering: "1",
+  columns: 2,
+)
 
-#show: rest => columns(2, rest)
+#place(
+  top + center,
+  float: true,
+  scope: "parent",
+  clearance: 2em,
+)[
+>>>  #text(
+>>>    17pt,
+>>>    weight: "bold",
+>>>    title,
+>>>  )
+>>>
+>>>  #grid(
+>>>    columns: (1fr, 1fr),
+>>>    [
+>>>      Therese Tungsten \
+>>>      Artos Institute \
+>>>      #link("mailto:tung@artos.edu")
+>>>    ],
+>>>    [
+>>>      Dr. John Doe \
+>>>      Artos Institute \
+>>>      #link("mailto:doe@artos.edu")
+>>>    ]
+>>>  )
+<<<   ...
+
+  #par(justify: false)[
+    *Abstract* \
+    #lorem(80)
+  ]
+]
 
 = Introduction
 #lorem(300)
@@ -298,6 +322,11 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 = Related Work
 #lorem(200)
 ```
+
+In this example, we also used the `clearance` argument of the `{place}` function
+to provide the space between it and the body instead of using the [`{v}`]($v)
+function. We can also remove the explicit `{align(center, ..)}` calls around the
+various parts since they inherit the center alignment from the placement.
 
 最後に見出しのスタイルの設定をしましょう。
 ガイドラインに従うために、見出しは中央揃えにして、小さな大文字を使わなければなりません。
@@ -309,7 +338,7 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 >>>   for glacier flow
 >>> ]
 >>>
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 >>> #set par(justify: true)
 >>> #set page(
 >>>   "us-letter",
@@ -319,43 +348,47 @@ grid関数はセルを指定するcontent引数を任意の数で受け取れま
 >>>     title
 >>>   ),
 >>>   numbering: "1",
+>>>   columns: 2,
 >>> )
 #show heading: it => [
   #set align(center)
-  #set text(12pt, weight: "regular")
+  #set text(13pt, weight: "regular")
   #block(smallcaps(it.body))
 ]
 
 <<< ...
 >>>
->>> #align(center, text(
->>>   17pt,
->>>   weight: "bold",
->>>   title,
->>> ))
+>>> #place(
+>>>   top + center,
+>>>   float: true,
+>>>   scope: "parent",
+>>>   clearance: 2em,
+>>> )[
+>>>   #text(
+>>>     17pt,
+>>>     weight: "bold",
+>>>     title,
+>>>   )
 >>>
->>> #grid(
->>>   columns: (1fr, 1fr),
->>>   align(center)[
->>>     Therese Tungsten \
->>>     Artos Institute \
->>>     #link("mailto:tung@artos.edu")
->>>   ],
->>>   align(center)[
->>>     Dr. John Doe \
->>>     Artos Institute \
->>>     #link("mailto:doe@artos.edu")
+>>>   #grid(
+>>>     columns: (1fr, 1fr),
+>>>     [
+>>>       Therese Tungsten \
+>>>       Artos Institute \
+>>>       #link("mailto:tung@artos.edu")
+>>>     ],
+>>>     [
+>>>       Dr. John Doe \
+>>>       Artos Institute \
+>>>       #link("mailto:doe@artos.edu")
+>>>     ]
+>>>   )
+>>>
+>>>   #par(justify: false)[
+>>>     *Abstract* \
+>>>     #lorem(80)
 >>>   ]
->>> )
->>>
->>> #align(center)[
->>>   #set par(justify: false)
->>>   *Abstract* \
->>>   #lorem(80)
 >>> ]
->>>
->>> #v(4mm)
->>> #show: rest => columns(2, rest)
 >>>
 >>> = Introduction
 >>> #lorem(35)
@@ -382,7 +415,7 @@ MotivationとProblem Statementはサブセクションであり、イタリッ�
 >>>   for glacier flow
 >>> ]
 >>>
->>> #set text(font: "Linux Libertine", 11pt)
+>>> #set text(font: "Libertinus Serif", 11pt)
 >>> #set par(justify: true)
 >>> #set page(
 >>>   "us-letter",
@@ -392,13 +425,14 @@ MotivationとProblem Statementはサブセクションであり、イタリッ�
 >>>     title
 >>>   ),
 >>>   numbering: "1",
+>>>   columns: 2,
 >>> )
 >>>
 #show heading.where(
   level: 1
 ): it => block(width: 100%)[
   #set align(center)
-  #set text(12pt, weight: "regular")
+  #set text(13pt, weight: "regular")
   #smallcaps(it.body)
 ]
 
@@ -411,34 +445,37 @@ MotivationとProblem Statementはサブセクションであり、イタリッ�
   it.body + [.],
 )
 >>>
->>> #align(center, text(
->>>   17pt,
->>>   weight: "bold",
->>>   title,
->>> ))
+>>> #place(
+>>>   top + center,
+>>>   float: true,
+>>>   scope: "parent",
+>>>   clearance: 2em,
+>>> )[
+>>>   #text(
+>>>     17pt,
+>>>     weight: "bold",
+>>>     title,
+>>>   )
 >>>
->>> #grid(
->>>   columns: (1fr, 1fr),
->>>   align(center)[
->>>     Therese Tungsten \
->>>     Artos Institute \
->>>     #link("mailto:tung@artos.edu")
->>>   ],
->>>   align(center)[
->>>     Dr. John Doe \
->>>     Artos Institute \
->>>     #link("mailto:doe@artos.edu")
+>>>  #grid(
+>>>    columns: (1fr, 1fr),
+>>>    [
+>>>      Therese Tungsten \
+>>>      Artos Institute \
+>>>      #link("mailto:tung@artos.edu")
+>>>    ],
+>>>    [
+>>>      Dr. John Doe \
+>>>      Artos Institute \
+>>>      #link("mailto:doe@artos.edu")
+>>>    ]
+>>>  )
+>>>
+>>>   #par(justify: false)[
+>>>     *Abstract* \
+>>>     #lorem(80)
 >>>   ]
->>> )
->>>
->>> #align(center)[
->>>   #set par(justify: false)
->>>   *Abstract* \
->>>   #lorem(80)
 >>> ]
->>>
->>> #v(4mm)
->>> #show: rest => columns(2, rest)
 >>>
 >>> = Introduction
 >>> #lorem(35)

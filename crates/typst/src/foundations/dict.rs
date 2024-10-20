@@ -12,7 +12,7 @@ use crate::foundations::{
     array, cast, func, repr, scope, ty, Array, Module, Repr, Str, Value,
 };
 use crate::syntax::is_ident;
-use crate::util::ArcExt;
+use crate::utils::ArcExt;
 
 /// Create a new [`Dict`] from key-value pairs.
 #[macro_export]
@@ -261,7 +261,7 @@ pub struct ToDict(Dict);
 
 cast! {
     ToDict,
-    v: Module => Self(v.scope().iter().map(|(k, v)| (Str::from(k.clone()), v.clone())).collect()),
+    v: Module => Self(v.scope().iter().map(|(k, v, _)| (Str::from(k.clone()), v.clone())).collect()),
 }
 
 impl Debug for Dict {

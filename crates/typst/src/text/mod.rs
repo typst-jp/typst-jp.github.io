@@ -31,22 +31,26 @@ pub use self::space::*;
 use std::fmt::{self, Debug, Formatter};
 
 use ecow::{eco_format, EcoString};
-use rustybuzz::{Feature, Tag};
+use icu_properties::sets::CodePointSetData;
+use icu_provider::AsDeserializingBufferProvider;
+use icu_provider_blob::BlobDataProvider;
+use once_cell::sync::Lazy;
+use rustybuzz::Feature;
 use smallvec::SmallVec;
-use ttf_parser::Rect;
+use ttf_parser::Tag;
 
-use crate::diag::{bail, SourceResult, StrResult};
+use crate::diag::{bail, warning, HintedStrResult, SourceResult};
 use crate::engine::Engine;
-use crate::foundations::Packed;
 use crate::foundations::{
-    cast, category, elem, Args, Array, Cast, Category, Construct, Content, Dict, Fold,
-    NativeElement, Never, PlainText, Repr, Resolve, Scope, Set, Smart, StyleChain,
+    cast, category, dict, elem, Args, Array, Cast, Category, Construct, Content, Dict,
+    Fold, IntoValue, NativeElement, Never, NoneValue, Packed, PlainText, Repr, Resolve,
+    Scope, Set, Smart, StyleChain,
 };
-use crate::layout::Em;
-use crate::layout::{Abs, Axis, Dir, Length, Rel};
+use crate::layout::{Abs, Axis, Dir, Em, Length, Ratio, Rel};
 use crate::model::ParElem;
 use crate::syntax::Spanned;
 use crate::visualize::{Color, Paint, RelativeTo, Stroke};
+use crate::World;
 
 /// Text styling.
 ///
@@ -66,10 +70,10 @@ pub(super) fn define(global: &mut Scope) {
     global.define_elem::<OverlineElem>();
     global.define_elem::<StrikeElem>();
     global.define_elem::<HighlightElem>();
+    global.define_elem::<SmallcapsElem>();
     global.define_elem::<RawElem>();
     global.define_func::<lower>();
     global.define_func::<upper>();
-    global.define_func::<smallcaps>();
     global.define_func::<lorem>();
 }
 
@@ -105,13 +109,14 @@ pub struct TextElem {
     ///   automatically. The priority is: project fonts > server fonts.
     ///
     /// - Locally, Typst uses your installed system fonts or embedded fonts in
-    ///   the CLI, which are `Linux Libertine`, `New Computer Modern`,
+    ///   the CLI, which are `Libertinus Serif`, `New Computer Modern`,
     ///   `New Computer Modern Math`, and `DejaVu Sans Mono`. In addition, you
     ///   can use the `--font-path` argument or `TYPST_FONT_PATHS` environment
     ///   variable to add directories that should be scanned for fonts. The
     ///   priority is: `--font-paths` > system fonts > embedded fonts. Run
     ///   `typst fonts` to see the fonts that Typst has discovered on your
-    ///   system.
+    ///   system. Note that you can pass the `--ignore-system-fonts` parameter
+    ///   to the CLI to ensure Typst won't search for system fonts.
     ///
     /// ```example
     /// #set text(font: "PT Sans")
@@ -125,7 +130,14 @@ pub struct TextElem {
     /// This is Latin. \
     /// هذا عربي.
     /// ```
-    #[default(FontList(vec![FontFamily::new("Linux Libertine")]))]
+    #[parse({
+        let font_list: Option<Spanned<FontList>> = args.named("font")?;
+        if let Some(list) = &font_list {
+            check_font_list(engine, list);
+        }
+        font_list.map(|font_list| font_list.v)
+    })]
+    #[default(FontList(vec![FontFamily::new("Libertinus Serif")]))]
     #[borrowed]
     #[ghost]
     pub font: FontList,
@@ -165,7 +177,7 @@ pub struct TextElem {
     /// change your mind about how to signify the emphasis.
     ///
     /// ```example
-    /// #text(font: "Linux Libertine", style: "italic")[Italic]
+    /// #text(font: "Libertinus Serif", style: "italic")[Italic]
     /// #text(font: "DejaVu Sans", style: "oblique")[Oblique]
     /// ```
     #[ghost]
@@ -401,7 +413,7 @@ pub struct TextElem {
     ///
     /// ```example
     /// #set text(
-    ///   font: "Linux Libertine",
+    ///   font: "Libertinus Serif",
     ///   size: 20pt,
     /// )
     ///
@@ -433,9 +445,10 @@ pub struct TextElem {
     /// the other way around in `rtl` text.
     ///
     /// If you set this to `rtl` and experience bugs or in some way bad looking
-    /// output, please do get in touch with us through the
-    /// [contact form](https://typst.app/contact) or our
-    /// [Discord server]($community/#discord)!
+    /// output, please get in touch with us through the
+    /// [Forum](https://forum.typst.app/),
+    /// [Discord server](https://discord.gg/2uDybryKPe),
+    /// or our [contact form](https://typst.app/contact).
     ///
     /// ```example
     /// #set text(dir: rtl)
@@ -467,6 +480,48 @@ pub struct TextElem {
     #[resolve]
     #[ghost]
     pub hyphenate: Hyphenate,
+
+    /// The "cost" of various choices when laying out text. A higher cost means
+    /// the layout engine will make the choice less often. Costs are specified
+    /// as a ratio of the default cost, so `{50%}` will make text layout twice
+    /// as eager to make a given choice, while `{200%}` will make it half as
+    /// eager.
+    ///
+    /// Currently, the following costs can be customized:
+    /// - `hyphenation`: splitting a word across multiple lines
+    /// - `runt`: ending a paragraph with a line with a single word
+    /// - `widow`: leaving a single line of paragraph on the next page
+    /// - `orphan`: leaving single line of paragraph on the previous page
+    ///
+    /// Hyphenation is generally avoided by placing the whole word on the next
+    /// line, so a higher hyphenation cost can result in awkward justification
+    /// spacing.
+    ///
+    /// Runts are avoided by placing more or fewer words on previous lines, so a
+    /// higher runt cost can result in more awkward in justification spacing.
+    ///
+    /// Text layout prevents widows and orphans by default because they are
+    /// generally discouraged by style guides. However, in some contexts they
+    /// are allowed because the prevention method, which moves a line to the
+    /// next page, can result in an uneven number of lines between pages. The
+    /// `widow` and `orphan` costs allow disabling these modifications.
+    /// (Currently, `{0%}` allows widows/orphans; anything else, including the
+    /// default of `{100%}`, prevents them. More nuanced cost specification for
+    /// these modifications is planned for the future.)
+    ///
+    /// ```example
+    /// #set text(hyphenate: true, size: 11.4pt)
+    /// #set par(justify: true)
+    ///
+    /// #lorem(10)
+    ///
+    /// // Set hyphenation to ten times the normal cost.
+    /// #set text(costs: (hyphenation: 1000%))
+    ///
+    /// #lorem(10)
+    /// ```
+    #[fold]
+    pub costs: Costs,
 
     /// Whether to apply kerning.
     ///
@@ -508,13 +563,22 @@ pub struct TextElem {
     #[ghost]
     pub alternates: bool,
 
-    /// Which stylistic set to apply. Font designers can categorize alternative
+    /// Which stylistic sets to apply. Font designers can categorize alternative
     /// glyphs forms into stylistic sets. As this value is highly font-specific,
-    /// you need to consult your font to know which sets are available. When set
-    /// to an integer between `{1}` and `{20}`, enables the corresponding
-    /// OpenType font feature from `ss01`, ..., `ss20`.
+    /// you need to consult your font to know which sets are available.
+    ///
+    /// This can be set to an integer or an array of integers, all
+    /// of which must be between `{1}` and `{20}`, enabling the
+    /// corresponding OpenType feature(s) from `ss01` to `ss20`.
+    /// Setting this to `{none}` will disable all stylistic sets.
+    ///
+    /// ```example
+    /// #set text(font: "IBM Plex Serif")
+    /// ß vs #text(stylistic-set: 5)[ß] \
+    /// 10 years ago vs #text(stylistic-set: (1, 2, 3))[10 years ago]
+    /// ```
     #[ghost]
-    pub stylistic_set: Option<StylisticSet>,
+    pub stylistic_set: StylisticSets,
 
     /// Whether standard ligatures are active.
     ///
@@ -748,13 +812,13 @@ cast! {
         self.0.into_value()
     },
     family: FontFamily => Self(vec![family]),
-    values: Array => Self(values.into_iter().map(|v| v.cast()).collect::<StrResult<_>>()?),
+    values: Array => Self(values.into_iter().map(|v| v.cast()).collect::<HintedStrResult<_>>()?),
 }
 
 /// Resolve a prioritized iterator over the font families.
 pub(crate) fn families(styles: StyleChain) -> impl Iterator<Item = &str> + Clone {
     const FALLBACKS: &[&str] = &[
-        "linux libertine",
+        "libertinus serif",
         "twitter color emoji",
         "noto color emoji",
         "apple color emoji",
@@ -829,28 +893,6 @@ pub enum TopEdge {
     Length(Length),
 }
 
-impl TopEdge {
-    /// Determine if the edge is specified from bounding box info.
-    pub fn is_bounds(&self) -> bool {
-        matches!(self, Self::Metric(TopEdgeMetric::Bounds))
-    }
-
-    /// Resolve the value of the text edge given a font's metrics.
-    pub fn resolve(self, font_size: Abs, font: &Font, bbox: Option<Rect>) -> Abs {
-        match self {
-            TopEdge::Metric(metric) => {
-                if let Ok(metric) = metric.try_into() {
-                    font.metrics().vertical(metric).at(font_size)
-                } else {
-                    bbox.map(|bbox| (font.to_em(bbox.y_max)).at(font_size))
-                        .unwrap_or_default()
-                }
-            }
-            TopEdge::Length(length) => length.at(font_size),
-        }
-    }
-}
-
 cast! {
     TopEdge,
     self => match self {
@@ -897,28 +939,6 @@ pub enum BottomEdge {
     Metric(BottomEdgeMetric),
     /// An edge specified as a length.
     Length(Length),
-}
-
-impl BottomEdge {
-    /// Determine if the edge is specified from bounding box info.
-    pub fn is_bounds(&self) -> bool {
-        matches!(self, Self::Metric(BottomEdgeMetric::Bounds))
-    }
-
-    /// Resolve the value of the text edge given a font's metrics.
-    pub fn resolve(self, font_size: Abs, font: &Font, bbox: Option<Rect>) -> Abs {
-        match self {
-            BottomEdge::Metric(metric) => {
-                if let Ok(metric) = metric.try_into() {
-                    font.metrics().vertical(metric).at(font_size)
-                } else {
-                    bbox.map(|bbox| (font.to_em(bbox.y_min)).at(font_size))
-                        .unwrap_or_default()
-                }
-            }
-            BottomEdge::Length(length) => length.at(font_size),
-        }
-    }
 }
 
 cast! {
@@ -1001,28 +1021,44 @@ impl Resolve for Hyphenate {
     }
 }
 
-/// A stylistic set in a font.
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-pub struct StylisticSet(u8);
+/// A set of stylistic sets to enable.
+#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
+pub struct StylisticSets(u32);
 
-impl StylisticSet {
-    /// Create a new set, clamping to 1-20.
-    pub fn new(index: u8) -> Self {
-        Self(index.clamp(1, 20))
+impl StylisticSets {
+    /// Converts this set into a Typst array of values.
+    pub fn into_array(self) -> Array {
+        self.sets().map(IntoValue::into_value).collect()
     }
 
-    /// Get the value, guaranteed to be 1-20.
-    pub fn get(self) -> u8 {
-        self.0
+    /// Returns whether this set contains a particular stylistic set.
+    pub fn has(self, ss: u8) -> bool {
+        self.0 & (1 << (ss as u32)) != 0
+    }
+
+    /// Returns an iterator over all stylistic sets to enable.
+    pub fn sets(self) -> impl Iterator<Item = u8> {
+        (1..=20).filter(move |i| self.has(*i))
     }
 }
 
 cast! {
-    StylisticSet,
-    self => self.0.into_value(),
+    StylisticSets,
+    self => self.into_array().into_value(),
+    _: NoneValue => Self(0),
     v: i64 => match v {
-        1 ..= 20 => Self::new(v as u8),
+        1 ..= 20 => Self(1 << (v as u32)),
         _ => bail!("stylistic set must be between 1 and 20"),
+    },
+    v: Vec<i64> => {
+        let mut flags = 0;
+        for i in v {
+            match i {
+                1 ..= 20 => flags |= 1 << (i as u32),
+                _ => bail!("stylistic set must be between 1 and 20"),
+            }
+        }
+        Self(flags)
     },
 }
 
@@ -1067,7 +1103,7 @@ cast! {
             let tag = v.cast::<EcoString>()?;
             Ok((Tag::from_bytes_lossy(tag.as_bytes()), 1))
         })
-        .collect::<StrResult<_>>()?),
+        .collect::<HintedStrResult<_>>()?),
     values: Dict => Self(values
         .into_iter()
         .map(|(k, v)| {
@@ -1075,7 +1111,7 @@ cast! {
             let tag = Tag::from_bytes_lossy(k.as_bytes());
             Ok((tag, num))
         })
-        .collect::<StrResult<_>>()?),
+        .collect::<HintedStrResult<_>>()?),
 }
 
 impl Fold for FontFeatures {
@@ -1087,7 +1123,7 @@ impl Fold for FontFeatures {
 /// Collect the OpenType features to apply.
 pub(crate) fn features(styles: StyleChain) -> Vec<Feature> {
     let mut tags = vec![];
-    let mut feat = |tag, value| {
+    let mut feat = |tag: &[u8; 4], value: u32| {
         tags.push(Feature::new(Tag::from_bytes(tag), value, ..));
     };
 
@@ -1105,9 +1141,8 @@ pub(crate) fn features(styles: StyleChain) -> Vec<Feature> {
         feat(b"salt", 1);
     }
 
-    let storage;
-    if let Some(set) = TextElem::stylistic_set_in(styles) {
-        storage = [b's', b's', b'0' + set.get() / 10, b'0' + set.get() % 10];
+    for set in TextElem::stylistic_set_in(styles).sets() {
+        let storage = [b's', b's', b'0' + set / 10, b'0' + set % 10];
         feat(&storage, 1);
     }
 
@@ -1121,7 +1156,7 @@ pub(crate) fn features(styles: StyleChain) -> Vec<Feature> {
     }
 
     if TextElem::historical_ligatures_in(styles) {
-        feat(b"hilg", 1);
+        feat(b"hlig", 1);
     }
 
     match TextElem::number_type_in(styles) {
@@ -1168,5 +1203,116 @@ pub struct WeightDelta(pub i64);
 impl Fold for WeightDelta {
     fn fold(self, outer: Self) -> Self {
         Self(outer.0 + self.0)
+    }
+}
+
+/// Costs for various layout decisions.
+///
+/// Costs are updated (prioritizing the later value) when folded.
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
+#[non_exhaustive]
+pub struct Costs {
+    hyphenation: Option<Ratio>,
+    runt: Option<Ratio>,
+    widow: Option<Ratio>,
+    orphan: Option<Ratio>,
+}
+
+impl Costs {
+    #[must_use]
+    pub fn hyphenation(&self) -> Ratio {
+        self.hyphenation.unwrap_or(Ratio::one())
+    }
+
+    #[must_use]
+    pub fn runt(&self) -> Ratio {
+        self.runt.unwrap_or(Ratio::one())
+    }
+
+    #[must_use]
+    pub fn widow(&self) -> Ratio {
+        self.widow.unwrap_or(Ratio::one())
+    }
+
+    #[must_use]
+    pub fn orphan(&self) -> Ratio {
+        self.orphan.unwrap_or(Ratio::one())
+    }
+}
+
+impl Fold for Costs {
+    #[inline]
+    fn fold(self, outer: Self) -> Self {
+        Self {
+            hyphenation: self.hyphenation.or(outer.hyphenation),
+            runt: self.runt.or(outer.runt),
+            widow: self.widow.or(outer.widow),
+            orphan: self.orphan.or(outer.orphan),
+        }
+    }
+}
+
+cast! {
+    Costs,
+    self => dict![
+        "hyphenation" => self.hyphenation(),
+        "runt" => self.runt(),
+        "widow" => self.widow(),
+        "orphan" => self.orphan(),
+    ].into_value(),
+    mut v: Dict => {
+        let ret = Self {
+            hyphenation: v.take("hyphenation").ok().map(|v| v.cast()).transpose()?,
+            runt: v.take("runt").ok().map(|v| v.cast()).transpose()?,
+            widow: v.take("widow").ok().map(|v| v.cast()).transpose()?,
+            orphan: v.take("orphan").ok().map(|v| v.cast()).transpose()?,
+        };
+        v.finish(&["hyphenation", "runt", "widow", "orphan"])?;
+        ret
+    },
+}
+
+/// Whether a codepoint is Unicode `Default_Ignorable`.
+pub(crate) fn is_default_ignorable(c: char) -> bool {
+    /// The set of Unicode default ignorables.
+    static DEFAULT_IGNORABLE_DATA: Lazy<CodePointSetData> = Lazy::new(|| {
+        icu_properties::sets::load_default_ignorable_code_point(
+            &BlobDataProvider::try_new_from_static_blob(typst_assets::icu::ICU)
+                .unwrap()
+                .as_deserializing(),
+        )
+        .unwrap()
+    });
+    DEFAULT_IGNORABLE_DATA.as_borrowed().contains(c)
+}
+
+/// Checks for font families that are not available.
+fn check_font_list(engine: &mut Engine, list: &Spanned<FontList>) {
+    let book = engine.world.book();
+    for family in &list.v {
+        let found = book.contains_family(family.as_str());
+        if family.as_str() == "linux libertine" {
+            let mut warning = warning!(
+                list.span,
+                "Typst's default font has changed from Linux Libertine to its successor Libertinus Serif";
+                hint: "please set the font to `\"Libertinus Serif\"` instead"
+            );
+
+            if found {
+                warning.hint(
+                    "Linux Libertine is available on your system - \
+                     you can ignore this warning if you are sure you want to use it",
+                );
+                warning.hint("this warning will be removed in Typst 0.13");
+            }
+
+            engine.sink.warn(warning);
+        } else if !found {
+            engine.sink.warn(warning!(
+                list.span,
+                "unknown font family: {}",
+                family.as_str(),
+            ));
+        }
     }
 }

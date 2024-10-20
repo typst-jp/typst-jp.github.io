@@ -51,6 +51,11 @@ impl FontBook {
         self.infos.get(index)
     }
 
+    /// Returns true if the book contains a font family with the given name.
+    pub fn contains_family(&self, family: &str) -> bool {
+        self.families.contains_key(family)
+    }
+
     /// An ordered iterator over all font families this book knows and details
     /// about the fonts that are part of them.
     pub fn families(
@@ -285,6 +290,12 @@ impl FontInfo {
             flags,
             coverage: Coverage::from_vec(codepoints),
         })
+    }
+
+    /// Whether this is the macOS LastResort font. It can yield tofus with
+    /// glyph ID != 0.
+    pub fn is_last_resort(&self) -> bool {
+        self.family == "LastResort"
     }
 }
 
