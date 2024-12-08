@@ -1,0 +1,19 @@
+{
+  "name": "typst-jp.github.io",
+  "type": "module",
+  "scripts": {
+    "textlint-md": "textlint ./docs/",
+    "textlint-md:fix": "textlint --fix ./docs/",
+    "textlint-html": "textlint ./dist/docs/"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "textlint": "^14.3.0",
+    "textlint-filter-rule-comments": "^1.2.2",
+    "textlint-plugin-html": "^1.0.1",
+    "textlint-rule-preset-jtf-style": "^2.3.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
