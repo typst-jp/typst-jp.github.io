@@ -21,7 +21,7 @@ cannot always know what the best semantic HTML representation of your content
 is.
 
 Instead, it gives _you_ full control: You can check the current export format
-through the [`target`] function and when it is set to HTML, generate [raw HTML
+through the [`target`]($target) function and when it is set to HTML, generate [raw HTML
 elements]($html.elem). The primary intended use of these elements is in
 templates and show rules. This way, the document's contents can be fully
 agnostic to the export target and content can be shared between PDF and HTML

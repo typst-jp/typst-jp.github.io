@@ -7,4 +7,4 @@ for elements in the document to construct things like a list of figures or
 headers which show the current chapter title.
 
 Most of the functions are _contextual._ It is recommended to read the chapter on
-[context] before continuing here.
+[context]($context) before continuing here.
