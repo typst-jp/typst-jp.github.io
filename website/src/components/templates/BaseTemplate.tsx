@@ -1,5 +1,6 @@
 import type { FC, PropsWithChildren } from "hono/jsx";
 import type { Page } from "../../types/model";
+import { SiteNoticeBanner, Footer } from "../ui/common/";
 
 export type BaseTemplateProps = PropsWithChildren<{
   page: Page;
@@ -125,59 +126,15 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
         `,
           }}
         />
+        <link href="/src/styles.css" rel="stylesheet"></link>
+        <script
+          defer
+          src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"
+        ></script>
       </head>
 
       <body class="no-js docs has-outline">
-        <div class="alert">
-          <div class="alert-content">
-            <span>
-              ⚠ <b>注意</b> 当サイトは、
-              <a href="https://typst.app/docs/">
-                Typst v0.13.1 公式ドキュメント
-              </a>
-              を、日本語コミュニティが非公式に翻訳したものです。誤訳・未訳・古い情報が含まれている可能性があるため、
-              <a href="https://typst.app/docs/">公式ドキュメント</a>{" "}
-              との併用を推奨します。このサイトの内容に誤りを発見された方は、
-              <a href="https://github.com/typst-jp/typst-jp.github.io">
-                GitHubリポジトリまでご報告を頂けましたら幸いです
-              </a>
-              。我々のコミュニティにご興味のある方は、ぜひ
-              <a href="https://discord.gg/9xF7k4aAuH">
-                非公式Discordサーバー「くみはんクラブ」
-              </a>
-              にご参加ください。
-            </span>
-            <br />
-            <span>
-              ⚠ <b>Warning:</b> This site provides an unofficial translation of
-              the{" "}
-              <a href="https://typst.app/docs/">Typst v0.13.1 documentation</a>{" "}
-              by the Japanese Community. Please note that there may be some
-              inaccuracies, untranslated sections or outdated information. We
-              highly recommend referring to{" "}
-              <a href="https://typst.app/docs/">
-                the latest official documentation
-              </a>{" "}
-              as well. If you find any errors in the content,{" "}
-              <a href="https://github.com/typst-jp/typst-jp.github.io">
-                please let us know through our GitHub repository.
-              </a>{" "}
-              If you are interested in our community, feel free to join{" "}
-              <a href="https://discord.gg/9xF7k4aAuH">
-                our unofficial Discord server, "Kumihan Club."
-              </a>
-            </span>
-          </div>
-          <button id="closeAlertButton" class="close">
-            <img
-              alt="Close"
-              src="/assets/icons/16-close-dark.svg"
-              width="16"
-              height="16"
-            />
-          </button>
-        </div>
-
+        <SiteNoticeBanner />
         <header class="boring">
           <div>
             <a href="/docs" class="logo-box">
@@ -483,81 +440,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
           )}
         </div>
 
-        <footer>
-          <div>
-            <ul>
-              <li>
-                <a href="https://typst.app/">（公式）ホームページ</a>
-              </li>
-              <li>
-                <a href="https://typst.app/docs/">
-                  （公式）ドキュメント（英語）
-                </a>
-              </li>
-              <li>
-                <a href="https://typst.app/universe/">
-                  （公式）拡張パッケージ・テンプレートの宇宙
-                </a>
-              </li>
-              <li>
-                <a href="https://typst.app/about/">（公式）Typstについて</a>
-              </li>
-              <li>
-                <a href="https://typst.app/contact/">（公式）連絡先</a>
-              </li>
-              <li>
-                <a href="https://typst.app/privacy/">
-                  （公式）プライバシーポリシー
-                </a>
-              </li>
-              <li>
-                <a href="https://typst.app/terms/">（公式）サービス規約</a>
-              </li>
-              <li>
-                <a href="https://typst.app/legal/">（公式）免責事項</a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <ul>
-              <li>
-                <a href="https://typst.app/tools/">（公式）ツール</a>
-              </li>
-              <li>
-                <a href="https://typst.app/blog/">（公式）ブログ</a>
-              </li>
-              <li>
-                <a href="https://twitter.com/typstapp/">（公式）Twitter</a>
-              </li>
-              <li>
-                <a href="https://discord.gg/2uDybryKPe">（公式）Discord</a>
-              </li>
-              <li>
-                <a rel="me" href="https://mastodon.social/@typst">
-                  （公式）Mastodon
-                </a>
-              </li>
-              <li>
-                <a href="https://www.linkedin.com/company/typst/">
-                  （公式）LinkedIn
-                </a>
-              </li>
-              <li>
-                <a href="https://instagram.com/typstapp/">（公式）Instagram</a>
-              </li>
-              <li>
-                <a href="https://github.com/typst/">（公式）GitHub</a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p>Made in Berlin</p>
-            <p>
-              Translated by{" "}
-              <a href="https://github.com/typst-jp">Typst Japan Community</a>
-            </p>
-          </div>
-        </footer>
+        <Footer />
 
         <script src="/scripts/fuse.basic.min.js"></script>
         <script src="/scripts/docs.js?bust=20230913"></script>
