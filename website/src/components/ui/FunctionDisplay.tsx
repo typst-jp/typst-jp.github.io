@@ -1,48 +1,52 @@
-import { FC } from "hono/jsx";
+import type { FC } from "hono/jsx";
 import type { Func } from "../../types/model";
+import { ChevronRightIcon } from "../icons";
 import { FunctionDefinition } from "./FunctionDefinition";
 import { FunctionParameters } from "./FunctionParameters";
+import { HtmlContent } from "./HtmlContent";
 
 type FunctionDisplayProps = {
-  func: Func;
-  prefix?: string;
-  isExampleFolding?: boolean;
+	func: Func;
+	prefix?: string;
+	isExampleFolding?: boolean;
 };
 
 export const FunctionDisplay: FC<FunctionDisplayProps> = ({
-  func,
-  prefix = "",
-  isExampleFolding = true,
+	func,
+	prefix = "",
+	isExampleFolding = true,
 }) => {
-  return (
-    <>
-      <div dangerouslySetInnerHTML={{ __html: func.details }} />
+	return (
+		<>
+			<HtmlContent html={func.details} />
 
-      <FunctionDefinition func={func} prefix={prefix} />
+			<div class="my-4">
+				<FunctionDefinition func={func} prefix={prefix} />
+			</div>
 
-      {func.example && isExampleFolding && (
-        <details class="folding-example">
-          <summary>
-            <img
-              src="/assets/icons/16-arrow-right.svg"
-              alt=""
-              width="16"
-              height="16"
-            />
-            View example
-          </summary>
-          <div
-            class="folding"
-            dangerouslySetInnerHTML={{ __html: func.example }}
-          />
-        </details>
-      )}
+			{func.example && isExampleFolding && (
+				<details class="my-4 folding-example group">
+					<summary class="flex items-center gap-1 text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800">
+						<div class="w-4 h-4 text-gray-400 transform transition-transform duration-200 group-open:rotate-90">
+							<ChevronRightIcon />
+						</div>
+						例を表示
+					</summary>
+					<div class="mt-2 bg-white p-3 rounded-md border border-gray-200 text-sm">
+						<HtmlContent html={func.example} />
+					</div>
+				</details>
+			)}
 
-      {func.example && !isExampleFolding && (
-        <div dangerouslySetInnerHTML={{ __html: func.example }} />
-      )}
+			{func.example && !isExampleFolding && (
+				<div class="my-6 bg-gray-50 p-4 rounded-md border border-gray-200">
+					<HtmlContent html={func.example} />
+				</div>
+			)}
 
-      <FunctionParameters func={func} prefix={prefix} />
-    </>
-  );
+			<div class="my-4">
+				<FunctionParameters func={func} prefix={prefix} />
+			</div>
+		</>
+	);
 };
