@@ -10,71 +10,71 @@ use crate::introspection::{Count, CounterUpdate, Locatable};
 use crate::layout::{Em, HAlignment, Length, OuterHAlignment};
 use crate::model::Numbering;
 
-/// A logical subdivison of textual content.
+/// テキストコンテンツの論理的な区分。
 ///
-/// Typst automatically collects _inline-level_ elements into paragraphs.
-/// Inline-level elements include [text], [horizontal spacing]($h),
-/// [boxes]($box), and [inline equations]($math.equation).
+/// Typstは _インラインレベル_ の要素を自動的に段落にまとめます。
+/// インラインレベルの要素には、[テキスト]($text)、 [水平方向の空白]($h)、
+/// [ボックス]($box)、[インライン数式]($math.equation)が含まれます。
 ///
-/// To separate paragraphs, use a blank line (or an explicit [`parbreak`]).
-/// Paragraphs are also automatically interrupted by any block-level element
-/// (like [`block`], [`place`], or anything that shows itself as one of these).
+/// 段落を区切るには、空行（または明示的な[`parbreak`]）を使用します。
+/// 段落は、任意のブロックレベルの要素
+/// （[`block`]、[`place`]、またはこれらのいずれかとして表示されるもの）によっても自動的に中断されます。
 ///
-/// The `par` element is primarily used in set rules to affect paragraph
-/// properties, but it can also be used to explicitly display its argument as a
-/// paragraph of its own. Then, the paragraph's body may not contain any
-/// block-level content.
+/// `par`要素は主にsetルールにおいて段落のプロパティに影響を与えるために使用されますが、
+/// その引数を明示的に独立した段落として表示するためにも使用できます。
+/// その場合、
+/// その段落の本文にはブロックレベルのコンテンツを含めることはできません。
 ///
-/// # Boxes and blocks
-/// As explained above, usually paragraphs only contain inline-level content.
-/// However, you can integrate any kind of block-level content into a paragraph
-/// by wrapping it in a [`box`].
+/// # ボックスとブロック
+/// 上記の通り、通常、段落はインラインレベルのコンテンツのみを含みます。
+/// しかし、[`box`]でラップすることで、
+/// あらゆる種類のブロックレベルのコンテンツを段落に組み込むことができます。
 ///
-/// Conversely, you can separate inline-level content from a paragraph by
-/// wrapping it in a [`block`]. In this case, it will not become part of any
-/// paragraph at all. Read the following section for an explanation of why that
-/// matters and how it differs from just adding paragraph breaks around the
-/// content.
+/// 逆に、インラインレベルのコンテンツを[`block`]でラップすることにより、
+/// コンテンツを段落から分離できます。
+/// この場合、そのコンテンツはどの段落にも属さなくなります。
+/// なぜこれが重要なのか、また単にコンテンツの前後に段落区切りを追加することとどう異なるのかについては、
+/// 次のセクションをお読みください。
 ///
-/// # What becomes a paragraph?
-/// When you add inline-level content to your document, Typst will automatically
-/// wrap it in paragraphs. However, a typical document also contains some text
-/// that is not semantically part of a paragraph, for example in a heading or
-/// caption.
+/// # 何が段落になるのか？
+/// インラインレベルのコンテンツをドキュメントに追加すると、
+/// Typstは自動的にそれを段落でラップします。
+/// しかし、一般的なドキュメントには、見出しやキャプションなど、
+/// 意味的に段落の一部ではないテキストも含まれます。
 ///
-/// The rules for when Typst wraps inline-level content in a paragraph are as
-/// follows:
+/// Typstがインラインレベルのコンテンツを
+/// 段落でラップするルールは次の通りです。
 ///
-/// - All text at the root of a document is wrapped in paragraphs.
+/// - ドキュメントのルート（最上位）にある全てのテキストは段落でラップされます。
 ///
-/// - Text in a container (like a `block`) is only wrapped in a paragraph if the
-///   container holds any block-level content. If all of the contents are
-///   inline-level, no paragraph is created.
+/// - コンテナ（`block`など）内のテキストは、
+///   そのコンテナにブロックレベルのコンテンツが含まれている場合にのみ段落でラップされます。
+///   コンテンツが全てインラインレベルである場合は、段落は作成されません。
 ///
-/// In the laid-out document, it's not immediately visible whether text became
-/// part of a paragraph. However, it is still important for various reasons:
+/// 組版された文書では、テキストが段落の一部になったかどうかはすぐにはわかりません。
+/// しかし、いくつかの理由からこれは依然として重要です。
 ///
-/// - Certain paragraph styling like `first-line-indent` will only apply to
-///   proper paragraphs, not any text. Similarly, `par` show rules of course
-///   only trigger on paragraphs.
+/// - `first-line-indent`などの特定の段落スタイルは正式な段落に対してのみ適用され、
+/// 任意のテキストには適用されません。
+///    同様に、`par`に対するshowルールももちろん段落に対してのみ適用されます。
 ///
-/// - A proper distinction between paragraphs and other text helps people who
-///   rely on assistive technologies (such as screen readers) navigate and
-///   understand the document properly. Currently, this only applies to HTML
-///   export since Typst does not yet output accessible PDFs, but support for
-///   this is planned for the near future.
+/// - 段落とその他のテキストを適切に区別することは、
+/// スクリーンリーダーなどの支援技術を利用する人々が文書を正しく読み進め、理解するのに役立ちます。
+/// 現在はTypstがアクセシブルなPDFをまだ出力しないため、
+/// この仕組みはHTMLエクスポートにのみ適用されますが、
+/// 近い将来PDFへのサポートも計画されています。
 ///
-/// - HTML export will generate a `<p>` tag only for paragraphs.
+/// - HTMLエクスポートでは、段落に対してのみ`<p>`タグが生成されます。
 ///
-/// When creating custom reusable components, you can and should take charge
-/// over whether Typst creates paragraphs. By wrapping text in a [`block`]
-/// instead of just adding paragraph breaks around it, you can force the absence
-/// of a paragraph. Conversely, by adding a [`parbreak`] after some content in a
-/// container, you can force it to become a paragraph even if it's just one
-/// word. This is, for example, what [non-`tight`]($list.tight) lists do to
-/// force their items to become paragraphs.
+/// 独自の再利用可能なコンポーネントを作成する際には、
+/// Typstが段落を作成するかどうかを自分で制御できますし、制御すべきです。
+/// テキストを単に段落区切りで囲むのではなく、
+/// `block`で囲むことで段落を作成させないようにできます。
+/// 逆に、コンテナ内のコンテンツの後に`parbreak`を追加することで、
+/// たとえ1つの単語であっても段落にすることができます。
+/// これは、[非タイト]($list.tight)リストがその項目を強制的に段落にさせるために行う手法の例です。
 ///
-/// # Example
+/// # 例
 /// ```example
 /// #set par(
 ///   first-line-indent: 1em,
@@ -95,55 +95,55 @@ use crate::model::Numbering;
 /// ```
 #[elem(scope, title = "Paragraph")]
 pub struct ParElem {
-    /// The spacing between lines.
+    /// 行間。
     ///
-    /// Leading defines the spacing between the [bottom edge]($text.bottom-edge)
-    /// of one line and the [top edge]($text.top-edge) of the following line. By
-    /// default, these two properties are up to the font, but they can also be
-    /// configured manually with a text set rule.
+    /// leadingは、
+    /// ある行の[下端]($text.bottom-edge)と次の行の[上端]($text.top-edge)との間隔を定義します。
+    /// デフォルトでは、これら2つのプロパティはフォントによって決まりますが、
+    /// テキストのsetルールを使用して手動で設定することもできます。
     ///
-    /// By setting top edge, bottom edge, and leading, you can also configure a
-    /// consistent baseline-to-baseline distance. You could, for instance, set
-    /// the leading to `{1em}`, the top-edge to `{0.8em}`, and the bottom-edge
-    /// to `{-0.2em}` to get a baseline gap of exactly `{2em}`. The exact
-    /// distribution of the top- and bottom-edge values affects the bounds of
-    /// the first and last line.
+    /// top-edge、bottom-edge、およびleadingを設定することで、
+    /// ベースライン間の距離を一定に揃えることも可能です。
+    /// 例えば、leadingを `{1em}`、top-edgeを`{0.8em}`、
+    /// bottom-edgeを `{-0.2em}` に設定すると、
+    /// ちょうど`{2em}`のベースライン間隔になります。
+    /// top-edgeとbottom-edgeの値の正確な配分が最初の行と最後の行の境界に影響を与えます。
     #[resolve]
     #[default(Em::new(0.65).into())]
     pub leading: Length,
 
-    /// The spacing between paragraphs.
+    /// 段落間の間隔。
     ///
-    /// Just like leading, this defines the spacing between the bottom edge of a
-    /// paragraph's last line and the top edge of the next paragraph's first
-    /// line.
+    /// leadingと同様に、
+    /// このプロパティはある段落の最終行の下端と、
+    /// 次の段落の最初の行の上端との間隔を定義します。
     ///
-    /// When a paragraph is adjacent to a [`block`] that is not a paragraph,
-    /// that block's [`above`]($block.above) or [`below`]($block.below) property
-    /// takes precedence over the paragraph spacing. Headings, for instance,
-    /// reduce the spacing below them by default for a better look.
+    /// 段落が、段落ではない[`block`]に隣接している場合、
+    /// そのブロックの[`above`]($block.above)または[`below`]($block.below)プロパティが段落間の間隔よりも優先されます。
+    /// 例えば、
+    /// 見出しはより良い外観のためにデフォルトで下側の間隔を狭くしています。
     #[resolve]
     #[default(Em::new(1.2).into())]
     pub spacing: Length,
 
-    /// Whether to justify text in its line.
+    /// 行内でテキストを両端揃えするかどうか。
     ///
-    /// Hyphenation will be enabled for justified paragraphs if the
-    /// [text function's `hyphenate` property]($text.hyphenate) is set to
-    /// `{auto}` and the current language is known.
+    /// [text関数の`hyphenate`プロパティ]($text.hyphenate)が`{auto}`に設定され、
+    /// かつ現在の言語が認識されている場合、
+    /// 両端揃えが行われた段落ではハイフネーションが有効になります。
     ///
-    /// Note that the current [alignment]($align.alignment) still has an effect
-    /// on the placement of the last line except if it ends with a
-    /// [justified line break]($linebreak.justify).
+    /// 最後の行が[両端揃えされた改行]($linebreak.justify)で終わらない限り、
+    /// 現在の[alignment]($align.alignment)は依然として
+    /// 最終行の配置に影響を与えることに注意してください。
     #[default(false)]
     pub justify: bool,
 
-    /// How to determine line breaks.
+    /// 改行位置の決定方法
     ///
-    /// When this property is set to `{auto}`, its default value, optimized line
-    /// breaks will be used for justified paragraphs. Enabling optimized line
-    /// breaks for ragged paragraphs may also be worthwhile to improve the
-    /// appearance of the text.
+    /// このプロパティがデフォルトの`{auto}`に設定されている場合、
+    /// 両端揃えされた段落に対して最適化された改行が行われます。
+    /// また、段落が不揃いであっても最適化された改行を有効にすることで、
+    /// テキストの見栄えが向上することがあります。
     ///
     /// ```example
     /// #set page(width: 207pt)
@@ -161,24 +161,24 @@ pub struct ParElem {
     /// ```
     pub linebreaks: Smart<Linebreaks>,
 
-    /// The indent the first line of a paragraph should have.
+    /// 段落の最初の行のインデント。
     ///
-    /// By default, only the first line of a consecutive paragraph will be
-    /// indented (not the first one in the document or container, and not
-    /// paragraphs immediately following other block-level elements).
+    /// デフォルトでは、
+    /// 連続する段落のうち最初の行のみがインデントされます
+    /// （文書やコンテナの先頭の段落、あるいは他のブロックレベル要素に続く段落はインデントされません）。
     ///
-    /// If you want to indent all paragraphs instead, you can pass a dictionary
-    /// containing the `amount` of indent as a length and the pair
-    /// `{all: true}`. When `all` is omitted from the dictionary, it defaults to
-    /// `{false}`.
+    /// 全ての段落をインデントしたい場合は、
+    /// インデントの`amount`（長さ）と`{all: true}`を含む辞書を渡してください。
+    /// `all`が辞書から省略された場合、
+    /// デフォルトでは`{false}`になります。
     ///
-    /// By typographic convention, paragraph breaks are indicated either by some
-    /// space between paragraphs or by indented first lines. Consider
-    /// - reducing the [paragraph `spacing`]($par.spacing) to the
-    ///   [`leading`]($par.leading) using `{set par(spacing: 0.65em)}`
-    /// - increasing the [block `spacing`]($block.spacing) (which inherits the
-    ///   paragraph spacing by default) to the original paragraph spacing using
-    ///   `{set block(spacing: 1.2em)}`
+    /// タイポグラフィの慣例として、段落の区切りは段落間の空白か最初の行のインデントのどちらかで示されます。
+    /// 次の設定を検討してみてください。
+    /// - [段落の`spacing`]($par.spacing)を
+    ///   `{set par(spacing: 0.65em)}`を使用して[`leading`]($par.leading)と同じ長さまで減らす
+    /// - [ブロックの`spacing`]($block.spacing)
+    ///   （デフォルトでは段落の間隔を継承します）を`{set block(spacing: 1.2em)}`を使用して
+    ///   元の段落間隔と同じ長さまで増やす
     ///
     /// ```example
     /// #set block(spacing: 1.2em)
@@ -206,7 +206,7 @@ pub struct ParElem {
     /// ```
     pub first_line_indent: FirstLineIndent,
 
-    /// The indent that all but the first line of a paragraph should have.
+    /// 段落の最初の行以外全ての行のインデント。
     ///
     /// ```example
     /// #set par(hanging-indent: 1em)
@@ -216,7 +216,7 @@ pub struct ParElem {
     #[resolve]
     pub hanging_indent: Length,
 
-    /// The contents of the paragraph.
+    /// 段落の内容。
     #[required]
     pub body: Content,
 }
@@ -230,12 +230,12 @@ impl ParElem {
 /// How to determine line breaks in a paragraph.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Cast)]
 pub enum Linebreaks {
-    /// Determine the line breaks in a simple first-fit style.
+    /// シンプルなファーストフィット方式で改行位置を決定します。
     Simple,
-    /// Optimize the line breaks for the whole paragraph.
+    /// 段落全体の改行位置を最適化します。
     ///
-    /// Typst will try to produce more evenly filled lines of text by
-    /// considering the whole paragraph when calculating line breaks.
+    /// Typstは改行を計算する際に段落全体を考慮し、
+    /// より均等に埋まった行を生成しようとします。
     Optimized,
 }
 
@@ -269,13 +269,13 @@ impl From<FirstLineIndent> for Dict {
     }
 }
 
-/// A paragraph break.
+/// 段落区切り。
 ///
-/// This starts a new paragraph. Especially useful when used within code like
-/// [for loops]($scripting/#loops). Multiple consecutive
-/// paragraph breaks collapse into a single one.
+/// 新しい段落を開始します。
+/// 特に[forループ]($scripting/#loops)などのコード内で使用する場合に便利です。
+/// 複数の連続した段落区切りは、単一の段落区切りにまとめられます。
 ///
-/// # Example
+/// # 例
 /// ```example
 /// #for i in range(3) {
 ///   [Blind text #i: ]
@@ -284,9 +284,9 @@ impl From<FirstLineIndent> for Dict {
 /// }
 /// ```
 ///
-/// # Syntax
-/// Instead of calling this function, you can insert a blank line into your
-/// markup to create a paragraph break.
+/// # 構文
+/// この関数を呼び出す代わりに、
+/// マークアップ内に空行を挿入することで段落区切りを作成できます。
 #[elem(title = "Paragraph Break", Unlabellable)]
 pub struct ParbreakElem {}
 
@@ -299,13 +299,13 @@ impl ParbreakElem {
 
 impl Unlabellable for Packed<ParbreakElem> {}
 
-/// A paragraph line.
+/// 段落の行。
 ///
-/// This element is exclusively used for line number configuration through set
-/// rules and cannot be placed.
+/// この要素はsetルールを用いた行番号の設定にのみ使用され、
+/// 直接配置することはできません。
 ///
-/// The [`numbering`]($par.line.numbering) option is used to enable line
-/// numbers by specifying a numbering format.
+/// [`numbering`]($par.line.numbering)オプションは、
+/// 番号付け形式を指定して行番号を有効化するために使用されます。
 ///
 /// ```example
 /// >>> #set page(margin: (left: 3em))
@@ -316,10 +316,10 @@ impl Unlabellable for Packed<ParbreakElem> {}
 /// Typst is there for you.
 /// ```
 ///
-/// The `numbering` option takes either a predefined
-/// [numbering pattern]($numbering) or a function returning styled content. You
-/// can disable line numbers for text inside certain elements by setting the
-/// numbering to `{none}` using show-set rules.
+/// `numbering`オプションには、予め定義された[番号付けパターン]($numbering)か、
+/// スタイル付きコンテンツを返す関数のいずれかを指定します。
+/// set-showルールを用いてnumberingを`{none}`に設定することで、
+/// 特定要素内のテキストの行番号を無効にすることができます。
 ///
 /// ```example
 /// >>> #set page(margin: (left: 3em))
@@ -347,15 +347,15 @@ impl Unlabellable for Packed<ParbreakElem> {}
 /// originating from distant times.
 /// ```
 ///
-/// This element exposes further options which may be used to control other
-/// aspects of line numbering, such as its [alignment]($par.line.number-align)
-/// or [margin]($par.line.number-margin). In addition, you can control whether
-/// the numbering is reset on each page through the
-/// [`numbering-scope`]($par.line.numbering-scope) option.
+/// この要素は、行番号の[alignment]($par.line.number-align)[margin]($par.line.number-margin)など、
+/// 行の番号付けの様々な設定を制御できる追加オプションを提供します。
+/// さらに、
+/// [`numbering-scope`]($par.line.numbering-scope)オプションを使用すると、
+/// ページごとに番号をリセットするかどうかの制御が可能です。
 #[elem(name = "line", title = "Paragraph Line", keywords = ["line numbering"], Construct, Locatable)]
 pub struct ParLine {
-    /// How to number each line. Accepts a
-    /// [numbering pattern or function]($numbering).
+    /// 各行を番号付けする方法。
+    /// [番号付けパターンまたは関数]($numbering)を指定できます。
     ///
     /// ```example
     /// >>> #set page(margin: (left: 3em))
@@ -368,11 +368,11 @@ pub struct ParLine {
     #[ghost]
     pub numbering: Option<Numbering>,
 
-    /// The alignment of line numbers associated with each line.
+    /// 各行に付随する行番号の配置。
     ///
-    /// The default of `{auto}` indicates a smart default where numbers grow
-    /// horizontally away from the text, considering the margin they're in and
-    /// the current text direction.
+    /// デフォルトの`{auto}`は、
+    /// 行番号が余白や現在のテキストの方向を考慮しつつ、
+    /// テキストから離れる方向へ水平に伸びるスマートな設定を示します。
     ///
     /// ```example
     /// >>> #set page(margin: (left: 3em))
@@ -388,13 +388,13 @@ pub struct ParLine {
     #[ghost]
     pub number_align: Smart<HAlignment>,
 
-    /// The margin at which line numbers appear.
+    /// 行番号を表示する位置の余白。
     ///
-    /// _Note:_ In a multi-column document, the line numbers for paragraphs
-    /// inside the last column will always appear on the `{end}` margin (right
-    /// margin for left-to-right text and left margin for right-to-left),
-    /// regardless of this configuration. That behavior cannot be changed at
-    /// this moment.
+    /// _注意_: 複数段組みの文書では、
+    /// この設定に関わらず最後の段の段落につく行番号が常に`{end}`の余白（左から右のテキストでは右の余白、
+    /// 右から左のテキストでは左の余白）に表示されます。
+    /// 現時点では、
+    /// この挙動を変更することはできません。
     ///
     /// ```example
     /// >>> #set page(margin: (right: 3em))
@@ -411,10 +411,10 @@ pub struct ParLine {
     #[default(OuterHAlignment::Start)]
     pub number_margin: OuterHAlignment,
 
-    /// The distance between line numbers and text.
+    /// 行番号とテキストの間隔。
     ///
-    /// The default value of `{auto}` results in a clearance that is adaptive to
-    /// the page width and yields reasonable results in most cases.
+    /// デフォルトの値である `{auto}` では、ページ幅に応じて間隔が自動調整され、
+    /// ほとんどの場合において適切な間隔が得られます。
     ///
     /// ```example
     /// >>> #set page(margin: (left: 3em))
@@ -431,12 +431,12 @@ pub struct ParLine {
     #[default]
     pub number_clearance: Smart<Length>,
 
-    /// Controls when to reset line numbering.
+    /// 行番号をリセットするタイミングを制御する。
     ///
-    /// _Note:_ The line numbering scope must be uniform across each page run (a
-    /// page run is a sequence of pages without an explicit pagebreak in
-    /// between). For this reason, set rules for it should be defined before any
-    /// page content, typically at the very start of the document.
+    /// _注意:_ 行番号のスコープは、
+    /// ページラン（改ページが明示的に挿入されていない連続したページ）内で統一されている必要があります。
+    /// そのため、setルールによる設定は、
+    /// ページコンテンツの前、通常は文書の最初などで定義することが望ましいです。
     ///
     /// ```example
     /// >>> #set page(margin: (left: 3em))
@@ -469,11 +469,11 @@ impl Construct for ParLine {
 /// supported.
 #[derive(Debug, Cast, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LineNumberingScope {
-    /// Indicates that the line number counter spans the whole document, i.e.,
-    /// it's never automatically reset.
+    /// 行番号カウンターが文書全体にまたがり、
+    /// 決して自動的にリセットされないことを示します。
     Document,
-    /// Indicates that the line number counter should be reset at the start of
-    /// every new page.
+    /// 行番号カウンターが各新規ページの
+    /// 先頭でリセットされることを示します。
     Page,
 }
 
