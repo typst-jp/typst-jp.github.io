@@ -19,27 +19,21 @@ use crate::layout::{
 use crate::model::{TableCell, TableFooter, TableHLine, TableHeader, TableVLine};
 use crate::visualize::{Paint, Stroke};
 
-/// Arranges content in a grid.
+/// グリッド状にコンテンツを配置。
 ///
-/// The grid element allows you to arrange content in a grid. You can define the
-/// number of rows and columns, as well as the size of the gutters between them.
-/// There are multiple sizing modes for columns and rows that can be used to
-/// create complex layouts.
+/// グリッド要素を用いるとコンテンツをグリッド状に配置することができます。
+/// 行と列の数に加えて、それらの間隔を定義することができます。
+/// 複雑なレイアウトが作成できるような、列と行の大きさに関するモードが複数あります。
 ///
-/// While the grid and table elements work very similarly, they are intended for
-/// different use cases and carry different semantics. The grid element is
-/// intended for presentational and layout purposes, while the
-/// [`{table}`]($table) element is intended for, in broad terms, presenting
-/// multiple related data points. In the future, Typst will annotate its output
-/// such that screenreaders will announce content in `table` as tabular while a
-/// grid's content will be announced no different than multiple content blocks
-/// in the document flow. Set and show rules on one of these elements do not
-/// affect the other.
+/// グリッド要素とテーブル要素はとてもよく似た挙動をする一方で、これらは異なるユースケースが想定されており、異なる意味論が提供されています。
+/// The grid element is intended for presentational and layout purposes, while the [`{table}`]($table) element is intended for, in broad terms, presenting multiple related data points.
+/// In the future, Typst will annotate its output such that screenreaders will announce content in `table` as tabular while a grid's content will be announced no different than multiple content blocks in the document flow.
+/// Set and show rules on one of these elements do not affect the other.
 ///
 /// A grid's sizing is determined by the track sizes specified in the arguments.
-/// Because each of the sizing parameters accepts the same values, we will
-/// explain them just once, here. Each sizing argument accepts an array of
-/// individual track sizes. A track size is either:
+/// Because each of the sizing parameters accepts the same values, we will explain them just once, here.
+/// Each sizing argument accepts an array of individual track sizes.
+/// A track size is either:
 ///
 /// - `{auto}`: The track will be sized to fit its contents. It will be at most
 ///   as large as the remaining space. If there is more than one `{auto}` track
