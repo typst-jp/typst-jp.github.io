@@ -1,5 +1,6 @@
 import type { FC } from "hono/jsx";
 import { twMerge } from "tailwind-merge";
+import { t } from "../../../translations";
 import type { TranslationStatus } from "../../../utils/translationStatus";
 import { LanguageIcon } from "../../icons";
 
@@ -20,8 +21,8 @@ const getStatusConfig = (status: TranslationStatus): StatusConfig => {
 				borderColor: "border-green-200",
 				textColor: "text-green-800",
 				iconColor: "text-green-600",
-				label: "翻訳済み",
-				message: "このページは日本語に翻訳済みです。",
+				label: t("translated"),
+				message: t("translatedMessage"),
 			};
 		case "partially_translated":
 			return {
@@ -29,9 +30,8 @@ const getStatusConfig = (status: TranslationStatus): StatusConfig => {
 				borderColor: "border-yellow-200",
 				textColor: "text-yellow-800",
 				iconColor: "text-yellow-600",
-				label: "部分的に翻訳済み",
-				message:
-					"このページは部分的に翻訳されています。一部原文の内容が含まれています。",
+				label: t("partiallyTranslated"),
+				message: t("partiallyTranslatedMessage"),
 			};
 		case "untranslated":
 			return {
@@ -39,9 +39,8 @@ const getStatusConfig = (status: TranslationStatus): StatusConfig => {
 				borderColor: "border-red-200",
 				textColor: "text-red-800",
 				iconColor: "text-red-600",
-				label: "未翻訳",
-				message:
-					"このページはまだ翻訳されていません。原文の内容が表示されています。",
+				label: t("untranslated"),
+				message: t("untranslatedMessage"),
 			};
 		case "community":
 			return {
@@ -49,9 +48,8 @@ const getStatusConfig = (status: TranslationStatus): StatusConfig => {
 				borderColor: "border-cyan-200",
 				textColor: "text-cyan-800",
 				iconColor: "text-cyan-600",
-				label: "日本語版オリジナル",
-				message:
-					"このページの内容は公式ドキュメントには含まれておらず、日本語コミュニティが独自に追加したものです。",
+				label: t("originalVersion"),
+				message: t("contentAddedByCommunity"),
 			};
 	}
 };

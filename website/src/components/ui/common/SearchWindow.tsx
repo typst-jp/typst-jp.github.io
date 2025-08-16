@@ -1,4 +1,5 @@
 import type { FC } from "hono/jsx";
+import { t } from "../../../translations";
 import { CloseIcon } from "../../icons";
 
 export const SearchWindow: FC = () => {
@@ -7,12 +8,12 @@ export const SearchWindow: FC = () => {
 			<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
 			<script src="/pagefind/pagefind-ui.js" />
 			<div class="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
-				<h2 class="text-lg font-semibold">検索</h2>
+				<h2 class="text-lg font-semibold">{t("search")}</h2>
 				<button
 					type="button"
 					class="text-gray-400 hover:text-gray-600"
 					x-on:click="searchOpen = false"
-					aria-label="検索を閉じる"
+					aria-label={t("closeSearch")}
 				>
 					<div class="w-6 h-6 text-gray-600 hover:text-gray-800 transition-colors">
 						<CloseIcon />

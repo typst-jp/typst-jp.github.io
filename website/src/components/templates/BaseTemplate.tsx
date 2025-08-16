@@ -1,4 +1,5 @@
 import type { FC, PropsWithChildren } from "hono/jsx";
+import { t } from "../../translations";
 import type { Page } from "../../types/model";
 import { getTranslationStatus } from "../../utils/translationStatus";
 import {
@@ -42,10 +43,12 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 	const outline = page.outline;
 	const translationStatus = getTranslationStatus(route);
 	return (
-		<html lang="ja" class="scroll-pt-24">
+		<html lang={t("lang")} class="scroll-pt-24">
 			<head>
 				<meta charSet="utf-8" />
-				<title>{title} – Typstドキュメント日本語版</title>
+				<title>
+					{title} – {t("documentationTitle")}
+				</title>
 				<meta name="description" content={description} />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<meta name="theme-color" content="#239dad" />
@@ -55,7 +58,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 				/>
 				<meta
 					property="og:title"
-					content={`${title} – Typstドキュメント日本語版`}
+					content={`${title} – ${t("documentationTitle")}`}
 				/>
 				<meta property="og:site_name" content="Typst" />
 				<meta property="og:description" content={description} />
@@ -152,7 +155,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 									type="button"
 									class="text-gray-600"
 									x-on:click="sidebarOpen = false"
-									aria-label="メニューを閉じる"
+									aria-label={t("closeMenu")}
 								>
 									<div class="w-6 h-6 text-gray-600 hover:text-gray-800 transition-colors">
 										<CloseIcon />
@@ -192,7 +195,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 										<div class="w-4 h-4 mr-1 ">
 											<WorldIcon />
 										</div>
-										原文（英語）を開く
+										{t("originalArticle")}
 									</a>
 								</div>
 							)}
@@ -212,7 +215,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 										<WorldIcon />
 									</div>
 									<span class="text-sm font-medium text-gray-800 group-hover:text-gray-900 transition-colors">
-										原文（英語）を開く
+										{t("originalArticle")}
 									</span>
 									<div class="w-4 h-4 ml-2 text-gray-400 transition-colors">
 										<ChevronRightIcon />
@@ -231,12 +234,10 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 												<CaretRightCircleIcon />
 											</div>
 											<strong class="text-base font-semibold text-gray-800">
-												チュートリアル
+												{t("tutorial")}
 											</strong>
 										</div>
-										<p class="text-sm text-gray-600">
-											一歩一歩、Typstの使い方を学びましょう。
-										</p>
+										<p class="text-sm text-gray-600">{t("learnTypst")}</p>
 									</a>
 									<a
 										class="doc-category flex flex-col p-6 bg-white border border-gray-200 rounded-lg hover:border-gray-500 hover:bg-gray-50 transition-all duration-200"
@@ -247,12 +248,10 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 												<InfoCircleIcon />
 											</div>
 											<strong class="text-base font-semibold text-gray-800">
-												リファレンス
+												{t("referenceTo")}
 											</strong>
 										</div>
-										<p class="text-sm text-gray-600">
-											Typstのあらゆる構文、概念、型、関数についての詳細なリファレンスです。
-										</p>
+										<p class="text-sm text-gray-600">{t("reference")}</p>
 									</a>
 								</div>
 							) : (
@@ -268,7 +267,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 													<ChevronLeftIcon />
 												</div>
 												<strong class="text-base font-semibold text-gray-800">
-													前のページ
+													{t("previousPage")}
 												</strong>
 											</div>
 											<p class="text-sm text-gray-600">{previousPage.title}</p>
@@ -279,7 +278,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 										>
 											<div class="flex items-center mb-3 justify-between">
 												<strong class="text-base font-semibold text-gray-800">
-													次のページ
+													{t("nextPage")}
 												</strong>
 												<div class="w-6 h-6 text-gray-400">
 													<ChevronRightIcon />

@@ -5,6 +5,7 @@ import {
 	typstOfficialUrl,
 	version,
 } from "../../../metadata";
+import { t } from "../../../translations";
 import { calculateTranslationProgressRate } from "../../../utils/translationStatus";
 import {
 	DiscordIcon,
@@ -29,7 +30,9 @@ const TranslationCoverageBadge = () => {
 				<div class="w-4 h-4 text-gray-600">
 					<LanguageIcon />
 				</div>
-				<span class="text-xs text-gray-600 font-medium">翻訳率</span>
+				<span class="text-xs text-gray-600 font-medium">
+					{t("translationRate")}
+				</span>
 			</div>
 			<div class="flex items-center gap-1">
 				<div class="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -66,7 +69,7 @@ export const Header = () => {
 							<div class="w-4 h-4 text-gray-600">
 								<SearchIcon />
 							</div>
-							<span class="text-left flex-1">検索...</span>
+							<span class="text-left flex-1">{t("search")}...</span>
 						</button>
 					</div>
 
@@ -98,7 +101,7 @@ export const Header = () => {
 										href={typstOfficialUrl}
 										class="text-sm text-gray-600 hover:text-gray-800 transition-colors"
 									>
-										Typst公式サイト
+										{t("typstOfficialWebsite")}
 									</a>
 								</li>
 								<li class="secondary">
@@ -106,7 +109,7 @@ export const Header = () => {
 										href={typstOfficialDocsUrl}
 										class="text-sm text-gray-600 hover:text-gray-800 transition-colors"
 									>
-										Typst公式ドキュメント
+										{t("typstOfficialDoc")}
 									</a>
 								</li>
 							</ul>
@@ -131,7 +134,7 @@ export const Header = () => {
 							type="button"
 							class="p-2 text-gray-600 hover:text-gray-800 transition-colors"
 							x-on:click="searchOpen = true"
-							aria-label="検索を開く"
+							aria-label={t("openSearch")}
 						>
 							<div class="w-6 h-6 text-gray-600 hover:text-gray-800 transition-colors">
 								<SearchIcon />
@@ -141,7 +144,7 @@ export const Header = () => {
 							type="button"
 							class="p-1 bg-white rounded-md border border-gray-200"
 							x-on:click="sidebarOpen = !sidebarOpen"
-							aria-label="メニューを開く"
+							aria-label={t("openMenu")}
 						>
 							<div class="w-6 h-6 text-gray-600 hover:text-gray-800 transition-colors">
 								<MenuIcon />
