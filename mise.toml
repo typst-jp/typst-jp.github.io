@@ -1,0 +1,9 @@
+[tools]
+typstyle = "0.13.17"
+"ubi:Myriad-Dreamin/shiroa" = "0.3.0"
+
+[tasks]
+dev = "shiroa serve"
+build = "shiroa build"
+clean = "shiroa clean"
+format = { run = "typstyle --inplace .", alias = "fmt" }
