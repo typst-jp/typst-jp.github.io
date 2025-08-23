@@ -1,4 +1,5 @@
 import type { FC } from "hono/jsx";
+import { Translation } from "../../translations";
 import type { CategoryBody, Page } from "../../types/model";
 import { HtmlContent } from "../ui/HtmlContent";
 import BaseTemplate, { type BaseTemplateProps } from "./BaseTemplate";
@@ -26,7 +27,9 @@ export const CategoryTemplate: FC<CategoryTemplateProps> = ({
 		>
 			<h1 id="summary">{page.body.content.title}</h1>
 			<HtmlContent html={page.body.content.details} />
-			<h2 id="definitions">定義</h2>
+			<h2 id="definitions">
+				<Translation translationKey="definition" />
+			</h2>
 			<ul class="subgridded">
 				{page.body.content.items.map((item) => (
 					<li key={item.route}>

@@ -1,6 +1,7 @@
 import { html } from "hono/html";
 import type { FC, PropsWithChildren } from "hono/jsx";
 import { basePath, originUrl, typstOfficialDocsUrl } from "../../metadata";
+import { Translation, t } from "../../translations";
 import type { Page } from "../../types/model";
 import { joinPath, removeBasePath } from "../../utils/path";
 import { getTranslationStatus } from "../../utils/translationStatus";
@@ -54,17 +55,19 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 		removeBasePath(basePath, route),
 	);
 	return (
-		<html lang="ja" class="scroll-pt-24">
+		<html lang={t("lang")} class="scroll-pt-24">
 			<head>
 				<meta charSet="utf-8" />
-				<title>{title} – Typstドキュメント日本語版</title>
+				<title>
+					{title} – {t("documentationTitle")}
+				</title>
 				<meta name="description" content={description} />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<meta name="theme-color" content="#239dad" />
 				<meta property="og:url" content={absoluteRouteUrl} />
 				<meta
 					property="og:title"
-					content={`${title} – Typstドキュメント日本語版`}
+					content={`${title} – ${t("documentationTitle")}`}
 				/>
 				<meta property="og:site_name" content="Typst" />
 				<meta property="og:description" content={description} />
@@ -178,7 +181,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 									type="button"
 									class="text-gray-600"
 									x-on:click="sidebarOpen = false"
-									aria-label="メニューを閉じる"
+									aria-label={t("ariaCloseMenu")}
 								>
 									<div class="w-6 h-6 text-gray-600 hover:text-gray-800 transition-colors">
 										<CloseIcon />
@@ -218,7 +221,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 										<div class="w-4 h-4 mr-1 ">
 											<WorldIcon />
 										</div>
-										原文（英語）を開く
+										<Translation translationKey="originalArticle" />
 									</a>
 								</div>
 							)}
@@ -238,7 +241,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 										<WorldIcon />
 									</div>
 									<span class="text-sm font-medium text-gray-800 group-hover:text-gray-900 transition-colors">
-										原文（英語）を開く
+										<Translation translationKey="originalArticle" />
 									</span>
 									<div class="w-4 h-4 ml-2 text-gray-400 transition-colors">
 										<ChevronRightIcon />
@@ -257,11 +260,11 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 												<CaretRightCircleIcon />
 											</div>
 											<strong class="text-base font-semibold text-gray-800">
-												チュートリアル
+												<Translation translationKey="tutorial" />
 											</strong>
 										</div>
 										<p class="text-sm text-gray-600">
-											一歩一歩、Typstの使い方を学びましょう。
+											<Translation translationKey="learnTypst" />
 										</p>
 									</a>
 									<a
@@ -273,11 +276,11 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 												<InfoCircleIcon />
 											</div>
 											<strong class="text-base font-semibold text-gray-800">
-												リファレンス
+												<Translation translationKey="referenceTo" />
 											</strong>
 										</div>
 										<p class="text-sm text-gray-600">
-											Typstのあらゆる構文、概念、型、関数についての詳細なリファレンスです。
+											<Translation translationKey="reference" />
 										</p>
 									</a>
 								</div>
@@ -294,7 +297,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 													<ChevronLeftIcon />
 												</div>
 												<strong class="text-base font-semibold text-gray-800">
-													前のページ
+													<Translation translationKey="previousPage" />
 												</strong>
 											</div>
 											<p class="text-sm text-gray-600">{previousPage.title}</p>
@@ -305,7 +308,7 @@ export const BaseTemplate: FC<BaseTemplateProps> = ({
 										>
 											<div class="flex items-center mb-3 justify-between">
 												<strong class="text-base font-semibold text-gray-800">
-													次のページ
+													<Translation translationKey="nextPage" />
 												</strong>
 												<div class="w-6 h-6 text-gray-400">
 													<ChevronRightIcon />

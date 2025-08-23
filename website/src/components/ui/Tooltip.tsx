@@ -1,6 +1,6 @@
-import type { FC } from "hono/jsx";
+import type { FC, JSX, JSXNode } from "hono/jsx";
+import { Translation, TranslationProps, t } from "../../translations";
 import { CloseIcon, HelpCircleIcon } from "../icons";
-import { HtmlContent } from "./HtmlContent";
 
 type TooltipProps = {
 	kind:
@@ -17,65 +17,65 @@ type TooltipProps = {
 const tooltipContent: Record<
 	TooltipProps["kind"],
 	{
-		label: string;
-		desc: string;
+		label: JSXNode;
+		desc: JSXNode;
 		isShowLabel: boolean;
 		bgColor: string;
 		textColor: string;
 	}
 > = {
 	element: {
-		label: "要素関数",
-		desc: "要素関数は<code>set</code>ルールや<code>show</code>ルールでカスタマイズできます。",
+		label: <Translation translationKey="elementFunction" />,
+		desc: <Translation translationKey="elementFunctionDesc" />,
 		isShowLabel: true,
 		bgColor: "bg-blue-50",
 		textColor: "text-blue-700",
 	},
 	contextual: {
-		label: "コンテキスト関数",
-		desc: "コンテキスト関数は、コンテキストが既知の場合にのみ使用できます。",
+		label: <Translation translationKey="contextFunction" />,
+		desc: <Translation translationKey="contextFunctionDesc" />,
 		isShowLabel: true,
 		bgColor: "bg-indigo-50",
 		textColor: "text-indigo-700",
 	},
 	definitions: {
-		label: "定義",
-		desc: "これらの関数や型には、関連する定義を持たせることができます。定義にアクセスするには、対象の関数や型の名前を指定した後に、ピリオド区切りで定義名を記述します。",
+		label: <Translation translationKey="definitionTooltip" />,
+		desc: <Translation translationKey="definitionTooltipDesc" />,
 		isShowLabel: false,
 		bgColor: "bg-gray-100",
 		textColor: "text-gray-700",
 	},
 	parameters: {
-		label: "引数",
-		desc: "引数は関数への入力値です。関数名の後に括弧で囲んで指定します。",
+		label: <Translation translationKey="argument" />,
+		desc: <Translation translationKey="argumentDesc" />,
 		isShowLabel: false,
 		bgColor: "bg-gray-100",
 		textColor: "text-gray-700",
 	},
 	variadic: {
-		label: "可変長引数",
-		desc: "可変長引数は複数回指定することができます。",
+		label: <Translation translationKey="variadic" />,
+		desc: <Translation translationKey="variadicDesc" />,
 		isShowLabel: true,
 		bgColor: "bg-green-50",
 		textColor: "text-green-700",
 	},
 	settable: {
-		label: "設定可能引数",
-		desc: "設定可能引数は、<code>set</code>ルールを用いて設定でき、それ以降で使用するデフォルト値を変更できます。",
+		label: <Translation translationKey="settable" />,
+		desc: <Translation translationKey="settableDesc" />,
 		isShowLabel: true,
 		bgColor: "bg-amber-50",
 		textColor: "text-amber-700",
 	},
 	positional: {
-		label: "位置引数",
-		desc: "位置引数は順序通りに指定することで、引数名を省略して設定できます。",
+		label: <Translation translationKey="positional" />,
+		desc: <Translation translationKey="positionalDesc" />,
 		isShowLabel: true,
 		bgColor: "bg-purple-50",
 		textColor: "text-purple-700",
 	},
 	required: {
-		label: "必須引数",
-		desc: "必須引数は、関数を呼び出す際に必ず指定しなければなりません。",
+		label: <Translation translationKey="required" />,
+		desc: <Translation translationKey="requiredDesc" />,
 		isShowLabel: true,
 		bgColor: "bg-rose-50",
 		textColor: "text-rose-700",
@@ -101,7 +101,7 @@ export const Tooltip: FC<TooltipProps> = ({ kind }) => {
 			<button
 				type="button"
 				class="w-4 h-4 hover:bg-black/10 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-				aria-label={`${content.label}の詳細情報を表示`}
+				aria-label={`${content.label}${t("ariaShowInformation")}`}
 				tabindex={0}
 				{...{ "x-on:click": "helpOpen = true" }}
 				{...{ "x-on:keydown.enter": "helpOpen = true" }}
@@ -146,7 +146,7 @@ export const Tooltip: FC<TooltipProps> = ({ kind }) => {
 							{...{ "x-on:click": "helpOpen = false" }}
 							{...{ "x-on:keydown.enter": "helpOpen = false" }}
 							{...{ "x-on:keydown.space": "helpOpen = false" }}
-							aria-label="閉じる"
+							aria-label={t("ariaClose")}
 						>
 							<div class="w-6 h-6">
 								<CloseIcon />
@@ -154,9 +154,7 @@ export const Tooltip: FC<TooltipProps> = ({ kind }) => {
 						</button>
 					</div>
 					<div class="p-4">
-						<div class="text-sm font-normal text-gray-700">
-							<HtmlContent html={content.desc} />
-						</div>
+						<div class="text-sm font-normal text-gray-700">{content.desc}</div>
 					</div>
 				</div>
 			</div>
