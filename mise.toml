@@ -7,3 +7,6 @@ dev = "shiroa serve"
 build = "shiroa build"
 clean = "shiroa clean"
 format = { run = "typstyle --inplace .", alias = "fmt" }
+
+[env]
+TYPST_FONT_PATHS = "{{config_root}}/fonts"

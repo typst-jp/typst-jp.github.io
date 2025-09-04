@@ -33,6 +33,7 @@
 
 // Fonts
 #let main-font = (
+  "Noto Sans CJK JP",
   "Charter",
   "Source Han Serif SC",
   // "Source Han Serif TC",
@@ -40,6 +41,7 @@
   "Libertinus Serif",
 )
 #let code-font = (
+  "Noto Sans Mono CJK JP",
   "BlexMono Nerd Font Mono",
   // shiroa's embedded font
   "DejaVu Sans Mono",
