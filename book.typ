@@ -4,7 +4,11 @@
 #show: book
 
 #book-meta(
+  language: "ja",
   title: "Typst Japanese Community",
+  authors: ("Typst Japanese Community contributors",),
+  description: "Typst日本語コミュニティのランディングページ",
+  repository: "https://github.com/typst-jp/typst-jp.github.io",
   summary: [
     #prefix-chapter("index.typ")[Home]
   ],
