@@ -4,9 +4,9 @@
 #show: book
 
 #book-meta(
-  title: "shiroa",
+  title: "Typst Japanese Community",
   summary: [
-    #prefix-chapter("sample-page.typ")[Hello, typst]
+    #prefix-chapter("index.typ")[Home]
   ],
 )
 
